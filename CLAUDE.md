@@ -36,7 +36,7 @@ This file is the project brief for Claude Code. Read it fully before writing cod
 | Team size | Unknown (handout allows 1 to 4; bigger team, more output expected) | Fill in. |
 | Report and presentation deadlines | Unknown | Fill in; the milestone plan in section 8 is relative. |
 | Nsight Compute permissions on cuda2 | Untested | Run `scripts/check_profilers.sh` on cuda2. If it fails with `ERR_NVGPUCTRPERM`, email CIMS helpdesk immediately; the whole project depends on counters. |
-| Target GPU access | **Updated 2026-11-10.** The Slurm cluster reachable from `/scratch` (login node `b-9-198`) offers, all open to our account: T4 (`n1s8-t4-1`), V100 (`n1s4-v100-1` and others), A100 (`c12m85-a100-1`, `a100-4-std`), L4 (`g2-standard-12`), RTX PRO 6000 Blackwell (`g4-standard-48`, `gpu:rtx6000`; confirm with device_info). H200 and L40S (Torch spec sheet) are not in this cluster's partition list; H100 and B200 are external. | Run `calib.sbatch` on each partition, record `device_info.csv`. Decide whether H200/L40S are still needed or whether T4/V100/A100/L4/PRO 6000 suffice (section 5). |
+| Target GPU access | **Updated 2026-11-10.** The Slurm cluster reachable from `/scratch` (login node `b-9-198`) lists T4, V100, A100, L4 and RTX 6000-class (`g4-standard-48`) partitions, but a submit filter lets account `csci_ga_3033_025-2026fa` use only **`c12m85-a100-1` (1x A100) and `g2-standard-12` (1x L4)** (checked with `sbatch --test-only`). H200 and L40S (Torch spec sheet) are not on this cluster; H100, B200, PRO 6000 are external. | Calibrate A100 and L4. Ask the course staff / HPC whether the account can get T4, V100 or `g4-standard-48` (PRO 6000 is the key L2 GPU), and how to reach Torch's H200/L40S. |
 | VLA-Perf prior work | **Read 2026-11-10** (section 3.4). Pure spec-sheet roofline; explicitly does not model launch overhead; no L2 term; no graph prediction; validated only on RTX 4090. | Verify Table 1 and Section 4 numbers against the PDF before quoting them. |
 
 ---
@@ -125,11 +125,11 @@ transfer assumes a comparable host (or measure it).
 | GPU | Where | Arch / CC | SMs | L2 | DRAM BW | Memory | Notes |
 |---|---|---|---|---|---|---|---|
 | RTX 2080 Ti (x2) | CIMS `cuda2` (verified) | Turing, sm_75 | 68 | 5.5 MB | ~616 GB/s | 11 GB GDDR6 | Source GPU. FP16 tensor cores; **no BF16, no FP8; FlashAttention-2 unsupported (needs Ampere+)**. Full 7B VLAs do not fit in FP16. |
-| T4 | cluster `n1s8-t4-1` | Turing, sm_75 | 40 | 4 MB | ~320 GB/s | 16 GB | Same arch as source, different specs: cleanest flavor-B test. |
-| V100 | cluster `n1s4-v100-1` etc. | Volta, sm_70 | 80 | 6 MB | ~900 GB/s | 16/32 GB | |
-| A100 | cluster `c12m85-a100-1` | Ampere, sm_80 | 108 | 40 MB | ~1.6 to 2.0 TB/s | 40/80 GB | |
-| L4 | cluster `g2-standard-12` | Ada, sm_89 | 58 | 48 MB | ~300 GB/s | 24 GB | Huge L2 relative to bandwidth. |
-| RTX PRO 6000 | cluster `g4-standard-48` (to confirm) | Blackwell, sm_120 | TBD | 128 MB | ~1.8 TB/s | 96 GB | Key GPU for the L2 inversion. Runs our sm_89 PTX via JIT. |
+| T4 | cluster `n1s8-t4-1` (not allowed for our account) | Turing, sm_75 | 40 | 4 MB | ~320 GB/s | 16 GB | Same arch as source, different specs: cleanest flavor-B test. |
+| V100 | cluster `n1s4-v100-1` etc. (not allowed for our account) | Volta, sm_70 | 80 | 6 MB | ~900 GB/s | 16/32 GB | |
+| A100 | cluster `c12m85-a100-1` (allowed) | Ampere, sm_80 | 108 | 40 MB | ~1.6 to 2.0 TB/s | 40/80 GB | |
+| L4 | cluster `g2-standard-12` (allowed) | Ada, sm_89 | 58 | 48 MB | ~300 GB/s | 24 GB | Huge L2 relative to bandwidth. |
+| RTX PRO 6000 | cluster `g4-standard-48` (to confirm; not allowed for our account) | Blackwell, sm_120 | TBD | 128 MB | ~1.8 TB/s | 96 GB | Key GPU for the L2 inversion. Runs our sm_89 PTX via JIT. |
 | L40S | NYU Torch (68 GPUs) | Ada, sm_89 | 142 | 96 MB | ~864 GB/s | 48 GB | Not on this cluster. |
 | H200 | NYU Torch (29 GPUs) | Hopper, sm_90 | 132 | 50 MB | ~4.8 TB/s | 141 GB | Not on this cluster. |
 | H100 | External / unconfirmed | Hopper, sm_90 | 132 (SXM) | 50 MB | ~3.35 TB/s (SXM) | 80 GB | |
@@ -201,7 +201,7 @@ node), and the user runs the CIMS steps (cuda2 is not reachable from here).
 - 2026-09-30: Chose Project 2 flavor B with VLA focus (merged ideas: cross-GPU VLA latency prediction + "when do CUDA graphs pay off"). Approval email sent late; status: ____.
 - 2026-11-10: Repo created at `/scratch/am16489/vla-gpu-latency`. Slurm account `csci_ga_3033_025-2026fa`, 300 GPU-h cap.
 - 2026-11-10: Read VLA-Perf (section 3.4). It is a spec-sheet roofline with no launch, cache or graph terms; our contribution is complementary, and its roofline is our baseline 2.
-- 2026-11-10: Found T4, V100, A100, L4 and (probably) RTX PRO 6000 partitions on the Slurm cluster. T4 shares the source GPU's architecture, so it isolates spec differences from architecture differences.
+- 2026-11-10: The Slurm cluster has T4, V100, A100, L4 and (probably) RTX PRO 6000 partitions, but our account may only submit to A100 (`c12m85-a100-1`) and L4 (`g2-standard-12`). Requesting T4 (same arch as the source GPU, isolates spec from architecture differences) and PRO 6000 (L2 inversion) access is worthwhile.
 - 2026-11-10: Calibration microbenchmarks write one CSV schema:
   `gpu,bench,kernel,config,mode,timer,n_runs,mean_us,std_us,min_us,median_us,module_loading`
   (`config` is `;`-separated `key=value`; `timer` is `event` or `host`).
