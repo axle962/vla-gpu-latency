@@ -1,0 +1,24 @@
+# build outputs
+bench/build*/
+*.o
+# profiler reports are large; keep them out of git (export CSV summaries instead)
+*.ncu-rep
+*.nsys-rep
+*.sqlite
+*.qdrep
+# cluster-local settings and logs
+scripts/cluster/site.sh
+logs/*
+!logs/.gitkeep
+# python
+__pycache__/
+*.pyc
+.venv/
+.env
+# paper build
+paper/*.aux
+paper/*.log
+paper/*.out
+paper/*.bbl
+paper/*.blg
+paper/*.synctex.gz
