@@ -28,6 +28,40 @@ This file is the project brief for Claude Code. Read it fully before writing cod
 
 ---
 
+## 0.1 Resume here (paused 2026-11-10 ~23:35)
+
+State when the last session paused:
+- **Calibration done on A100** (`results/calib/NVIDIA_A100*`, two nodes; launch numbers agree
+  within 2%). The first run's bandwidth data was deleted (old sweep starved small working sets;
+  see its NOTE.txt). Findings are in section 4.2 (eager per-kernel penalty ~2 us persists for long
+  kernels) and below: A100 BW_L2 ~2.65 TB/s, BW_DRAM 1.48 TB/s (95% of spec), L2 knee ~20 to 27 MB
+  (half of the nominal 40 MB, consistent with A100's two L2 partitions).
+- **L4 calibration job 28144** keeps failing node boots and being requeued. Check it with
+  `sacct -D -j 28144 -o JobID,State,ElapsedRaw,NodeList`; results will land in
+  `results/calib/NVIDIA_L4*`. Commit them and run `uv run python model/calib.py results/calib/*/`.
+- **Workload extraction started.** Chosen VLAs (all ungated on HF): SmolVLA
+  (`lerobot/smolvla_base`, 450M, pi0-style flow-matching expert, fits on the 2080 Ti so it is the
+  one full VLA measurable on the source GPU) and OpenVLA-7B (`openvla/openvla-7b`, A100/L4 only).
+  pi0 is deferred: it needs gated `google/paligemma-3b-pt-224` (user must accept the license and
+  provide an HF token). GR00T N1.5-3B is ungated but heavy; optional.
+  - `workloads/trace_common.py` (written, linted, **not yet run**): eager/graph step latency +
+    torch.profiler kernel list (grid, block, regs, smem, aten op and input shapes) per step.
+  - Envs (git-ignored): `envs/openvla` (torch 2.2.0 cu121, transformers 4.40.1; installed OK).
+    `envs/smolvla` (`lerobot[smolvla]`) was being installed when the session paused; check
+    `envs/smolvla.log` / `envs/smolvla/bin/python -c "import lerobot"` and rerun
+    `UV_CACHE_DIR=/scratch/am16489/.cache/uv uv venv -p 3.10 envs/smolvla && VIRTUAL_ENV=$PWD/envs/smolvla uv pip install "lerobot[smolvla]" pandas`
+    if incomplete. Set `HF_HOME=/scratch/am16489/.cache/huggingface`.
+  - Next: write `workloads/trace_smolvla.py` and `workloads/trace_openvla.py` (dummy 224x224
+    images + instruction, FP16 everywhere so the 2080 Ti can run the same thing, batch 1), plus
+    an sbatch that runs them on A100 (~15 min each, ~0.5 GPU-h total), then try CUDA-graph
+    capture of the SmolVLA denoising loop for measured graph speedup.
+- GPU-hours used so far on `csci_ga_3033_025-2026fa`: well under 0.5.
+- Pending for the user (CIMS): see "Needs the user" in section 1 and the cuda2 commands in
+  section 6. The user asked for a full "what to run on cuda machines and elsewhere" list once
+  the cluster runs are finished.
+
+---
+
 ## 1. Status and open items (check these first)
 
 | Item | Status | Action |
@@ -99,6 +133,18 @@ Per kernel k on target GPU G:
 - Optional: a small regression on residuals (gradient boosting or linear on counter features), reported as an ablation against the purely analytical model.
 
 **Design decision to record in the paper:** whether `L_launch(G)`, `BW_L2(G)` and `δ_node(G)` come from spec sheets only, or from a few tiny calibration microbenchmarks on the target (empty kernel, bandwidth sweep). Flavor B is strictest if the target is described by specs only. Calibration microbenchmarks can be an ablation ("specs-only vs specs + 3 microbenchmarks"). The microbenchmarks exist in `bench/calib/` (section 10).
+
+**First calibration evidence (A100-SXM4-40GB, 2026-11-10, `results/calib/NVIDIA_A100*`)
+contradicts the `max(t_k, L_launch)` form.** Eager back-to-back empty kernels are spaced
+2.53 us apart (equal to the 2.53 us CPU cost of one `cudaLaunchKernel`); graph nodes are
+0.79 us apart. But for a chain of 100 dependent busy-wait kernels of duration D (grid of 1 block), eager
+takes about `D + 2.1 us` per kernel and graph about `D + 0.1 us` for every
+D from 2 to 100 us. The roughly 2 us eager penalty does not disappear when the kernel is
+longer than the CPU launch cost, so it is a GPU-side per-kernel cost (dependency resolution
+and kernel start for stream launches), not CPU starvation. Working hypothesis:
+`T_eager ≈ Σ_k (t_k + g_eager(G))` with `g_eager ≈ 2 us` plus a CPU-starvation term only when
+`t_k + g_eager < L_launch`, and `T_graph ≈ L_graph + Σ_k (t_k + δ_node(G))`. Check on L4 and
+cuda2, and with full-grid kernels, before committing to it.
 
 Note: `L_launch` is partly a property of the **host CPU and driver**, not the GPU. Record the
 host CPU model with every calibration run, and say in the paper that cross-GPU launch-cost

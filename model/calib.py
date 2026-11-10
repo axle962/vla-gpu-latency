@@ -65,7 +65,7 @@ def launch_params(path: Path) -> dict[str, float]:
 def bandwidth_params(path: Path, l2_bytes: float) -> dict[str, float]:
     df = pd.read_csv(path)
     df = df.join(_cfg(df.config))
-    df["gbps"] = df.bytes * df.passes / (df.median_us * 1e-6) / 1e9
+    df["gbps"] = df.moved / (df.median_us * 1e-6) / 1e9
     l2_part = df[df.bytes <= 0.25 * l2_bytes]
     dram_part = df[df.bytes >= 8 * l2_bytes]
     bw_l2 = float(l2_part.gbps.median()) if len(l2_part) else float("nan")

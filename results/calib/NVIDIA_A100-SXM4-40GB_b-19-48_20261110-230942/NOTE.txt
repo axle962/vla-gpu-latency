@@ -1,0 +1,1 @@
+bandwidth.csv removed: produced by the first sweep version, which starved small working sets of threads (fixed in the next commit). Launch CSVs are valid.
