@@ -62,6 +62,36 @@ State when the last session paused:
   section 6. The user asked for a full "what to run on cuda machines and elsewhere" list once
   the cluster runs are finished.
 
+### 0.2 Memory note to carry over
+
+The earlier session kept this as a Claude Code memory under the wildfire project, which a
+session started in this folder does not see. To add it here, save the block below as
+`~/.claude/projects/-scratch-am16489-vla-gpu-latency/memory/gpu-budget.md` and add the index
+line to `MEMORY.md` in the same folder (or ask Claude to "save the section 0.2 memory note").
+
+```markdown
+---
+name: gpu-budget
+description: This project's Slurm account is csci_ga_3033_025-2026fa with a 300 GPU-hour cap; estimate and tally GPU jobs against it
+metadata:
+  type: project
+---
+
+The GPU Architecture course project (cross-GPU VLA latency + CUDA-graph speedup prediction) lives at `/scratch/am16489/vla-gpu-latency`, GitHub `axle962/vla-gpu-latency` (pushed via the `github-me` SSH alias). Its Slurm account is `csci_ga_3033_025-2026fa`, with its own 300 GPU-hour cap (`gres/gpu=18000` GPU-minutes; stated by the user 2026-11-10). The user's wildfire project (`/scratch/am16489/wildfire-spread-simulation`) has a separate account, `csci_ga_2271-2026fa`, with its own 300 GPU-hour cap.
+
+**Why:** two courses, two allocations; submitting under the wrong account bills the wrong budget.
+
+**How to apply:** never submit this project's jobs under `csci_ga_2271-2026fa` (or the reverse). Estimate GPU-hours before submitting, smoke-test before sweeps, and request 1 GPU unless needed. Tally only this account, with `-D` so requeued attempts after failed node boots (frequent here) are counted:
+`sacct -D -S 2026-09-01 -X -A csci_ga_3033_025-2026fa -n -P --format=ElapsedRaw,AllocTRES | awk -F'|' '$2~/gres\/gpu/{s+=$1} END{print s/3600" GPU-h"}'`
+State the cost when proposing multi-run experiments.
+```
+
+Index line for `MEMORY.md`:
+
+```markdown
+- [GPU budget](gpu-budget.md) — Slurm account csci_ga_3033_025-2026fa, 300 GPU-h cap; estimate and tally GPU jobs
+```
+
 ---
 
 ## 1. Status and open items (check these first)
