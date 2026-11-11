@@ -259,7 +259,9 @@ def main() -> None:
         "graph_scope": "denoising loop only (prefix eager)",
         "tf32": False,
     }
-    out = args.out or default_out(f"smolvla_cam{len(img_keys)}_steps{cfg.num_steps}")
+    out = args.out or default_out(
+        f"smolvla_cam{len(img_keys)}_steps{cfg.num_steps}_chunk{cfg.chunk_size}"
+    )
     profile_and_save(
         out, "smolvla", full_step, meta,
         warmup=args.warmup, reps=args.reps, prof_steps=args.prof_steps, extra_modes=extra,

@@ -62,6 +62,16 @@ State:
   - Why only the denoising loop is graphed: the SigLIP vision embedding calls
     `torch.arange(mask.sum())` (data-dependent host sync). The loop's constant uploads
     (`torch.tensor(list, device=cuda)`) are memoized during capture (`CudaConstMemo`).
+- **OpenVLA-7B traced on A100** (`traces/openvla7b_fp16/NVIDIA_A100*`, job 28964, FP16, SDPA,
+  one 224x224 image, 7 action tokens, `predict_action`): eager 312 ms per action; prefill
+  (vision + 283-token Llama prefill + first token) 69 ms; **40 ms per decode token**. 11,519
+  kernels per step, GPU busy 127 ms (41%). Decode GEMVs take ~10.5 ms of GPU per token, close
+  to streaming 13 GB of weights at 1.48 TB/s (8.8 ms), so decode is ~4x launch/dispatch bound.
+  Graph mode not done yet (needs a static KV cache; HF 4.40 generate grows the cache).
+- **Parser fix (2026-11-11):** kernels are now linked to ops by launch timestamps
+  (innermost enclosing cpu_op on the launching thread), because torch 2.2 fills
+  "External id" differently and mislabeled OpenVLA ops. Driver-API launches are counted too
+  (SmolVLA: 13,526 kernels per step instead of 13,190).
 - **Workloads.** SmolVLA (`lerobot/smolvla_base`, 450M, fits the 2080 Ti) and OpenVLA-7B
   (`openvla/openvla-7b`, A100 only, since L4 is down). pi0 deferred (gated PaliGemma; needs the
   user's HF token). GR00T N1.5-3B optional.
@@ -73,11 +83,9 @@ State:
     `envs/smolvla` (`lerobot[smolvla]`, torch 2.10.0 cu128, transformers 4.57.6). Recreate with
     `UV_CACHE_DIR=/scratch/am16489/.cache/uv uv venv -p 3.10 envs/smolvla && VIRTUAL_ENV=$PWD/envs/smolvla uv pip install "lerobot[smolvla]" pandas`.
 - **Next:**
-  1. `workloads/trace_openvla.py` (eager only at first: HF generate of 7 action tokens, FP16,
-     SDPA attention) and its sbatch; download the ~15 GB weights first (safetensors and
-     configs only).
-  2. SmolVLA sweeps on A100: cameras 1/2/3, flow steps 5/10/20, chunk 25/50/100 (~9 runs,
-     ~3 min each, under 0.5 GPU-h in total).
+  1. OpenVLA CUDA-graph mode (static KV cache decode loop) for a measured graph speedup.
+  2. SmolVLA sweep on A100 submitted as job 28950 (`scripts/cluster/sweep_smolvla.sbatch`,
+     7 configs); check `logs/sweep-smolvla-28950.out`, then commit `traces/smolvla_*`.
   3. cuda2 (user): run the same `trace_smolvla.py` on the 2080 Ti (the source GPU). This
      needs a smolvla env and the weights on CIMS.
 - GPU-hours used on `csci_ga_3033_025-2026fa`: 2.46 of 300 (2026-11-11).

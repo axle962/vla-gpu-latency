@@ -28,6 +28,36 @@ def _load(path: Path) -> list[dict]:
         return json.load(f)["traceEvents"]
 
 
+def _innermost_ops(events: list[dict], launches: list[dict]) -> dict[int, dict]:
+    """Map each launch's correlation id to the innermost cpu_op enclosing it on the same
+    thread. Uses only timestamps, so it does not depend on how a torch version fills the
+    "External id" field (torch 2.2 links kernels to the wrong op through it)."""
+    by_tid: dict = defaultdict(list)
+    for e in events:
+        if e.get("cat") == "cpu_op" and e.get("ph") == "X":
+            by_tid[e.get("tid")].append(e)
+    out: dict[int, dict] = {}
+    lby_tid: dict = defaultdict(list)
+    for e in launches:
+        lby_tid[e.get("tid")].append(e)
+    for tid, ls in lby_tid.items():
+        ops = sorted(by_tid.get(tid, []), key=lambda e: (e["ts"], -e["dur"]))
+        stack: list[dict] = []
+        i = 0
+        for la in ls:  # launches are sorted by ts
+            t = la["ts"]
+            while i < len(ops) and ops[i]["ts"] <= t:
+                while stack and stack[-1]["ts"] + stack[-1]["dur"] < ops[i]["ts"]:
+                    stack.pop()
+                stack.append(ops[i])
+                i += 1
+            while stack and stack[-1]["ts"] + stack[-1]["dur"] < t:
+                stack.pop()
+            if stack:
+                out[la["args"]["correlation"]] = stack[-1]
+    return out
+
+
 def parse_trace(path: Path) -> tuple[pd.DataFrame, pd.DataFrame]:
     events = _load(path)
     steps = sorted(
@@ -40,20 +70,25 @@ def parse_trace(path: Path) -> tuple[pd.DataFrame, pd.DataFrame]:
         ),
         key=lambda e: e["ts"],
     )
-    # External id -> aten op (name, shapes). Kernels carry the External id of the op that
-    # launched them.
-    ops: dict[int, dict] = {}
-    for e in events:
-        if e.get("cat") == "cpu_op":
-            ext = e.get("args", {}).get("External id")
-            if ext is not None:
-                ops[ext] = e
+    # Launch API calls (runtime and driver) carry the correlation id of the GPU work they
+    # enqueue. GPU work lags the CPU, so steps and ops are assigned through these calls.
+    launches = sorted(
+        (
+            e
+            for e in events
+            if e.get("cat") in ("cuda_runtime", "cuda_driver")
+            and e.get("ph") == "X"
+            and e.get("args", {}).get("correlation") is not None
+        ),
+        key=lambda e: e["ts"],
+    )
+    corr_op = _innermost_ops(events, launches)
     rows = []
     for e in events:
         if e.get("cat") not in GPU_CATS or e.get("ph") != "X":
             continue
         a = e.get("args", {})
-        op = ops.get(a.get("External id"), {})
+        op = corr_op.get(a.get("correlation"), {})
         rows.append(
             {
                 "cat": e["cat"],
@@ -75,19 +110,6 @@ def parse_trace(path: Path) -> tuple[pd.DataFrame, pd.DataFrame]:
             }
         )
     k = pd.DataFrame(rows).sort_values("ts_us").reset_index(drop=True)
-    # Assign GPU events to steps through the CPU runtime call that launched them (same
-    # correlation id): GPU work lags the CPU, so GPU timestamps cannot be used directly.
-    # A launch belongs to step i if it falls inside that step's annotation.
-    launches = sorted(
-        (
-            e
-            for e in events
-            if e.get("cat") == "cuda_runtime"
-            and e.get("ph") == "X"
-            and e.get("args", {}).get("correlation") is not None
-        ),
-        key=lambda e: e["ts"],
-    )
     corr_step: dict[int, int] = {}
     for i, s in enumerate(steps):
         t0, t1 = s["ts"], s["ts"] + s["dur"]
