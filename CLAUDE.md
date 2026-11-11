@@ -28,7 +28,7 @@ This file is the project brief for Claude Code. Read it fully before writing cod
 
 ---
 
-## 0.1 Resume here (updated 2026-11-11 ~18:00)
+## 0.1 Resume here (updated 2026-11-11 ~22:30)
 
 State:
 - **Calibration done on A100** (`results/calib/NVIDIA_A100*`, two nodes; launch numbers agree
@@ -40,15 +40,17 @@ State:
   the script: each node boot failed, Slurm requeued automatically (about 8 billed minutes per
   attempt, 28488 alone made 9 attempts), and the job ended `CANCELLED by 0`. About 2.1 of the
   2.46 GPU-h used so far went to these failed boots. 20 L4 nodes are drained. The sbatch files
-  now set `--no-requeue`, so one failed boot costs at most ~0.15 GPU-h. Do not resubmit to L4
-  repeatedly; ask NYU HPC about g2-standard-12 boot failures first.
+  set `--no-requeue`, but that does **not** stop requeues after a failed node boot (sweep job
+  28998 was still requeued twice on A100, ~6 billed minutes each, before running on b-19-49).
+  A100 boots also fail sometimes; L4 boots have never succeeded. Do not resubmit to L4; ask NYU
+  HPC about g2-standard-12 boot failures first.
 - **Cluster quirks found 2026-11-11.** The login node has ~1.8 GB of RAM and no swap: importing
   torch or parsing a 100 MB trace JSON there stalls for minutes. Parse traces on the CPU
   partition `n2c48m24` (allowed for our account, no GPU, costs no GPU-hours):
   `sbatch -p n2c48m24 scripts/cluster/reparse.sbatch traces/<model>/<run>/`. One CPU node
   (b-10-119) hung without writing a log; `--exclude` it if it happens again. Slurm job IDs are
   reused from 2024, so `sacct -j <id>` can show an unrelated old job; filter with `-A` and `-S`.
-- **SmolVLA traced on A100** (`traces/smolvla_cam3_steps10/NVIDIA_A100*`, job 28487, FP16, 3
+- **SmolVLA traced on A100** (`traces/smolvla_cam3_steps10_chunk50/NVIDIA_A100*_b-19-37*`, job 28487, FP16, 3
   cameras 256x256 resized to 512, 10 flow steps, chunk 50, batch 1):
   eager full step 377 ms; eager prefix 58 ms; eager denoise loop 316 ms; **CUDA-graph denoise
   loop 35.8 ms (8.8x)**; hybrid (eager prefix + graph loop) 94 ms (4.0x end to end).
@@ -72,6 +74,21 @@ State:
   (innermost enclosing cpu_op on the launching thread), because torch 2.2 fills
   "External id" differently and mislabeled OpenVLA ops. Driver-API launches are counted too
   (SmolVLA: 13,526 kernels per step instead of 13,190).
+- **SmolVLA sweep on A100 done** (job 28998, 7 configs, all bit-exact;
+  `results/traces_summary.csv` from `python3 model/summarize_traces.py`):
+  - Reproducible: the baseline on two nodes differs by 1.4% (eager 377 vs 383 ms), graph
+    denoise 35.8 vs 35.6 ms.
+  - Each flow step is ~1,166 kernels: eager ~32 ms per step (~27.5 us per kernel of CPU
+    dispatch), graph ~3.5 ms per step (~3.0 us per kernel = kernel time + node cost).
+    Graph speedup of the loop is a constant ~9x for 5, 10 and 20 steps; end-to-end hybrid
+    speedup grows with steps (2.9x at 5, 4.0x at 10, 5.4x at 20) because the eager prefix is
+    fixed (~59 ms, ~1,870 kernels).
+  - Chunk 25 to 100 (4x action tokens) moves graph denoise only 35.0 to 37.2 ms: even under
+    graphs the kernels are latency bound, not work bound. Eager denoise is unchanged.
+  - Cameras 1 to 3: prefix 42 to 59 ms (~8.4 ms per camera); denoise unchanged.
+  - Model implication: T_eager ~ T_prefix + N_steps * K_step * c_dispatch, and
+    T_graph_loop ~ N_steps * sum_k (t_k + delta_node); both linear in N_steps, so the loop's
+    graph speedup is set by c_dispatch / (mean t_k + delta_node), independent of N_steps.
 - **Workloads.** SmolVLA (`lerobot/smolvla_base`, 450M, fits the 2080 Ti) and OpenVLA-7B
   (`openvla/openvla-7b`, A100 only, since L4 is down). pi0 deferred (gated PaliGemma; needs the
   user's HF token). GR00T N1.5-3B optional.
@@ -84,11 +101,11 @@ State:
     `UV_CACHE_DIR=/scratch/am16489/.cache/uv uv venv -p 3.10 envs/smolvla && VIRTUAL_ENV=$PWD/envs/smolvla uv pip install "lerobot[smolvla]" pandas`.
 - **Next:**
   1. OpenVLA CUDA-graph mode (static KV cache decode loop) for a measured graph speedup.
-  2. SmolVLA sweep on A100 submitted as job 28950 (`scripts/cluster/sweep_smolvla.sbatch`,
-     7 configs); check `logs/sweep-smolvla-28950.out`, then commit `traces/smolvla_*`.
+  2. Measure c_dispatch on the host directly (a PyTorch per-op microbenchmark: tiny add/mm in a
+     loop, eager vs graph) so the launch term does not have to come from the VLA trace itself.
   3. cuda2 (user): run the same `trace_smolvla.py` on the 2080 Ti (the source GPU). This
      needs a smolvla env and the weights on CIMS.
-- GPU-hours used on `csci_ga_3033_025-2026fa`: 2.46 of 300 (2026-11-11).
+- GPU-hours used on `csci_ga_3033_025-2026fa`: 3.08 of 300 (2026-11-11 22:30).
 - Pending for the user (CIMS): see "Needs the user" in section 1 and the cuda2 commands in
   section 6. The user asked for a full "what to run on cuda machines and elsewhere" list once
   the cluster runs are finished.
