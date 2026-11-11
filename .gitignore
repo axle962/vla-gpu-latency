@@ -23,3 +23,5 @@ paper/*.bbl
 paper/*.blg
 paper/*.synctex.gz
 envs/
+# raw profiler traces stay on /scratch (tens of MB each); summaries and kernels.csv.gz are kept
+traces/**/trace.json.gz

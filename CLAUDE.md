@@ -28,36 +28,59 @@ This file is the project brief for Claude Code. Read it fully before writing cod
 
 ---
 
-## 0.1 Resume here (paused 2026-11-10 ~23:35)
+## 0.1 Resume here (updated 2026-11-11 ~18:00)
 
-State when the last session paused:
+State:
 - **Calibration done on A100** (`results/calib/NVIDIA_A100*`, two nodes; launch numbers agree
   within 2%). The first run's bandwidth data was deleted (old sweep starved small working sets;
   see its NOTE.txt). Findings are in section 4.2 (eager per-kernel penalty ~2 us persists for long
   kernels) and below: A100 BW_L2 ~2.65 TB/s, BW_DRAM 1.48 TB/s (95% of spec), L2 knee ~20 to 27 MB
   (half of the nominal 40 MB, consistent with A100's two L2 partitions).
-- **L4 calibration has no results yet.** Job 28144 failed node boot several times, was requeued,
-  and was finally `CANCELLED by 0` (the system) without producing output. Resubmit:
-  `source scripts/cluster/site.sh && sbatch -p g2-standard-12 scripts/cluster/calib.sbatch`,
-  then commit `results/calib/NVIDIA_L4*` and run `uv run python model/calib.py results/calib/*/`.
-- **Workload extraction started.** Chosen VLAs (all ungated on HF): SmolVLA
-  (`lerobot/smolvla_base`, 450M, pi0-style flow-matching expert, fits on the 2080 Ti so it is the
-  one full VLA measurable on the source GPU) and OpenVLA-7B (`openvla/openvla-7b`, A100/L4 only).
-  pi0 is deferred: it needs gated `google/paligemma-3b-pt-224` (user must accept the license and
-  provide an HF token). GR00T N1.5-3B is ungated but heavy; optional.
-  - `workloads/trace_common.py` (written, linted, **not yet run**): eager/graph step latency +
-    torch.profiler kernel list (grid, block, regs, smem, aten op and input shapes) per step.
-  - Envs (git-ignored): `envs/openvla` (torch 2.2.0 cu121, transformers 4.40.1; installed OK).
-    `envs/smolvla` (`lerobot[smolvla]`, torch 2.10.0 cu128; installed OK). Recreate with
+- **L4 (`g2-standard-12`) is unusable right now.** Jobs 28144, 28473 and 28488 never started
+  the script: each node boot failed, Slurm requeued automatically (about 8 billed minutes per
+  attempt, 28488 alone made 9 attempts), and the job ended `CANCELLED by 0`. About 2.1 of the
+  2.46 GPU-h used so far went to these failed boots. 20 L4 nodes are drained. The sbatch files
+  now set `--no-requeue`, so one failed boot costs at most ~0.15 GPU-h. Do not resubmit to L4
+  repeatedly; ask NYU HPC about g2-standard-12 boot failures first.
+- **Cluster quirks found 2026-11-11.** The login node has ~1.8 GB of RAM and no swap: importing
+  torch or parsing a 100 MB trace JSON there stalls for minutes. Parse traces on the CPU
+  partition `n2c48m24` (allowed for our account, no GPU, costs no GPU-hours):
+  `sbatch -p n2c48m24 scripts/cluster/reparse.sbatch traces/<model>/<run>/`. One CPU node
+  (b-10-119) hung without writing a log; `--exclude` it if it happens again. Slurm job IDs are
+  reused from 2024, so `sacct -j <id>` can show an unrelated old job; filter with `-A` and `-S`.
+- **SmolVLA traced on A100** (`traces/smolvla_cam3_steps10/NVIDIA_A100*`, job 28487, FP16, 3
+  cameras 256x256 resized to 512, 10 flow steps, chunk 50, batch 1):
+  eager full step 377 ms; eager prefix 58 ms; eager denoise loop 316 ms; **CUDA-graph denoise
+  loop 35.8 ms (8.8x)**; hybrid (eager prefix + graph loop) 94 ms (4.0x end to end).
+  13,190 kernels per step, median kernel 3.3 us, 78% under 5 us, GPU busy 57.7 ms (15% of the
+  eager step). Per step also 529 memcpys and 36 stream syncs. The host is a 2.2 GHz cloud Xeon,
+  so eager cost is ~27 us per kernel of CPU (Python + aten dispatch), far above the 2.5 us
+  `cudaLaunchKernel` cost from calibration. Model implication: `L_launch` for real PyTorch
+  workloads is framework dispatch cost per op, not the bare driver launch cost; calibrate it from
+  the eager trace (or a PyTorch microbenchmark), and record host CPU. Graph replay and the split
+  loop both match the stock output bit for bit.
+  - Why only the denoising loop is graphed: the SigLIP vision embedding calls
+    `torch.arange(mask.sum())` (data-dependent host sync). The loop's constant uploads
+    (`torch.tensor(list, device=cuda)`) are memoized during capture (`CudaConstMemo`).
+- **Workloads.** SmolVLA (`lerobot/smolvla_base`, 450M, fits the 2080 Ti) and OpenVLA-7B
+  (`openvla/openvla-7b`, A100 only, since L4 is down). pi0 deferred (gated PaliGemma; needs the
+  user's HF token). GR00T N1.5-3B optional.
+  - Code: `workloads/trace_common.py` (timing + profiling), `workloads/trace_parse.py`
+    (pandas-only trace parser), `workloads/trace_smolvla.py`,
+    `scripts/cluster/trace_smolvla.sbatch` (run with `HF_HUB_OFFLINE=1`; weights are in
+    `$HF_HOME=/scratch/am16489/.cache/huggingface`, including the SmolVLM2-500M backbone).
+  - Envs (git-ignored): `envs/openvla` (torch 2.2.0 cu121, transformers 4.40.1),
+    `envs/smolvla` (`lerobot[smolvla]`, torch 2.10.0 cu128, transformers 4.57.6). Recreate with
     `UV_CACHE_DIR=/scratch/am16489/.cache/uv uv venv -p 3.10 envs/smolvla && VIRTUAL_ENV=$PWD/envs/smolvla uv pip install "lerobot[smolvla]" pandas`.
-    Set `HF_HOME=/scratch/am16489/.cache/huggingface`. No model weights downloaded yet.
-    Note the two envs use different torch/CUDA builds (2.2.0 cu121 vs 2.10.0 cu128); record
-    this in each trace's meta.json (trace_common.py already does).
-  - Next: write `workloads/trace_smolvla.py` and `workloads/trace_openvla.py` (dummy 224x224
-    images + instruction, FP16 everywhere so the 2080 Ti can run the same thing, batch 1), plus
-    an sbatch that runs them on A100 (~15 min each, ~0.5 GPU-h total), then try CUDA-graph
-    capture of the SmolVLA denoising loop for measured graph speedup.
-- GPU-hours used so far on `csci_ga_3033_025-2026fa`: well under 0.5.
+- **Next:**
+  1. `workloads/trace_openvla.py` (eager only at first: HF generate of 7 action tokens, FP16,
+     SDPA attention) and its sbatch; download the ~15 GB weights first (safetensors and
+     configs only).
+  2. SmolVLA sweeps on A100: cameras 1/2/3, flow steps 5/10/20, chunk 25/50/100 (~9 runs,
+     ~3 min each, under 0.5 GPU-h in total).
+  3. cuda2 (user): run the same `trace_smolvla.py` on the 2080 Ti (the source GPU). This
+     needs a smolvla env and the weights on CIMS.
+- GPU-hours used on `csci_ga_3033_025-2026fa`: 2.46 of 300 (2026-11-11).
 - Pending for the user (CIMS): see "Needs the user" in section 1 and the cuda2 commands in
   section 6. The user asked for a full "what to run on cuda machines and elsewhere" list once
   the cluster runs are finished.
@@ -280,6 +303,9 @@ node), and the user runs the CIMS steps (cuda2 is not reachable from here).
 - 2026-11-10: Repo created at `/scratch/am16489/vla-gpu-latency`. Slurm account `csci_ga_3033_025-2026fa`, 300 GPU-h cap.
 - 2026-11-10: Read VLA-Perf (section 3.4). It is a spec-sheet roofline with no launch, cache or graph terms; our contribution is complementary, and its roofline is our baseline 2.
 - 2026-11-10: The Slurm cluster has T4, V100, A100, L4 and (probably) RTX PRO 6000 partitions, but our account may only submit to A100 (`c12m85-a100-1`) and L4 (`g2-standard-12`). Requesting T4 (same arch as the source GPU, isolates spec from architecture differences) and PRO 6000 (L2 inversion) access is worthwhile.
+- 2026-11-11: Workload traces use torch.profiler (CUPTI) because nsys is not on the cluster.
+  SmolVLA graph mode captures only the denoising loop (vision encoder has a host sync).
+- 2026-11-11: Cluster sbatch files use `--no-requeue` after failed L4 boots billed ~2 GPU-h.
 - 2026-11-10: Calibration microbenchmarks write one CSV schema:
   `gpu,bench,kernel,config,mode,timer,n_runs,mean_us,std_us,min_us,median_us,module_loading`
   (`config` is `;`-separated `key=value`; `timer` is `event` or `host`).

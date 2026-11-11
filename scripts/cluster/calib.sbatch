@@ -12,6 +12,7 @@
 #SBATCH --mem=16G
 #SBATCH --time=00:30:00
 #SBATCH --output=logs/%x-%j.out
+#SBATCH --no-requeue
 set -euo pipefail
 cd "${SLURM_SUBMIT_DIR:-$(dirname "$0")/../..}"
 echo "job $SLURM_JOB_ID on $(hostname) partition ${SLURM_JOB_PARTITION:-?}"
