@@ -36,9 +36,10 @@ State when the last session paused:
   see its NOTE.txt). Findings are in section 4.2 (eager per-kernel penalty ~2 us persists for long
   kernels) and below: A100 BW_L2 ~2.65 TB/s, BW_DRAM 1.48 TB/s (95% of spec), L2 knee ~20 to 27 MB
   (half of the nominal 40 MB, consistent with A100's two L2 partitions).
-- **L4 calibration job 28144** keeps failing node boots and being requeued. Check it with
-  `sacct -D -j 28144 -o JobID,State,ElapsedRaw,NodeList`; results will land in
-  `results/calib/NVIDIA_L4*`. Commit them and run `uv run python model/calib.py results/calib/*/`.
+- **L4 calibration has no results yet.** Job 28144 failed node boot several times, was requeued,
+  and was finally `CANCELLED by 0` (the system) without producing output. Resubmit:
+  `source scripts/cluster/site.sh && sbatch -p g2-standard-12 scripts/cluster/calib.sbatch`,
+  then commit `results/calib/NVIDIA_L4*` and run `uv run python model/calib.py results/calib/*/`.
 - **Workload extraction started.** Chosen VLAs (all ungated on HF): SmolVLA
   (`lerobot/smolvla_base`, 450M, pi0-style flow-matching expert, fits on the 2080 Ti so it is the
   one full VLA measurable on the source GPU) and OpenVLA-7B (`openvla/openvla-7b`, A100/L4 only).
@@ -47,10 +48,11 @@ State when the last session paused:
   - `workloads/trace_common.py` (written, linted, **not yet run**): eager/graph step latency +
     torch.profiler kernel list (grid, block, regs, smem, aten op and input shapes) per step.
   - Envs (git-ignored): `envs/openvla` (torch 2.2.0 cu121, transformers 4.40.1; installed OK).
-    `envs/smolvla` (`lerobot[smolvla]`) was being installed when the session paused; check
-    `envs/smolvla.log` / `envs/smolvla/bin/python -c "import lerobot"` and rerun
-    `UV_CACHE_DIR=/scratch/am16489/.cache/uv uv venv -p 3.10 envs/smolvla && VIRTUAL_ENV=$PWD/envs/smolvla uv pip install "lerobot[smolvla]" pandas`
-    if incomplete. Set `HF_HOME=/scratch/am16489/.cache/huggingface`.
+    `envs/smolvla` (`lerobot[smolvla]`, torch 2.10.0 cu128; installed OK). Recreate with
+    `UV_CACHE_DIR=/scratch/am16489/.cache/uv uv venv -p 3.10 envs/smolvla && VIRTUAL_ENV=$PWD/envs/smolvla uv pip install "lerobot[smolvla]" pandas`.
+    Set `HF_HOME=/scratch/am16489/.cache/huggingface`. No model weights downloaded yet.
+    Note the two envs use different torch/CUDA builds (2.2.0 cu121 vs 2.10.0 cu128); record
+    this in each trace's meta.json (trace_common.py already does).
   - Next: write `workloads/trace_smolvla.py` and `workloads/trace_openvla.py` (dummy 224x224
     images + instruction, FP16 everywhere so the 2080 Ti can run the same thing, batch 1), plus
     an sbatch that runs them on A100 (~15 min each, ~0.5 GPU-h total), then try CUDA-graph
