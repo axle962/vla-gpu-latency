@@ -28,7 +28,7 @@ This file is the project brief for Claude Code. Read it fully before writing cod
 
 ---
 
-## 0.1 Resume here (updated 2026-11-11 ~22:30)
+## 0.1 Resume here (updated 2026-11-11 ~23:00)
 
 State:
 - **Calibration done on A100** (`results/calib/NVIDIA_A100*`, two nodes; launch numbers agree
@@ -69,7 +69,14 @@ State:
   (vision + 283-token Llama prefill + first token) 69 ms; **40 ms per decode token**. 11,519
   kernels per step, GPU busy 127 ms (41%). Decode GEMVs take ~10.5 ms of GPU per token, close
   to streaming 13 GB of weights at 1.48 TB/s (8.8 ms), so decode is ~4x launch/dispatch bound.
-  Graph mode not done yet (needs a static KV cache; HF 4.40 generate grows the cache).
+  **Graph mode (job 29163):** static KV cache + the 6 greedy decode steps captured as one CUDA
+  graph (`StaticPath` in `trace_openvla.py`); tokens match `generate` exactly. Decode 238.6 ms
+  eager (static cache) vs 85.2 ms graph (**2.8x**, 14.2 ms per token, 62% of the 8.8 ms
+  weight-streaming bound); end to end 311 ms stock vs 155 ms (eager prefill + graph decode,
+  **2.0x**). Smaller than SmolVLA's 4x because OpenVLA kernels are larger (decode GEMVs ~70 us).
+  Needed two transformers 4.40 workarounds (documented in the module docstring): patch
+  `_ignore_causal_mask_sdpa` (static cache + 1-token query loses the causal mask; 2D mask check
+  is a host sync), and delete, not None, the per-layer `past_key_value` after use.
 - **Parser fix (2026-11-11):** kernels are now linked to ops by launch timestamps
   (innermost enclosing cpu_op on the launching thread), because torch 2.2 fills
   "External id" differently and mislabeled OpenVLA ops. Driver-API launches are counted too
@@ -89,6 +96,20 @@ State:
   - Model implication: T_eager ~ T_prefix + N_steps * K_step * c_dispatch, and
     T_graph_loop ~ N_steps * sum_k (t_k + delta_node); both linear in N_steps, so the loop's
     graph speedup is set by c_dispatch / (mean t_k + delta_node), independent of N_steps.
+- **PyTorch dispatch calibration on A100 host** (`results/calib/NVIDIA_A100*_b-19-28*/
+  torch_dispatch_*.csv`, `workloads/torch_dispatch.py`; chains of 400 ops, eager vs CPU issue
+  vs graph, both torch builds):
+  - CPU cost per op is op-specific: elementwise add 6.8 us (torch 2.2) / 7.3 us (2.10);
+    with output allocation 9.4 us; `F.linear` 17 to 22 us (cuBLAS dispatch); SDPA 31 us; the
+    6-kernel RMSNorm 95 (2.2) / 105 (2.10) us. torch 2.10 is ~5 to 10% slower to dispatch.
+  - Graph cost per tiny kernel ~1.6 us (kernel + ~0.8 us node, matches launch_latency).
+  - `eager ~ max(issue, graph)` per op holds: tiny ops are CPU bound (eager/graph 3 to 7x);
+    the 1x4096x11008 decode GEMV (70 us GPU) and the 283x4096x4096 prefill GEMM are GPU bound
+    (1.0x). Crossover for adds is ~4M elements (~7 us of GPU work).
+  - The VLA traces average ~27 us per kernel eager, above these per-op costs: the gap is
+    Python module/HF-code overhead between aten ops. Model plan: c_dispatch per aten op type
+    from this table, times op counts from the trace, plus a per-step Python residual fitted on
+    one config and validated on the others.
 - **Workloads.** SmolVLA (`lerobot/smolvla_base`, 450M, fits the 2080 Ti) and OpenVLA-7B
   (`openvla/openvla-7b`, A100 only, since L4 is down). pi0 deferred (gated PaliGemma; needs the
   user's HF token). GR00T N1.5-3B optional.
@@ -100,12 +121,13 @@ State:
     `envs/smolvla` (`lerobot[smolvla]`, torch 2.10.0 cu128, transformers 4.57.6). Recreate with
     `UV_CACHE_DIR=/scratch/am16489/.cache/uv uv venv -p 3.10 envs/smolvla && VIRTUAL_ENV=$PWD/envs/smolvla uv pip install "lerobot[smolvla]" pandas`.
 - **Next:**
-  1. OpenVLA CUDA-graph mode (static KV cache decode loop) for a measured graph speedup.
-  2. Measure c_dispatch on the host directly (a PyTorch per-op microbenchmark: tiny add/mm in a
-     loop, eager vs graph) so the launch term does not have to come from the VLA trace itself.
+  1. First predictor (`model/`): per-kernel GPU time from the trace + per-op dispatch from the
+     calibration table -> predicted eager, graph and hybrid times for every traced config;
+     report % error against `results/traces_summary.csv` (same GPU first, then cross-GPU once
+     the 2080 Ti traces exist).
   3. cuda2 (user): run the same `trace_smolvla.py` on the 2080 Ti (the source GPU). This
      needs a smolvla env and the weights on CIMS.
-- GPU-hours used on `csci_ga_3033_025-2026fa`: 3.08 of 300 (2026-11-11 22:30).
+- GPU-hours used on `csci_ga_3033_025-2026fa`: 3.14 of 300 (2026-11-11 23:00).
 - Pending for the user (CIMS): see "Needs the user" in section 1 and the cuda2 commands in
   section 6. The user asked for a full "what to run on cuda machines and elsewhere" list once
   the cluster runs are finished.
