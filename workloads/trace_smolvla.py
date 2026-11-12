@@ -38,7 +38,7 @@ from pathlib import Path
 import torch
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from trace_common import default_out, profile_and_save  # noqa: E402
+from trace_common import default_out, profile_and_save, profile_graph  # noqa: E402
 
 from lerobot.policies.smolvla.modeling_smolvla import (  # noqa: E402
     SmolVLAPolicy,
@@ -266,6 +266,8 @@ def main() -> None:
         out, "smolvla", full_step, meta,
         warmup=args.warmup, reps=args.reps, prof_steps=args.prof_steps, extra_modes=extra,
     )
+    if graph_ok:
+        profile_graph(out, g.replay, n=args.prof_steps)
     print("wrote", out)
 
 

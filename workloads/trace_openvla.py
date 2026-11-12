@@ -43,7 +43,7 @@ import torch
 from PIL import Image
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from trace_common import default_out, profile_and_save  # noqa: E402
+from trace_common import default_out, profile_and_save, profile_graph  # noqa: E402
 
 import contextlib  # noqa: E402
 
@@ -274,6 +274,8 @@ def main() -> None:
         m["graph_decode_speedup"] = m["static_decode_ms_median"] / m["graph_decode_ms_median"]
         m["static_hybrid_speedup"] = m["eager_ms_median"] / m["static_hybrid_ms_median"]
     (out / "meta.json").write_text(json.dumps(m, indent=2))
+    if m.get("graph_ok"):
+        profile_graph(out, sp.graph.replay, n=args.prof_steps)
     print("decode_ms_per_token", m["decode_ms_per_token"], "wrote", out)
 
 

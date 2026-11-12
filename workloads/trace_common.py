@@ -7,6 +7,7 @@ Outputs in <out_dir>/:
   kernels.csv.gz     one row per GPU kernel/memcpy/memset in the profiled steps
   ops.csv            aggregated per (op, input shapes): count, kernels, gpu_us
   trace.json.gz      raw chrome trace (open in chrome://tracing or Perfetto)
+  kernels_graph.csv.gz, trace_graph.json.gz   the same for profiled CUDA-graph replays
 
 Why torch.profiler and not nsys: nsys is not installed on the cluster, and torch.profiler reads
 the same CUPTI activity records (kernel name, duration, grid, block, registers, shared memory)
@@ -27,7 +28,7 @@ from pathlib import Path
 import pandas as pd
 import torch
 from torch.profiler import ProfilerActivity, profile, record_function
-from trace_parse import summarize_trace
+from trace_parse import parse_trace, summarize_trace
 
 def _sync_time(fn: Callable[[], object]) -> float:
     torch.cuda.synchronize()
@@ -121,6 +122,46 @@ def profile_and_save(
     summary["gpu_busy_frac"] = summary["gpu_busy_ms_per_step"] / summary["eager_ms_median"]
     (out / "meta.json").write_text(json.dumps(summary, indent=2))
     print(json.dumps(summary, indent=2))
+
+
+def profile_graph(out_dir: str | Path, replay: Callable[[], object], n: int = 3) -> dict:
+    """Profile n replays of a captured CUDA graph (kernels back to back, same profiler as the
+    eager trace). Writes kernels_graph.csv.gz and trace_graph.json.gz, merges the in-graph
+    kernel statistics into meta.json and returns them. Comparing these durations with the
+    eager-traced ones separates profiler overhead from idle-gap effects on short kernels."""
+    out = Path(out_dir)
+    for _ in range(3):
+        replay()
+    torch.cuda.synchronize()
+    trace = out / "trace_graph.json"
+    with profile(activities=[ProfilerActivity.CPU, ProfilerActivity.CUDA]) as prof:
+        for i in range(n):
+            with record_function(f"vla_step_{i}"):
+                replay()
+            torch.cuda.synchronize()
+    prof.export_chrome_trace(str(trace))
+    with open(trace, "rb") as f, gzip.open(str(trace) + ".gz", "wb") as g:
+        g.write(f.read())
+    trace.unlink()
+    k, _ = parse_trace(out / "trace_graph.json.gz")
+    k.to_csv(out / "kernels_graph.csv.gz", index=False)
+    kk = k[k.cat == "kernel"]
+    per = kk.groupby("step").agg(n=("name", "size"), busy=("dur_us", "sum"))
+    first = k.groupby("step").ts_us.min()
+    last = (k.ts_us + k.dur_us).groupby(k.step).max()
+    stats = {
+        "graph_trace_replays": int(per.shape[0]),
+        "graph_trace_kernels_per_replay": float(per.n.median()),
+        "graph_trace_busy_ms": float(per.busy.median()) / 1e3,
+        "graph_trace_span_ms": float((last - first).median()) / 1e3,
+        "graph_trace_kernel_dur_us_median": float(kk.dur_us.median()),
+    }
+    meta_p = out / "meta.json"
+    meta = json.loads(meta_p.read_text())
+    meta.update(stats)
+    meta_p.write_text(json.dumps(meta, indent=2))
+    print("graph profile:", json.dumps(stats))
+    return stats
 
 
 def default_out(model: str) -> Path:
