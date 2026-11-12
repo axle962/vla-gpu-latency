@@ -16,9 +16,12 @@ Model (CLAUDE.md section 4.2, revised by the A100 calibration)
   Graph: T_graph = L_graph + sum_k (t_k + delta_node), over the captured kernels.
   Hybrid (graph-capable workloads): eager prefix + graph loop.
 
-Fitted parameter: p (seconds of Python/framework code per kernel not covered by single-op
-dispatch costs), fitted on ONE config per model and held fixed for the others. Everything else
-comes from microbenchmarks or the trace.
+Fitted parameters, both on ONE source-GPU run per model (the baseline config) and held fixed:
+  b  profiler bias per traced kernel (CUPTI tracing adds ~1 us to each kernel; shown by
+     profiling graph replays, workloads/trace_common.profile_graph), fitted so the graph loop
+     matches its measured (unprofiled) time; t_k := max(t_k - b, 0.5 us)
+  p  Python/framework time per kernel not covered by single-op dispatch costs, fitted so the
+     eager step matches. Everything else comes from microbenchmarks or the trace.
 
 Baselines
   gpu_only      sum of kernel durations (what a per-kernel roofline/VLA-Perf-style model
@@ -175,6 +178,28 @@ def graph(tr: StepTrace, c: Calib, sl: slice) -> float:
     return c.graph_call_us + float((t + c.delta_node_us).sum())
 
 
+MIN_KERNEL_US = 0.5
+
+
+def corrected(tr: StepTrace, b_us: float) -> StepTrace:
+    """Remove the profiler's per-kernel overhead b from traced kernel durations."""
+    return StepTrace(np.maximum(tr.t_us - b_us, MIN_KERNEL_US), tr.cls, tr.sync, tr.loop_start)
+
+
+def fit_b(tr: StepTrace, c: Calib, target_us: float) -> float:
+    """Profiler bias per kernel such that the graph-loop prediction matches a measured graph
+    time on the source GPU (CUPTI tracing adds ~1 us to each traced kernel; see CLAUDE.md)."""
+    loop = slice(tr.loop_start, None)
+    lo, hi = -5.0, 10.0
+    for _ in range(60):
+        mid = (lo + hi) / 2
+        if graph(corrected(tr, mid), c, loop) > target_us:
+            lo = mid
+        else:
+            hi = mid
+    return (lo + hi) / 2
+
+
 def fit_p(tr: StepTrace, c: Calib, target_us: float) -> float:
     lo, hi = 0.0, 200.0
     for _ in range(50):
@@ -210,24 +235,27 @@ def main() -> None:
             traces[r] = load_step(r, n_iter)
             print(f"#   {r.parent.name}/{r.name}: {len(traces[r].t_us)} events, loop starts at "
                   f"{traces[r].loop_start}", file=sys.stderr)
-        # Fit p on the baseline config only (the first run of it).
+        # Fit b (profiler bias) and p (Python residual) on ONE run: the first baseline-config
+        # run that has graph data. Every other run is held out.
+        g_key = "graph_denoise_ms_median" if model == "smolvla" else "graph_decode_ms_median"
+        cands = [(r, m) for r, m in mruns if m.get(g_key) and traces[r].loop_start > 0]
         if model == "smolvla":
-            fit_run = next(r for r, m in mruns
-                           if (m["cameras"], m["num_steps"], m["chunk_size"]) == (3, 10, 50))
-        else:
-            fit_run = mruns[0][0]
-        fit_meta = dict(mruns)[fit_run]
-        p_us = fit_p(traces[fit_run], c, fit_meta["eager_ms_median"] * 1e3)
-        print(f"#   fitted Python residual p = {p_us:.2f} us per kernel on {fit_run.name}",
-              file=sys.stderr)
+            cands = [(r, m) for r, m in cands
+                     if (m["cameras"], m["num_steps"], m["chunk_size"]) == (3, 10, 50)]
+        fit_run, fit_meta = cands[0]
+        b_us = fit_b(traces[fit_run], c, fit_meta[g_key] * 1e3)
+        p_us = fit_p(corrected(traces[fit_run], b_us), c, fit_meta["eager_ms_median"] * 1e3)
+        print(f"#   fitted on {fit_run.name}: profiler bias b = {b_us:.3f} us per kernel, "
+              f"Python residual p = {p_us:.2f} us per kernel", file=sys.stderr)
 
         for r, m in mruns:
-            tr = traces[r]
+            tr_raw = traces[r]
+            tr = corrected(tr_raw, b_us)
             cfg = r.parent.name
             full, pre = slice(None), slice(0, tr.loop_start)
             loop = slice(tr.loop_start, None)
             q: dict[str, tuple[float, dict]] = {}
-            preds_eager = {mode: eager(tr, c, full, mode) for mode in
+            preds_eager = {mode: eager(tr_raw, c, full, mode) for mode in
                            ("gpu_only", "driver_launch", "table")}
             preds_eager["full"] = eager(tr, c, full, "table", p_us)
             q["eager"] = (m["eager_ms_median"], preds_eager)
@@ -236,29 +264,29 @@ def main() -> None:
                     "eager_prefill_ms_median"
                 if m.get(pre_key):
                     q["eager_prefix"] = (m[pre_key], {
-                        "gpu_only": eager(tr, c, pre, "gpu_only"),
-                        "driver_launch": eager(tr, c, pre, "driver_launch"),
-                        "table": eager(tr, c, pre, "table"),
+                        "gpu_only": eager(tr_raw, c, pre, "gpu_only"),
+                        "driver_launch": eager(tr_raw, c, pre, "driver_launch"),
+                        "table": eager(tr_raw, c, pre, "table"),
                         "full": eager(tr, c, pre, "table", p_us)})
                 loop_key = "eager_denoise_ms_median" if model == "smolvla" else \
                     "static_decode_ms_median"
                 if m.get(loop_key):
                     q["eager_loop"] = (m[loop_key], {
-                        "gpu_only": eager(tr, c, loop, "gpu_only"),
-                        "driver_launch": eager(tr, c, loop, "driver_launch"),
-                        "table": eager(tr, c, loop, "table"),
+                        "gpu_only": eager(tr_raw, c, loop, "gpu_only"),
+                        "driver_launch": eager(tr_raw, c, loop, "driver_launch"),
+                        "table": eager(tr_raw, c, loop, "table"),
                         "full": eager(tr, c, loop, "table", p_us)})
-                g_key = "graph_denoise_ms_median" if model == "smolvla" else \
-                    "graph_decode_ms_median"
                 if m.get(g_key):
                     gp = graph(tr, c, loop)
-                    q["graph_loop"] = (m[g_key], {"gpu_only": eager(tr, c, loop, "gpu_only"),
-                                                  "full": gp})
+                    q["graph_loop"] = (m[g_key], {
+                        "gpu_only": eager(tr_raw, c, loop, "gpu_only"),
+                        "graph_no_bias": graph(tr_raw, c, loop),
+                        "full": gp})
                     h_key = "hybrid_ms_median" if model == "smolvla" else \
                         "static_hybrid_ms_median"
                     if m.get(h_key):
                         q["hybrid"] = (m[h_key], {
-                            "gpu_only": eager(tr, c, full, "gpu_only"),
+                            "gpu_only": eager(tr_raw, c, full, "gpu_only"),
                             "full": eager(tr, c, pre, "table", p_us) + gp})
             for name, (meas_ms, preds) in q.items():
                 for pred_name, pred_us in preds.items():

@@ -40,7 +40,7 @@ commit and push (or tar) the results. Never run GPU work on the `access` gateway
 
 ---
 
-## 0.1 Resume here (updated 2026-11-11 ~23:00)
+## 0.1 Resume here (updated 2026-11-12 ~22:30)
 
 State:
 - **Calibration done on A100** (`results/calib/NVIDIA_A100*`, two nodes; launch numbers agree
@@ -122,6 +122,27 @@ State:
     Python module/HF-code overhead between aten ops. Model plan: c_dispatch per aten op type
     from this table, times op counts from the trace, plus a per-step Python residual fitted on
     one config and validated on the others.
+- **Launch-aware model v1, same GPU (A100), `model/launch_model.py`** ->
+  `results/predictions_same_gpu.csv`. Two-timeline replay of the traced step (per-op PyTorch
+  dispatch from the calibration table, GPU-side g_eager = 2.14 us, host copies synchronous) and
+  graph = L_graph + sum(t_k + delta_node), delta_node = 0.28 us (C++ spin chains). Two fitted
+  parameters, both on one baseline run and held fixed: p (Python time per kernel beyond
+  single-op dispatch: 17.3 us SmolVLA, 16.7 us OpenVLA, nearly equal across models and torch
+  versions) and b (profiler bias per traced kernel: 0.98 us torch 2.10/cu128, 0.66 us torch
+  2.2/cu121). Held-out MAPE: SmolVLA (8 runs) eager 1.8%, eager denoise 3.4%, prefix 4.1%,
+  graph loop 0.7%, hybrid 2.8%; OpenVLA (repeat runs only) eager 0.7%, graph decode 0.3%,
+  prefill -14% (more Python per kernel in HF prefill/generate setup), hybrid -8%. Baselines:
+  GPU-time only 24 to 86%, bare driver launch 52 to 78%, dispatch table without p 51 to 62%.
+  - **Profiler bias finding (job 30203, graph replays profiled with `profile_graph`):** with
+    CUPTI tracing on, the SmolVLA graph replay takes 48.3 ms instead of 35.7 ms, and short
+    kernels measure the same eager (idle gaps) and in-graph (back to back), 2.99 vs 3.01 us.
+    So idle gaps do not slow kernels; the profiler adds ~1 us per kernel. Under torch 2.2/cu121
+    the overhead shows up as in-graph gaps (17 ms per OpenVLA decode) instead of longer
+    durations. Traced durations must be corrected by b before summing; b is a property of the
+    source machine's profiler and is fitted there, so this stays valid for cross-GPU use.
+  - Cluster note: two trace jobs (29191, 29303) failed their node boot and were then cancelled
+    by a system sweep at the top of the hour (`CANCELLED by 0` at hh:00). Failed boots cost 0
+    s. Watch for `REQUEUED` and resubmit instead of waiting.
 - **Workloads.** SmolVLA (`lerobot/smolvla_base`, 450M, fits the 2080 Ti) and OpenVLA-7B
   (`openvla/openvla-7b`, A100 only, since L4 is down). pi0 deferred (gated PaliGemma; needs the
   user's HF token). GR00T N1.5-3B optional.
@@ -133,14 +154,14 @@ State:
     `envs/smolvla` (`lerobot[smolvla]`, torch 2.10.0 cu128, transformers 4.57.6). Recreate with
     `UV_CACHE_DIR=/scratch/am16489/.cache/uv uv venv -p 3.10 envs/smolvla && VIRTUAL_ENV=$PWD/envs/smolvla uv pip install "lerobot[smolvla]" pandas`.
 - **Next:**
-  1. First predictor (`model/`): per-kernel GPU time from the trace + per-op dispatch from the
-     calibration table -> predicted eager, graph and hybrid times for every traced config;
-     report % error against `results/traces_summary.csv` (same GPU first, then cross-GPU once
-     the 2080 Ti traces exist).
+  1. Cross-GPU (flavor B): once the 2080 Ti traces are back, extend `launch_model.py` to take
+     a source run and a target GPU: dispatch table and b, p from the source host; kernel times
+     scaled to the target (per-kernel roofline transfer with the L2 term, section 4.2);
+     g_eager, delta_node from the target's C++ calibration. Validate on the A100 sweep.
   3. cuda2 (user, or Claude Code on cuda2): `docs/cuda2_runbook.md` /
      `scripts/run_cuda2.sh` (setup, calib, dispatch, 7-config SmolVLA trace). Then rerun
      `model/launch_model.py` with the 2080 Ti as source and the A100 as target.
-- GPU-hours used on `csci_ga_3033_025-2026fa`: 3.14 of 300 (2026-11-11 23:00).
+- GPU-hours used on `csci_ga_3033_025-2026fa`: 3.23 of 300 (2026-11-12 22:30).
 - Pending for the user (CIMS): see "Needs the user" in section 1 and the cuda2 commands in
   section 6. The user asked for a full "what to run on cuda machines and elsewhere" list once
   the cluster runs are finished.
