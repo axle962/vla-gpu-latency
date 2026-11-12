@@ -10,7 +10,9 @@
 #   scripts/run_cuda2.sh calib       # C++ microbenchmarks + ncu/nsys check (~2 min)
 #   scripts/run_cuda2.sh dispatch    # PyTorch per-op dispatch table (~1 min)
 #   scripts/run_cuda2.sh trace       # SmolVLA, same 7 configs as the A100 sweep (~25 min)
+#   scripts/run_cuda2.sh trace-baseline   # optional: repeat the baseline (variance)
 #   scripts/run_cuda2.sh results     # list what to commit
+# Full instructions (also for a Claude Code session on cuda2): docs/cuda2_runbook.md
 #
 # Then: git add results/calib traces && git commit -m "cuda2 2080 Ti runs" && git push
 # (or tar the new dirs and scp them back). Raw trace*.json.gz files are git-ignored.
@@ -92,6 +94,14 @@ trace)
       && grep -E "max \|diff\||graph profile|wrote" "$log" \
       || echo "FAILED: $c (see $log)"
   done
+  ;;
+trace-baseline)
+  # One more baseline run (3 cameras, 10 steps, chunk 50) for run-to-run variance.
+  export HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 CUDA_MODULE_LOADING=EAGER
+  mkdir -p logs
+  log="logs/cuda2-baseline-repeat-$(date +%H%M%S).log"
+  "$PY" workloads/trace_smolvla.py > "$log" 2>&1 \
+    && grep -E "max \|diff\||graph profile|wrote" "$log" || echo "FAILED (see $log)"
   ;;
 results)
   ls -d results/calib/*2080* traces/smolvla_*/*2080* 2>/dev/null

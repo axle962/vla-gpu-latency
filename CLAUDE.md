@@ -28,6 +28,18 @@ This file is the project brief for Claude Code. Read it fully before writing cod
 
 ---
 
+## 0.0 If this session runs on CIMS cuda2 (or another CIMS cudaN machine)
+
+Check `hostname` first. On a CIMS `cudaN` host the cluster rules below (Slurm, `sbatch`, the
+`csci_ga_3033_025-2026fa` account, GPU-hour budget, "never run GPU work on the login node",
+`/scratch/am16489/...` paths, conda nvcc) **do not apply**: there is no Slurm, GPU work runs
+directly on the machine (after checking with `nvidia-smi` that the GPU is idle), the toolchain
+comes from `module load cuda-12.4`, and home has a 4 GB quota. The task there is
+**`docs/cuda2_runbook.md`**: follow it step by step via `scripts/run_cuda2.sh <stage>`, then
+commit and push (or tar) the results. Never run GPU work on the `access` gateway.
+
+---
+
 ## 0.1 Resume here (updated 2026-11-11 ~23:00)
 
 State:
@@ -125,8 +137,9 @@ State:
      calibration table -> predicted eager, graph and hybrid times for every traced config;
      report % error against `results/traces_summary.csv` (same GPU first, then cross-GPU once
      the 2080 Ti traces exist).
-  3. cuda2 (user): run the same `trace_smolvla.py` on the 2080 Ti (the source GPU). This
-     needs a smolvla env and the weights on CIMS.
+  3. cuda2 (user, or Claude Code on cuda2): `docs/cuda2_runbook.md` /
+     `scripts/run_cuda2.sh` (setup, calib, dispatch, 7-config SmolVLA trace). Then rerun
+     `model/launch_model.py` with the 2080 Ti as source and the A100 as target.
 - GPU-hours used on `csci_ga_3033_025-2026fa`: 3.14 of 300 (2026-11-11 23:00).
 - Pending for the user (CIMS): see "Needs the user" in section 1 and the cuda2 commands in
   section 6. The user asked for a full "what to run on cuda machines and elsewhere" list once
@@ -409,4 +422,4 @@ Found during scoping:
 - Never trust a single timing. Warm up, use cudaEvents, repeat, and record `CUDA_MODULE_LOADING`.
 - Keep the analytical model readable and separate from any ML residual model so ablations are trivial.
 - Before claiming a result, check it against the documented anomalies in section 3.
-- GPU work only through `sbatch` with account `csci_ga_3033_025-2026fa`; state the GPU-hour estimate before submitting multi-job sweeps.
+- On the Slurm cluster: GPU work only through `sbatch` with account `csci_ga_3033_025-2026fa`; state the GPU-hour estimate before submitting multi-job sweeps. On CIMS cudaN hosts there is no Slurm: run directly on an idle GPU (section 0.0, `docs/cuda2_runbook.md`).
