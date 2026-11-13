@@ -201,8 +201,13 @@ GPUS = {
                    dispatch_glob="results/calib/NVIDIA_TITAN_V_cuda3_*",
                    bench_glob="results/bench/NVIDIA_TITAN_V_cuda3_*",
                    probe_glob="results/calib/NVIDIA_TITAN_V_cuda3_*/torch_probe_*.csv"),
+    # CIMS cuda5, Ada sm_89, 36 MB L2 (2026-11-13): similar DRAM bandwidth to the 2080 Ti.
+    "RTX4070": dict(calib_glob="results/calib/NVIDIA_GeForce_RTX_4070_cuda5_*",
+                    dispatch_glob="results/calib/NVIDIA_GeForce_RTX_4070_cuda5_*",
+                    bench_glob="results/bench/NVIDIA_GeForce_RTX_4070_cuda5_*",
+                    probe_glob="results/calib/NVIDIA_GeForce_RTX_4070_cuda5_*/torch_probe_*.csv"),
 }
-TRACE_KEY = {"A100": "A100", "2080Ti": "RTX_2080_Ti", "TITANV": "TITAN_V"}
+TRACE_KEY = {"A100": "A100", "2080Ti": "RTX_2080_Ti", "TITANV": "TITAN_V", "RTX4070": "RTX_4070"}
 
 
 def r_lat(src: GPU, tgt: GPU) -> float:

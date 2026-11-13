@@ -204,9 +204,8 @@ State:
     (cuBLAS) vs 39.4 ms on the 2080 Ti, although the TITAN V has more DRAM bandwidth.
   - cuda4, GTX TITAN X (Maxwell): C++ calibration only (DRAM 264 GB/s, L2 ~650 GB/s, knee
     ~4 MB). No WMMA, no ncu.
-  - cuda5, RTX 4070: pipeline started, but the GPU was held by another user's job (11.2 of
-    12 GB, 0% utilization) for hours; see `logs/cuda5-pipeline.log`. Rerun when free:
-    `docs/cuda2_runbook.md` section 6.
+  - cuda5, RTX 4070: done 2026-11-13 03:06 to 03:30 once the other user's job freed the GPU
+    (results in the "RTX 4070 (cuda5) done" bullet below).
 - **Workloads.** SmolVLA (`lerobot/smolvla_base`, 450M, fits the 2080 Ti) and OpenVLA-7B
   (`openvla/openvla-7b`, A100 only, since L4 is down). pi0 deferred (gated PaliGemma; needs the
   user's HF token). GR00T N1.5-3B optional.
@@ -298,11 +297,38 @@ State:
   knee 16 to 24 MB. The bound is the weights' DRAM time (250 MB/step at 1.48 TB/s = 1.7 ms of
   32 ms), so the cache term is second order for SmolVLA. CIMS stage `l2` / mode `l2-only` added
   (runbook section 8); cuda5 `full` now includes it.
+- **RTX 4070 (cuda5) done 2026-11-13** (Claude Code on cuda2; host Xeon E5-2650 v2, 2013,
+  16 threads; torch 2.10.0+cu128 like every other GPU):
+  - Calibration (DRAM 475 GB/s of 504, L2 ~1.5 TB/s up to 32 MB, 36 MB L2, 46 SMs), dispatch
+    table, probe, bench (all correctness checks pass), 7-config trace sweep + baseline repeat
+    (all bit-exact), sustained clock 2760 MHz (max 3105), ncu (`results/ncu/*4070*`: C++ flow
+    chain warm/cold/cuBLAS and the real step).
+  - **Most extreme inversion so far: slowest eager step (607 ms; repeat 617) and fastest graph
+    loop (22.8 ms, A100 35.6), loop graph speedup 22.5x** (2080 Ti 10.2, A100 9.0, TITAN V 4.6).
+    The cuda5 host dispatches PyTorch ops 1.5 to 2.7x slower than the other hosts (eager add
+    17.4 us) and runs Python 1.2 to 1.4x slower.
+  - L2: warm DRAM traffic per C++ flow step 271 MB vs 408 MB on the 2080 Ti; flushing L2 before
+    every kernel costs +28% vs +18%. Real SmolVLA step under ncu (prefix + first flow step,
+    3,008 kernels): 2.48 GB of DRAM traffic vs 3.90 GB on the 2080 Ti (-36%).
+  - Model: `RTX4070` added to `GPUS`/`TRACE_KEY` (the only change to `model/cross_gpu.py`);
+    `model/figures.py` got `--csv/--gpus/--tag` so the paper figures stay on the three-GPU set
+    (`paper/figures/*.pdf`) with four-GPU versions in `*_4gpu.*`. Reports:
+    `results/report_cross_gpu.md` (4 GPUs), `results/report_cross_gpu_3gpu.md` (3 GPUs,
+    identical to the earlier numbers). `slot_class` with the 4070: graph loop transfers well
+    (2080 Ti/A100 -> 4070 10% / 9%, back 5% / 6%) but **eager into the 4070 is 41 to 60% too
+    high**: the model scales all host time by the aten dispatch ratio (2.0 to 2.6x), while the
+    measured eager step is only 1.25 to 1.8x slower. `slot_cold_py` (Python-speed scaling)
+    gets -2 to +21% there but is worse on the first three. 4-GPU MAPE `slot_class`: eager 24%,
+    graph loop 15%, hybrid 15%; exact 4-GPU ranking 64%.
+  - Paper: RTX 4070 row in Table 1, new subsection "A fourth GPU", limitations updated; the
+    headline numbers stay on the three-GPU set. No \pending{} left.
 - **Next:**
-  1. User on CIMS: `l2` sweep on cuda2 and cuda3 (runbook section 8); cuda5 (RTX 4070) full
-     pipeline when its GPU is free (large-L2 test, includes l2); then
-     add `RTX4070` to `GPUS`/`TRACE_KEY` in `model/cross_gpu.py`, rerun cross_gpu, report,
-     figures, and fill the last \pending{} in the paper.
+  0. CIMS: `l2` sweep on cuda2, cuda3 and cuda5 (runbook section 8; cuda5's `full` run happened
+     before the stage existed, so it needs `l2-only` too).
+  1. Model: transfer of the Python share of host time between very different hosts (the 4070
+     eager failure); e.g. split p into a dispatch-scaled and a Python-scaled part fitted on the
+     three similar hosts and test on cuda5. Decide whether the paper headline should move to
+     four GPUs.
   2. Paper: verify bibliography, compile on Overleaf, tighten; presentation slides.
   3. Optional: spec-only what-if predictions for H100/H200/L40S remain a stated limitation.
 - GPU-hours used on `csci_ga_3033_025-2026fa`: 3.31 of 300 (2026-11-13 18:10).

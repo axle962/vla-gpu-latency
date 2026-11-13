@@ -20,8 +20,8 @@ import pandas as pd  # noqa: E402
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "paper/figures"
 # Categorical slots 1 to 3 of the reference palette, fixed per target GPU.
-GPU_COLOR = {"A100": "#2a78d6", "2080Ti": "#eb6834", "TITANV": "#1baf7a"}
-GPU_LABEL = {"A100": "A100", "2080Ti": "RTX 2080 Ti", "TITANV": "TITAN V"}
+GPU_COLOR = {"A100": "#2a78d6", "2080Ti": "#eb6834", "TITANV": "#1baf7a", "RTX4070": "#8a5cd1"}
+GPU_LABEL = {"A100": "A100", "2080Ti": "RTX 2080 Ti", "TITANV": "TITAN V", "RTX4070": "RTX 4070"}
 INK, INK2, GRID = "#0b0b0b", "#52514e", "#e4e3df"
 VARIANT_LABEL = {"same": "unchanged", "spec_bw": "spec BW ratio", "bw": "measured BW ratio",
                  "lat": "C++ latency ratio", "lat_bw": "C++ latency + BW",
@@ -40,7 +40,7 @@ def style(ax) -> None:
     ax.set_axisbelow(True)
 
 
-def pred_vs_meas(d: pd.DataFrame, variant: str) -> None:
+def pred_vs_meas(d: pd.DataFrame, variant: str, tag: str = "") -> None:
     x = d[(d.source != d.target) & (d.unit == "ms")
           & d.quantity.isin(["eager", "graph_loop", "hybrid"])]
     fig, axes = plt.subplots(1, 2, figsize=(7.0, 3.4), sharex=True, sharey=True)
@@ -64,14 +64,16 @@ def pred_vs_meas(d: pd.DataFrame, variant: str) -> None:
     axes[0].set_ylabel("predicted latency (ms)", fontsize=8, color=INK2)
     axes[1].legend(title="target GPU", fontsize=7, title_fontsize=7, frameon=False,
                    loc="upper left")
-    fig.text(0.5, -0.02, "eager step, graph loop and hybrid step; 6 source/target pairs x 7 "
-             "configs; dotted lines: +/-20%", ha="center", fontsize=7, color=INK2)
+    pairs = x[["source", "target"]].drop_duplicates().shape[0]
+    fig.text(0.5, -0.02, f"eager step, graph loop and hybrid step; {pairs} source/target pairs x "
+             f"{x.config.nunique()} configs; dotted lines: +/-20%", ha="center", fontsize=7,
+             color=INK2)
     fig.tight_layout()
-    fig.savefig(OUT / "pred_vs_meas.pdf", bbox_inches="tight")
-    fig.savefig(OUT / "pred_vs_meas.png", dpi=200, bbox_inches="tight")
+    fig.savefig(OUT / f"pred_vs_meas{tag}.pdf", bbox_inches="tight")
+    fig.savefig(OUT / f"pred_vs_meas{tag}.png", dpi=200, bbox_inches="tight")
 
 
-def mape_variants(d: pd.DataFrame, variant: str) -> None:
+def mape_variants(d: pd.DataFrame, variant: str, tag: str = "") -> None:
     x = d[d.source != d.target]
     order = [v for v in VARIANT_LABEL if v in set(x.kernel_transfer)]
     qs = [("eager", "eager step"), ("graph_loop", "graph loop"), ("hybrid", "hybrid step"),
@@ -92,18 +94,24 @@ def mape_variants(d: pd.DataFrame, variant: str) -> None:
         ax.set_xlabel("MAPE (%)", fontsize=8, color=INK2)
         ax.set_xlim(0, max(80, m.max() * 1.15))
     fig.tight_layout()
-    fig.savefig(OUT / "mape_variants.pdf", bbox_inches="tight")
-    fig.savefig(OUT / "mape_variants.png", dpi=200, bbox_inches="tight")
+    fig.savefig(OUT / f"mape_variants{tag}.pdf", bbox_inches="tight")
+    fig.savefig(OUT / f"mape_variants{tag}.png", dpi=200, bbox_inches="tight")
 
 
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--variant", default="slot_class")
+    ap.add_argument("--csv", default=str(ROOT / "results/predictions_cross_gpu.csv"))
+    ap.add_argument("--gpus", default="", help="comma list of GPU keys to keep (default: all)")
+    ap.add_argument("--tag", default="", help="suffix for the output file names, e.g. _4gpu")
     a = ap.parse_args()
     OUT.mkdir(parents=True, exist_ok=True)
-    d = pd.read_csv(ROOT / "results/predictions_cross_gpu.csv")
-    pred_vs_meas(d, a.variant)
-    mape_variants(d, a.variant)
+    d = pd.read_csv(a.csv)
+    if a.gpus:
+        keep = a.gpus.split(",")
+        d = d[d.source.isin(keep) & d.target.isin(keep)]
+    pred_vs_meas(d, a.variant, a.tag)
+    mape_variants(d, a.variant, a.tag)
     print("wrote", *sorted(p.name for p in OUT.glob("*")))
 
 

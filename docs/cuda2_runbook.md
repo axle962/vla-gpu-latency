@@ -245,8 +245,9 @@ ssh -n cuda5.cims.nyu.edu 'cd ~/fall2026/GPU/vla-gpu-latency && WORK=/scratch/am
 Then commit `results/calib/*/torch_probe_smolvla_env.csv` (and the cuda5 results) and push.
 
 Status 2026-11-13: cuda2 and cuda3 probes done, plus `scripts/clock_probe.sh` (sustained SM
-clock under the workload; `run_bench.sh` now runs it too). cuda5's full pipeline is started
-with `MAX_WAIT_S=43200` and waits for the RTX 4070 (held by another user's job).
+clock under the workload; `run_bench.sh` now runs it too). cuda5's full pipeline ran
+2026-11-13 03:06 to 03:30 after waiting ~4 h for the RTX 4070; ncu (chain + model) followed at
+13:04. All CIMS GPU work in this runbook is done.
 On the cluster: rerun `model/cross_gpu.py`, `model/report_cross_gpu.py`, `model/figures.py`.
 For cuda5, add an `RTX4070` entry to `GPUS` and `TRACE_KEY` in `model/cross_gpu.py`.
 

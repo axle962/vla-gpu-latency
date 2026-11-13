@@ -60,7 +60,7 @@ def main() -> None:
     t = s.pivot_table(index="source", columns="quantity", values="ape", aggfunc="mean")
     print(t[[q for q in QUANT_ORDER if q in t.columns]].round(1).to_markdown(), "\n")
 
-    print("## GPU ordering (all three GPUs ranked per source, config, quantity)\n")
+    print("## GPU ordering (all GPUs ranked per source, config, quantity)\n")
     rows = []
     for var in variants:
         g = d[d.kernel_transfer == var]

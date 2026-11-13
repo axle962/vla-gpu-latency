@@ -128,9 +128,11 @@ differ in the aten/C++ dispatch path, which is what $h$ measures.
 GPU & SMs & L2 & DRAM BW & host CPU\\\midrule
 RTX 2080 Ti (cuda2) & 68 & 5.5\,MB & 582\,GB/s & Xeon E5-2660 v3\\
 TITAN V (cuda3) & 80 & 4.5\,MB & 648\,GB/s & Xeon Gold 5118\\
-A100-SXM4-40GB & 108 & 40\,MB & 1479\,GB/s & cloud Xeon 2.2\,GHz\\\bottomrule
+A100-SXM4-40GB & 108 & 40\,MB & 1479\,GB/s & cloud Xeon 2.2\,GHz\\
+RTX 4070 (cuda5) & 46 & 36\,MB & 475\,GB/s & Xeon E5-2650 v2\\\bottomrule
 \end{tabular}
-\caption{GPUs. Bandwidth measured with our sweep (bench/calib).}\label{tab:gpus}
+\caption{GPUs. Bandwidth measured with our sweep (bench/calib). The RTX 4070 was added after
+the main analysis (Section~\ref{sec:rtx4070}); headline cross-GPU numbers use the first three.}\label{tab:gpus}
 \end{table}
 GPUs in Table~\ref{tab:gpus}; GTX TITAN X (Maxwell) was calibrated only. Software: PyTorch
 2.10/CUDA 12.8 for SmolVLA (same build on all hosts), PyTorch 2.2/CUDA 12.1 for OpenVLA; our
@@ -235,13 +237,36 @@ Measured eager step: TITAN V 340\,ms $<$ A100 383 $<$ 2080 Ti 484; graph loop: A
 bandwidth scaling never does. Graph speedup is therefore a property of the host-GPU pair:
 10.2$\times$ on cuda2, 9.0$\times$ on the A100 node and 4.6$\times$ on cuda3.
 
+\subsection{A fourth GPU: RTX 4070 behind an older host}\label{sec:rtx4070}
+The RTX 4070 (Ada, 36\,MB L2, 475\,GB/s measured, 2760\,MHz sustained under the workload)
+sits on cuda5, whose 2013 Xeon E5-2650 v2 dispatches PyTorch ops 1.5 to 2.7$\times$ slower than
+the other hosts (an eager add costs 17.4 vs 7.0 to 8.2\,$\mu$s) and runs Python 1.2 to
+1.4$\times$ slower. It gives the most extreme inversion we measured: the slowest eager step of
+the four GPUs (607\,ms) and the fastest graph loop (22.8\,ms, faster than the A100's
+35.6\,ms), so its loop graph speedup is 22.5$\times$ versus 4.6 to 10.2$\times$ elsewhere.
+Nsight Compute on the C++ flow step shows the larger L2 at work: warm-cache DRAM traffic per
+flow step is 271\,MB versus 408\,MB on the 2080 Ti, and flushing L2 before every kernel costs
+28\% versus 18\%.
+
+With the 4070 as an unseen target, the graph loop transfers well (\texttt{slot\_class}: 10\%
+from the 2080 Ti, 9\% from the A100, and 5 to 6\% in the other direction), but the eager step
+does not: predictions into the 4070 are 41 to 60\% too high. The model scales all host time by
+the target's aten dispatch ratio (2.0 to 2.6$\times$ here), while the measured eager step is
+only 1.25 to 1.8$\times$ slower than on the other hosts; the Python share of the step scales
+more like host Python speed (scaling it that way gives $-2$ to $+21\%$ for the 4070, but is
+worse among the first three GPUs). Over all four GPUs, \texttt{slot\_class} gives 24\%
+(eager), 15\% (graph loop) and 15\% (hybrid) MAPE. How to transfer the Python share between
+very different hosts is the main open problem the fourth GPU exposes.
+
 \section{Conclusions}
 For batch-1 VLA inference, latency prediction across GPUs is a launch and latency problem
 before it is a bandwidth or FLOP problem. A model that replays the host and GPU timelines,
 corrects profiler bias, and transfers per-kernel graph slots with a handful of target
 microbenchmarks predicts eager and hybrid latency within about 5 to 8\%, and reproduces
-orderings that spec ratios get wrong. Limitations: three GPUs, one host per GPU, SmolVLA only
-for cross-GPU validation, and no GPU with a very large L2. \pending{RTX 4070 (36\,MB L2)}
+orderings that spec ratios get wrong. Limitations: one host per GPU, SmolVLA only for
+cross-GPU validation, and an eager host model that does not transfer to a much slower host
+(the RTX 4070 on cuda5, Section~\ref{sec:rtx4070}), although the graph loop does. The largest
+L2 we could measure is 40\,MB, so the PRO 6000 (128\,MB) inversion remains untested.
 
 \begin{thebibliography}{9}
 \bibitem{vlaperf} W.~Jiang, J.~Clemons, K.~Sankaralingam, C.~Kozyrakis. How Fast Can I Run My

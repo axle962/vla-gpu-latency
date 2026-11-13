@@ -1,0 +1,5 @@
+gpu,bench,kernel,config,mode,timer,n_runs,mean_us,std_us,min_us,median_us,module_loading
+NVIDIA GeForce RTX 4070,chain,smolvla_flow,gemm=cublas;steps=10;rows=1194;launched=11940;traced_kernels=11480;traced_gpu_us=34471.7,eager,event,60,72743.2482,12233.9123,69442.4667,69875.8049,EAGER
+NVIDIA GeForce RTX 4070,chain,smolvla_flow,gemm=cublas;steps=10;rows=1194;launched=11940;traced_kernels=11480;traced_gpu_us=34471.7,eager,host,60,70021.9626,500.6449,69403.8540,69883.2530,EAGER
+NVIDIA GeForce RTX 4070,chain,smolvla_flow,gemm=cublas;steps=10;rows=1194;launched=11920;traced_kernels=11480;traced_gpu_us=34471.7,graph,event,60,23542.2965,57.3692,23508.9912,23535.4242,EAGER
+NVIDIA GeForce RTX 4070,chain,smolvla_flow,gemm=cublas;steps=10;rows=1194;launched=11920;traced_kernels=11480;traced_gpu_us=34471.7,graph,host,60,23538.9660,4.4972,23529.1070,23538.6170,EAGER

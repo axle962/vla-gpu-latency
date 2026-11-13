@@ -1,0 +1,5 @@
+host cuda5, GPU 0 (NVIDIA GeForce RTX 4070)
+spec: 3105 MHz, [Requested functionality has been deprecated] (max SM, application clock)
+SM clock under load: median 2760 MHz, min 2505, max 2760 (63 of 63 samples)
+chain 10 flow steps, cuBLAS, eager: 74.78 ms
+chain 10 flow steps, cuBLAS, graph: 23.54 ms
