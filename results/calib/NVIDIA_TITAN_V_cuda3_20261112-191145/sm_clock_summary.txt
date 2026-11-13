@@ -1,0 +1,5 @@
+host cuda3, GPU 0 (NVIDIA TITAN V)
+spec: 1912 MHz, 1200 MHz (max SM, application clock)
+SM clock under load: median 1335 MHz, min 1200, max 1335 (58 of 59 samples)
+chain 10 flow steps, cuBLAS, eager: 53.30 ms
+chain 10 flow steps, cuBLAS, graph: 52.76 ms

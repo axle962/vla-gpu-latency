@@ -1,0 +1,5 @@
+gpu,bench,kernel,config,mode,timer,n_runs,mean_us,std_us,min_us,median_us,module_loading
+NVIDIA TITAN V,chain,smolvla_flow,gemm=cublas;steps=10;rows=1194;launched=11940;traced_kernels=11480;traced_gpu_us=34471.7,eager,event,60,53311.9399,65.0185,53272.5754,53298.1758,EAGER
+NVIDIA TITAN V,chain,smolvla_flow,gemm=cublas;steps=10;rows=1194;launched=11940;traced_kernels=11480;traced_gpu_us=34471.7,eager,host,60,53327.1324,60.4416,53276.9270,53317.5895,EAGER
+NVIDIA TITAN V,chain,smolvla_flow,gemm=cublas;steps=10;rows=1194;launched=11920;traced_kernels=11480;traced_gpu_us=34471.7,graph,event,60,52764.9076,17.0500,52732.9292,52764.6713,EAGER
+NVIDIA TITAN V,chain,smolvla_flow,gemm=cublas;steps=10;rows=1194;launched=11920;traced_kernels=11480;traced_gpu_us=34471.7,graph,host,60,52770.1747,19.1117,52725.7020,52770.8610,EAGER

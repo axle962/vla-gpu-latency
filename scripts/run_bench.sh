@@ -49,5 +49,8 @@ for g in own cublas; do
   "$BUILD/chain_replay" --list=bench/chains/smolvla_flow.csv --gemm=$g --reps=3 \
     --per-op="$out/perop_flow_$g.csv" > /dev/null 2>> "$out/chains_log.txt"
 done
+# Sustained SM clock under this workload (latency-bound kernels scale with it).
+scripts/clock_probe.sh "$BUILD" "$out" > /dev/null
+cat "$out/sm_clock_summary.txt"
 echo "done: $out"
 cut -d, -f3,4,5,6,11 "$out/chains.csv" | column -t -s,

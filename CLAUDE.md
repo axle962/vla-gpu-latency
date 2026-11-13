@@ -252,8 +252,32 @@ State:
     of cases (bandwidth ratio 35%); reproduces the eager/graph inversion from every source.
   - `paper/main.tex`: first full draft (all required sections; orange \pending{} marks).
     No LaTeX on the cluster: compile on Overleaf or locally.
+- **Round 2 on CIMS, 2026-11-13 (Claude Code on cuda2):**
+  - `probe` done on cuda2 and cuda3 (`results/calib/*cuda2*/` and `*cuda3*/torch_probe_smolvla_env.csv`,
+    pinned to the GPU's NUMA node). `model/cross_gpu.py`, `report_cross_gpu.py` (saved as
+    `results/report_cross_gpu.md`) and `figures.py` rerun on cuda2 (added matplotlib and
+    tabulate to the env). Existing variants are unchanged; the new ones do not help:
+    `slot_cold` graph loop 22.1% (vs 16.2% `slot_class`), `slot_cold_py` eager 20.1% (vs 7.5%).
+  - **The cold-cache hypothesis is rejected.** TITAN V / 2080 Ti per-kernel graph time is
+    1.03 to 1.27x cold and 1.11 to 1.36x hot (A100 / 2080 Ti 0.70 to 0.97x), so cold data does
+    not produce the 1.5x seen in the real loop. Host Python speed is the same on all three
+    hosts (py_loop 0.29 / 0.32 / 0.32 us, module_tree 13.6 / 14.4 / 13.9 us), so scaling p by
+    Python speed (`slot_cold_py`) is wrong; what differs is the aten/C++ dispatch path (eager
+    linear 21 / 36 / 21 us, rmsnorm6 103 / 153 / 95 us on A100 / 2080 Ti / TITAN V hosts).
+  - **The TITAN V gap is the SM clock.** `scripts/clock_probe.sh` (now also run by
+    `run_bench.sh`) samples nvidia-smi while the C++ flow-step chain runs: the 2080 Ti holds a
+    median 1950 MHz (max 2160), the TITAN V only 1335 MHz (max 1912, application clock 1200,
+    no throttle reason reported). Ratio 1.46 matches the real-loop per-kernel ratio 1.54 and
+    the C++ replay ratio 1.35 (52.8 vs 38.9 ms). A clock-ratio transfer of the measured graph
+    loop gives 2080 Ti -> TITAN V 58.1 vs 61.4 ms (-5%) and back 42.0 vs 39.8 ms (+6%), versus
+    24% / 41% for `slot`. Not yet a variant in `model/cross_gpu.py` (model change left to the
+    modeling session). Clock alone does not cross architectures: the A100 (1410 MHz) is faster
+    per kernel than the 2080 Ti. A100 sustained clock was not sampled.
 - **Next:**
-  1. User on CIMS: probe stage on cuda2 and cuda3, cuda5 full pipeline when free
+  0. Model: add a sustained-clock feature (`sm_clock_summary.txt`) to the slot transfer, e.g.
+     slot(target) = slot(source) * clk_s / clk_t within an architecture family, plus an
+     architecture term; sample the A100 clock under load if the cluster is used again.
+  1. User on CIMS: probe stage on cuda2 and cuda3 (done 2026-11-13), cuda5 full pipeline when free
      (`docs/cuda2_runbook.md` section 7). Then rerun cross_gpu/report/figures, pick the final
      variant, add the RTX 4070 as a target (large-L2 test).
   2. Paper: survey (handout DOIs, CUDA-graph and dispatch-overhead papers), fill \pending{}.
