@@ -1,0 +1,6 @@
+# A100: NVIDIA A100-SXM4-40GB, BW 1479 GB/s (spec 1555), g_eager 2.14 us, delta_node 0.28 us, small kernels 11
+# 2080Ti: NVIDIA GeForce RTX 2080 Ti, BW 582 GB/s (spec 616), g_eager 1.07 us, delta_node 1.09 us, small kernels 11
+# TITANV: NVIDIA TITAN V, BW 648 GB/s (spec 653), g_eager 1.41 us, delta_node 0.77 us, small kernels 11
+# source A100: b = 1.009 us, p = 16.85 us (fit on NVIDIA_A100-SXM4-40GB_b-19-49_20261111-202939)
+# source 2080Ti: b = 0.644 us, p = 22.46 us (fit on NVIDIA_GeForce_RTX_2080_Ti_cuda2_20261112-210426)
+# source TITANV: b = 0.080 us, p = 13.80 us (fit on NVIDIA_TITAN_V_cuda3_20261112-192759)

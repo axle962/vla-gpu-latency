@@ -217,7 +217,31 @@ State:
   - Envs (git-ignored): `envs/openvla` (torch 2.2.0 cu121, transformers 4.40.1),
     `envs/smolvla` (`lerobot[smolvla]`, torch 2.10.0 cu128, transformers 4.57.6). Recreate with
     `UV_CACHE_DIR=/scratch/am16489/.cache/uv uv venv -p 3.10 envs/smolvla && VIRTUAL_ENV=$PWD/envs/smolvla uv pip install "lerobot[smolvla]" pandas`.
+- **A100 C++ bench done 2026-11-13** (job 30613, 51 s, `results/bench/NVIDIA_A100*_b-19-194_*`,
+  `scripts/cluster/bench.sbatch`; the conda env got `libcublas-dev` and `cuda-profiler-api`).
+  All correctness checks pass. 10-step denoise loop as a C++ graph (cuBLAS): A100 32.3 ms,
+  2080 Ti 39.4, TITAN V 52.8 vs real PyTorch graphs 35.7 / 40.1 / 61.7 ms. Our small C++
+  kernels are ~1.3x slower on the A100 than on the 2080 Ti (1410 MHz clock) although PyTorch's
+  small kernels take the same time on both.
+- **Cross-GPU model v0 (2026-11-13, `model/cross_gpu.py` -> `results/predictions_cross_gpu.csv`)**,
+  SmolVLA, 3 GPUs as source and target (6 pairs x 7 configs). Source fit: b, p on the source
+  baseline only. Target: C++ launch calib, BW sweep, PyTorch dispatch table (also its graph-mode
+  rows as per-op-class slot ratios), host speed ratio h for p. No target traces used.
+  - Findings: ~80% of loop kernels are latency bound; their slot (duration + node gap) is
+    3.0 / 3.4 / 5.2 us on A100 / 2080 Ti / TITAN V. Spec or measured bandwidth ratios fail
+    (graph loop MAPE ~64%). Profiler bias per kernel differs by GPU (fitted b: 1.0 / 0.64 /
+    0.08 us; uniform-bias estimate from graph replays 0.96 / 1.18 / 0.47), so transfer slots,
+    not raw traced durations.
+  - MAPE over cross pairs (best variant `slot_class`): eager 7.5%, hybrid 5.2%, graph loop
+    16% (2080 Ti<->A100 within 6%; pairs with the TITAN V 17 to 29%: real TITAN V graphs are
+    1.54x the 2080 Ti per kernel, the PyTorch graph-mode microbenchmarks say 1.17 to 1.5x and
+    the C++ replay 1.34x). Eager errors (~7 to 10% with the TITAN V host) come from scaling p by
+    the C++-dispatch host ratio: Python-heavy code scales differently (true p ratio 0.61, h 0.70).
 - **Next:**
+  0. Cross-GPU model: find the missing TITAN V graph slowdown (clock under load? per-kernel
+     heterogeneity in graph replays? check SM clocks in nvidia_smi.txt and the bias-per-class
+     split), add a pure-Python host benchmark for scaling p, then report per-pair errors and
+     the GPU-ordering inversion (eager: TITAN V fastest; graph: TITAN V slowest).
   1. Cross-GPU (flavor B): the 2080 Ti traces are in (`git pull`); extend `launch_model.py` to take
      a source run and a target GPU: dispatch table and b, p from the source host; kernel times
      scaled to the target (per-kernel roofline transfer with the L2 term, section 4.2);
@@ -229,7 +253,7 @@ State:
   3. cuda2 is done (section above). Use the ncu feature tables as per-kernel source features
      (DRAM/L2 bytes, occupancy; FLOPs from shapes) for the transfer model. TITAN V (cuda3) is a
      second validation target with full traces; the RTX 4070 (cuda5) is pending.
-- GPU-hours used on `csci_ga_3033_025-2026fa`: 3.23 of 300 (2026-11-12 22:30).
+- GPU-hours used on `csci_ga_3033_025-2026fa`: 3.24 of 300 (2026-11-13 03:30).
 - Pending for the user (CIMS): see "Needs the user" in section 1 and the cuda2 commands in
   section 6. The user asked for a full "what to run on cuda machines and elsewhere" list once
   the cluster runs are finished.

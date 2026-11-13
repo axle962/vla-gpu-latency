@@ -1,0 +1,25 @@
+gpu,bench,kernel,config,mode,timer,n_runs,mean_us,std_us,min_us,median_us,module_loading
+NVIDIA A100-SXM4-40GB,chain,smolvla_flow,gemm=own;steps=1;rows=1194;launched=1194;traced_kernels=1148;traced_gpu_us=3447.2,eager,event,20,8153.6512,4.7855,8141.8238,8154.6240,EAGER
+NVIDIA A100-SXM4-40GB,chain,smolvla_flow,gemm=own;steps=1;rows=1194;launched=1194;traced_kernels=1148;traced_gpu_us=3447.2,eager,host,20,6733.7069,621.4577,6442.2620,6463.4235,EAGER
+NVIDIA A100-SXM4-40GB,chain,smolvla_flow,gemm=own;steps=1;rows=1194;launched=1192;traced_kernels=1148;traced_gpu_us=3447.2,graph,event,20,4971.9809,3.7804,4966.4001,4972.0321,EAGER
+NVIDIA A100-SXM4-40GB,chain,smolvla_flow,gemm=own;steps=1;rows=1194;launched=1192;traced_kernels=1148;traced_gpu_us=3447.2,graph,host,20,4978.3204,4.6978,4970.1980,4978.1285,EAGER
+NVIDIA A100-SXM4-40GB,chain,smolvla_flow,gemm=own;steps=10;rows=1194;launched=11940;traced_kernels=11480;traced_gpu_us=34471.7,eager,event,20,65127.5780,10.9598,65112.0605,65126.9150,EAGER
+NVIDIA A100-SXM4-40GB,chain,smolvla_flow,gemm=own;steps=10;rows=1194;launched=11940;traced_kernels=11480;traced_gpu_us=34471.7,eager,host,20,65131.7326,10.8480,65113.3230,65130.4645,EAGER
+NVIDIA A100-SXM4-40GB,chain,smolvla_flow,gemm=own;steps=10;rows=1194;launched=11920;traced_kernels=11480;traced_gpu_us=34471.7,graph,event,20,49714.5855,16.6028,49684.4788,49713.6650,EAGER
+NVIDIA A100-SXM4-40GB,chain,smolvla_flow,gemm=own;steps=10;rows=1194;launched=11920;traced_kernels=11480;traced_gpu_us=34471.7,graph,host,20,49740.4551,21.5398,49712.0170,49739.2195,EAGER
+NVIDIA A100-SXM4-40GB,chain,smolvla_full,gemm=own;steps=1;rows=13937;launched=13937;traced_kernels=13340;traced_gpu_us=63926.0,eager,event,10,118394.3680,12.2322,118376.4496,118394.8784,EAGER
+NVIDIA A100-SXM4-40GB,chain,smolvla_full,gemm=own;steps=1;rows=13937;launched=13937;traced_kernels=13340;traced_gpu_us=63926.0,eager,host,10,118322.0875,91.7431,118182.0180,118345.3690,EAGER
+NVIDIA A100-SXM4-40GB,chain,smolvla_full,gemm=own;steps=1;rows=13937;launched=13901;traced_kernels=13340;traced_gpu_us=63926.0,graph,event,10,98830.8495,44.0828,98772.9950,98836.4830,EAGER
+NVIDIA A100-SXM4-40GB,chain,smolvla_full,gemm=own;steps=1;rows=13937;launched=13901;traced_kernels=13340;traced_gpu_us=63926.0,graph,host,10,98809.2322,34.5405,98762.3910,98806.9105,EAGER
+NVIDIA A100-SXM4-40GB,chain,smolvla_flow,gemm=cublas;steps=1;rows=1194;launched=1194;traced_kernels=1148;traced_gpu_us=3447.2,eager,event,20,4700.9792,7.4407,4687.8719,4700.6719,EAGER
+NVIDIA A100-SXM4-40GB,chain,smolvla_flow,gemm=cublas;steps=1;rows=1194;launched=1194;traced_kernels=1148;traced_gpu_us=3447.2,eager,host,20,4725.6755,50.9534,4695.9700,4710.6070,EAGER
+NVIDIA A100-SXM4-40GB,chain,smolvla_flow,gemm=cublas;steps=1;rows=1194;launched=1192;traced_kernels=1148;traced_gpu_us=3447.2,graph,event,20,3233.2289,1.1254,3231.7441,3232.7681,EAGER
+NVIDIA A100-SXM4-40GB,chain,smolvla_flow,gemm=cublas;steps=1;rows=1194;launched=1192;traced_kernels=1148;traced_gpu_us=3447.2,graph,host,20,3240.3822,1.0655,3238.6230,3240.6085,EAGER
+NVIDIA A100-SXM4-40GB,chain,smolvla_flow,gemm=cublas;steps=10;rows=1194;launched=11940;traced_kernels=11480;traced_gpu_us=34471.7,eager,event,20,47897.5998,3086.0328,46930.9425,46958.5915,EAGER
+NVIDIA A100-SXM4-40GB,chain,smolvla_flow,gemm=cublas;steps=10;rows=1194;launched=11940;traced_kernels=11480;traced_gpu_us=34471.7,eager,host,20,46959.3729,12.0716,46943.8700,46959.8560,EAGER
+NVIDIA A100-SXM4-40GB,chain,smolvla_flow,gemm=cublas;steps=10;rows=1194;launched=11920;traced_kernels=11480;traced_gpu_us=34471.7,graph,event,20,32330.7516,15.4690,32311.2946,32327.1675,EAGER
+NVIDIA A100-SXM4-40GB,chain,smolvla_flow,gemm=cublas;steps=10;rows=1194;launched=11920;traced_kernels=11480;traced_gpu_us=34471.7,graph,host,20,32336.0246,20.5826,32321.4910,32330.9785,EAGER
+NVIDIA A100-SXM4-40GB,chain,smolvla_full,gemm=cublas;steps=1;rows=13937;launched=13937;traced_kernels=13340;traced_gpu_us=63926.0,eager,event,10,65161.5234,9.2104,65144.8288,65164.8026,EAGER
+NVIDIA A100-SXM4-40GB,chain,smolvla_full,gemm=cublas;steps=1;rows=13937;launched=13937;traced_kernels=13340;traced_gpu_us=63926.0,eager,host,10,65170.8743,15.8706,65148.3660,65173.0200,EAGER
+NVIDIA A100-SXM4-40GB,chain,smolvla_full,gemm=cublas;steps=1;rows=13937;launched=13901;traced_kernels=13340;traced_gpu_us=63926.0,graph,event,10,47686.2457,38.0042,47651.8402,47669.7598,EAGER
+NVIDIA A100-SXM4-40GB,chain,smolvla_full,gemm=cublas;steps=1;rows=13937;launched=13901;traced_kernels=13340;traced_gpu_us=63926.0,graph,host,10,47671.0862,15.8110,47654.4760,47667.5795,EAGER
