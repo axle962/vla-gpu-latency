@@ -305,7 +305,7 @@ State:
      figures, and fill the last \pending{} in the paper.
   2. Paper: verify bibliography, compile on Overleaf, tighten; presentation slides.
   3. Optional: spec-only what-if predictions for H100/H200/L40S remain a stated limitation.
-- GPU-hours used on `csci_ga_3033_025-2026fa`: 3.26 of 300 (2026-11-13 17:00).
+- GPU-hours used on `csci_ga_3033_025-2026fa`: 3.31 of 300 (2026-11-13 18:10).
 - Pending for the user (CIMS): see "Needs the user" in section 1 and the cuda2 commands in
   section 6. The user asked for a full "what to run on cuda machines and elsewhere" list once
   the cluster runs are finished.
