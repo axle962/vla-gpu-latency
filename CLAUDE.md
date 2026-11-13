@@ -24,7 +24,7 @@ This file is the project brief for Claude Code. Read it fully before writing cod
   Blackwell JIT it, since CUDA 12.4 cannot emit sm_120).
 - Calibration run: `scripts/run_calib.sh [build_dir]`; on the cluster
   `sbatch -p <partition> scripts/cluster/calib.sbatch`. CSVs land in `results/calib/`.
-- Profiler check on cuda2: `scripts/check_profilers.sh`.
+- Profiler check on cuda2: `scripts/check_profilers.sh` (with `TMPDIR` private, see 0.1).
 
 ---
 
@@ -143,6 +143,70 @@ State:
   - Cluster note: two trace jobs (29191, 29303) failed their node boot and were then cancelled
     by a system sweep at the top of the hour (`CANCELLED by 0` at hh:00). Failed boots cost 0
     s. Watch for `REQUEUED` and resubmit instead of waiting.
+- **cuda2 (RTX 2080 Ti, source GPU) done 2026-11-12** (`docs/cuda2_runbook.md`, run by Claude
+  Code on cuda2; host Xeon E5-2660 v3 2.6 GHz, driver 595.104.02, torch 2.10.0+cu128):
+  - Calibration `results/calib/NVIDIA_GeForce_RTX_2080_Ti_cuda2_20261112-170614/`: DRAM
+    ~582 GB/s (94% of 616), L2 ~2.1 TB/s, L2 knee between 5.66 and 6.73 MB (matches 5.5 MB);
+    PyTorch dispatch table (add 7.6 us eager, 1.6 us as a graph node).
+  - **ncu works on cuda2**: `/tmp/nsight-compute-lock` belongs to another user, so ncu fails
+    with `InterprocessLockFailed` unless `TMPDIR` is private (`run_cuda2.sh` sets
+    `TMPDIR=$WORK/tmp`). Counters are allowed (no `ERR_NVGPUCTRPERM`); no helpdesk email needed.
+  - SmolVLA sweep, same 7 configs as the A100 plus a baseline repeat, all bit-exact
+    (`traces/*/NVIDIA_GeForce_RTX_2080_Ti_*`, `results/traces_summary.csv`). Baseline: eager
+    491 ms (repeat 497, +1.2%), prefix 75 ms, eager denoise 407 ms, graph denoise 40.1 ms
+    (10.2x), hybrid 116 ms (4.2x). Versus A100: eager 1.3x slower (CPU-bound, older host),
+    but graph denoise only 6 to 19% slower despite 2.5x less DRAM bandwidth: the kernels are
+    latency bound.
+  - **Eager timing on cuda2 has a host slow mode.** The 1-camera config's eager step was
+    bimodal in its first run (459 vs 588 ms across reps) and stuck at ~596 ms (denoise 522 ms)
+    in an unpinned rerun at 21:02, while the 3-camera baseline rerun right after was normal
+    (484 ms). Pinned with `numactl --cpunodebind=N --membind=N` the 1-camera config gives
+    457 ms (node 1, the GPUs' node) and 461 ms (node 0), so it is OS scheduling on the shared
+    40-thread host, not NUMA distance and not the workload; graph times are unaffected (37 ms).
+    Both unpinned 1-camera runs are kept in `traces/`; prefer runs with a small eager std, and
+    pin future eager timings on cuda2 (`numactl --cpunodebind=1 --membind=1`). The pinned test
+    outputs are only in `/scratch/am16489/tmp/numa_test` on cuda2.
+  - **Standalone CUDA C++ benchmarks (course requirement) build and run on cuda2**
+    (`results/bench/NVIDIA_GeForce_RTX_2080_Ti_cuda2_20261112-175909/`, `scripts/run_bench.sh`):
+    our kernels (`bench/kernels/kernels.cuh`: WMMA FP16 GEMM with split-K, FP32 SIMT GEMM,
+    tiled online-softmax attention, softmax, LayerNorm/RMSNorm, RoPE, SiLU/GELU, elementwise,
+    scan) all pass correctness checks against cuBLAS or a CPU reference. At the expert shapes
+    (M = 50) our GEMM is 1.2 to 1.5x cuBLAS; our attention is ~9x slower than PyTorch's
+    memory-efficient kernel for the vision tower (1.37 ms vs ~0.15 ms).
+  - **C++ replay of the traced step** (`bench/chains/chain_replay.cu`, lists from
+    `profile/extract_chain.py`): the 10-step denoise loop with cuBLAS GEMMs takes 39.4 ms as a
+    CUDA graph vs 40.1 ms for the real PyTorch graph (-1.6%). In C++, eager is 44.7 ms vs
+    PyTorch eager 407 ms: ~89% of SmolVLA's eager denoise time is Python/framework dispatch,
+    and the C++ eager/graph ratio is only 1.14x (0.98x with our kernels) vs 10.2x in PyTorch.
+    Full step: 75 ms (cuBLAS) / 146 ms (our kernels, slow attention) vs 64 ms traced GPU time.
+    Per-launch times of one flow step: 3.07 ms (cuBLAS) / 3.79 ms (ours) vs 3.45 ms traced
+    (the trace includes ~1 us profiler bias per kernel).
+  - **ncu per-kernel features** (`results/ncu/NVIDIA_GeForce_RTX_2080_Ti_cuda2_20261112-190706/`,
+    `scripts/run_ncu.sh`, 16 metrics in 3 passes, application replay, boost clocks): the C++
+    flow step with our kernels (L2 warm and flushed), with cuBLAS, and the real SmolVLA step
+    (prefix + first flow step = 3,008 kernels; the other 9 flow steps repeat the same kernels).
+    Findings: per flow step the GEMMs read 264 MB from DRAM (= the 250 MB of weights: weights
+    stream from DRAM every step on a 5.5 MB L2) while elementwise kernels hit L2 (99.6%).
+    Flushing L2 before every kernel costs +18% (4.7 to 5.6 ms) and raises DRAM traffic from
+    408 to 692 MB: the value of inter-kernel L2 residency on this GPU. Real step: 70% of
+    kernels under 5 us, median achieved occupancy 13.5%. ncu cost: SASS-instrumented FLOP
+    counters (`smsp__sass_thread_inst_*`) and kernel replay made a 1,300-kernel run take 35+
+    min; without them ~0.23 s per kernel. FLOPs come from the shapes instead. ncu does not
+    support Maxwell (cuda4).
+- **Other CIMS GPUs (2026-11-12, user approved; `scripts/run_cims_host.sh`, same torch build):**
+  - cuda3, TITAN V (Volta): calibration (DRAM 650 GB/s, L2 ~1.8 TB/s, knee 4 to 8 MB),
+    dispatch table, bench (all correctness checks pass), full 7-config trace sweep + baseline
+    repeat, all bit-exact. **Baseline: eager 343 ms (fastest of the three GPUs: its Xeon Gold
+    5118 host dispatches faster), graph denoise 61.5 ms (slowest), graph speedup 4.6x vs
+    10.2x on the 2080 Ti and 9.0x on the A100.** The GPU ordering inverts between eager and
+    graph mode: the graph speedup is set by host dispatch cost vs GPU kernel time, not by the
+    workload alone (section 3, hypothesis 3). C++ replay, 10-step loop as a graph: 52.8 ms
+    (cuBLAS) vs 39.4 ms on the 2080 Ti, although the TITAN V has more DRAM bandwidth.
+  - cuda4, GTX TITAN X (Maxwell): C++ calibration only (DRAM 264 GB/s, L2 ~650 GB/s, knee
+    ~4 MB). No WMMA, no ncu.
+  - cuda5, RTX 4070: pipeline started, but the GPU was held by another user's job (11.2 of
+    12 GB, 0% utilization) for hours; see `logs/cuda5-pipeline.log`. Rerun when free:
+    `docs/cuda2_runbook.md` section 6.
 - **Workloads.** SmolVLA (`lerobot/smolvla_base`, 450M, fits the 2080 Ti) and OpenVLA-7B
   (`openvla/openvla-7b`, A100 only, since L4 is down). pi0 deferred (gated PaliGemma; needs the
   user's HF token). GR00T N1.5-3B optional.
@@ -154,13 +218,17 @@ State:
     `envs/smolvla` (`lerobot[smolvla]`, torch 2.10.0 cu128, transformers 4.57.6). Recreate with
     `UV_CACHE_DIR=/scratch/am16489/.cache/uv uv venv -p 3.10 envs/smolvla && VIRTUAL_ENV=$PWD/envs/smolvla uv pip install "lerobot[smolvla]" pandas`.
 - **Next:**
-  1. Cross-GPU (flavor B): once the 2080 Ti traces are back, extend `launch_model.py` to take
+  1. Cross-GPU (flavor B): the 2080 Ti traces are in (`git pull`); extend `launch_model.py` to take
      a source run and a target GPU: dispatch table and b, p from the source host; kernel times
      scaled to the target (per-kernel roofline transfer with the L2 term, section 4.2);
      g_eager, delta_node from the target's C++ calibration. Validate on the A100 sweep.
-  3. cuda2 (user, or Claude Code on cuda2): `docs/cuda2_runbook.md` /
-     `scripts/run_cuda2.sh` (setup, calib, dispatch, 7-config SmolVLA trace). Then rerun
-     `model/launch_model.py` with the 2080 Ti as source and the A100 as target.
+  2. Run `scripts/run_bench.sh bench/build-cluster` on the A100 (C++ kernels and replay on the
+     target GPU: validation of per-kernel transfer on code we control); build with
+     `make -C bench ARCHS="75 70 80 89" BUILD=build-cluster` (needs cuBLAS from the conda
+     CUDA 12.4 env). ~2 GPU-minutes.
+  3. cuda2 is done (section above). Use the ncu feature tables as per-kernel source features
+     (DRAM/L2 bytes, occupancy; FLOPs from shapes) for the transfer model. TITAN V (cuda3) is a
+     second validation target with full traces; the RTX 4070 (cuda5) is pending.
 - GPU-hours used on `csci_ga_3033_025-2026fa`: 3.23 of 300 (2026-11-12 22:30).
 - Pending for the user (CIMS): see "Needs the user" in section 1 and the cuda2 commands in
   section 6. The user asked for a full "what to run on cuda machines and elsewhere" list once
@@ -205,7 +273,7 @@ Index line for `MEMORY.md`:
 | Professor approval | Email drafted Sep 30 (after the "before Sep 30 lecture" deadline for modified projects). **Approval status unknown here.** | Confirm approval and any scope changes he asked for. Record them in section 9. |
 | Team size | Unknown (handout allows 1 to 4; bigger team, more output expected) | Fill in. |
 | Report and presentation deadlines | Unknown | Fill in; the milestone plan in section 8 is relative. |
-| Nsight Compute permissions on cuda2 | Untested | Run `scripts/check_profilers.sh` on cuda2. If it fails with `ERR_NVGPUCTRPERM`, email CIMS helpdesk immediately; the whole project depends on counters. |
+| Nsight Compute permissions on cuda2 | **Works (2026-11-12)** with a private `TMPDIR` (the `/tmp` lock file belongs to another user). No helpdesk email needed. | None. |
 | Target GPU access | **Updated 2026-11-10.** The Slurm cluster reachable from `/scratch` (login node `b-9-198`) lists T4, V100, A100, L4 and RTX 6000-class (`g4-standard-48`) partitions, but a submit filter lets account `csci_ga_3033_025-2026fa` use only **`c12m85-a100-1` (1x A100) and `g2-standard-12` (1x L4)** (checked with `sbatch --test-only`). H200 and L40S (Torch spec sheet) are not on this cluster; H100, B200, PRO 6000 are external. | Calibrate A100 and L4. Ask the course staff / HPC whether the account can get T4, V100 or `g4-standard-48` (PRO 6000 is the key L2 GPU), and how to reach Torch's H200/L40S. |
 | VLA-Perf prior work | **Read 2026-11-10** (section 3.4). Pure spec-sheet roofline; explicitly does not model launch overhead; no L2 term; no graph prediction; validated only on RTX 4090. | Verify Table 1 and Section 4 numbers against the PDF before quoting them. |
 
@@ -307,6 +375,9 @@ transfer assumes a comparable host (or measure it).
 | GPU | Where | Arch / CC | SMs | L2 | DRAM BW | Memory | Notes |
 |---|---|---|---|---|---|---|---|
 | RTX 2080 Ti (x2) | CIMS `cuda2` (verified) | Turing, sm_75 | 68 | 5.5 MB | ~616 GB/s | 11 GB GDDR6 | Source GPU. FP16 tensor cores; **no BF16, no FP8; FlashAttention-2 unsupported (needs Ampere+)**. Full 7B VLAs do not fit in FP16. |
+| TITAN V (x2) | CIMS `cuda3` (found 2026-11-12) | Volta, sm_70 | 80 | 4.5 MB | ~653 GB/s | 12 GB HBM2 | Tensor cores; similar bandwidth to the source, different architecture. |
+| RTX 4070 | CIMS `cuda5` (found 2026-11-12) | Ada, sm_89 | 46 | 36 MB | ~504 GB/s | 12 GB GDDR6X | **Similar DRAM bandwidth to the 2080 Ti but 6.5x the L2: isolates the cache term on CIMS.** GPU shared with other users. |
+| GTX TITAN X (x2) | CIMS `cuda4` (found 2026-11-12) | Maxwell, sm_52 | 24 | 3 MB | ~336 GB/s | 12 GB | No tensor cores, no WMMA: C++ calibration only. |
 | T4 | cluster `n1s8-t4-1` (not allowed for our account) | Turing, sm_75 | 40 | 4 MB | ~320 GB/s | 16 GB | Same arch as source, different specs: cleanest flavor-B test. |
 | V100 | cluster `n1s4-v100-1` etc. (not allowed for our account) | Volta, sm_70 | 80 | 6 MB | ~900 GB/s | 16/32 GB | |
 | A100 | cluster `c12m85-a100-1` (allowed) | Ampere, sm_80 | 108 | 40 MB | ~1.6 to 2.0 TB/s | 40/80 GB | |
@@ -318,7 +389,7 @@ transfer assumes a comparable host (or measure it).
 | B200 | External / unconfirmed | Blackwell | TBD | TBD | TBD | TBD | |
 
 Cluster rows are from public spec sheets and must be replaced by `device_info.csv` values.
-Also check `nvidia-smi` on the other CIMS machines (`cuda1` to `cuda5`). If any has a different GPU, it is a free extra source or target that also satisfies the "runs on CIMS" rule.
+The CIMS machines were checked on 2026-11-12 (`docs/cuda2_runbook.md` section 6): cuda3 (TITAN V), cuda4 (TITAN X) and cuda5 (RTX 4070) are free extra targets that also satisfy the "runs on CIMS" rule; cuda1 is unreachable. Their rows above are spec-sheet values until `device_info.csv` and the bandwidth sweep from those hosts replace them.
 
 ---
 
@@ -390,6 +461,18 @@ node), and the user runs the CIMS steps (cuda2 is not reachable from here).
 - 2026-11-10: Calibration microbenchmarks write one CSV schema:
   `gpu,bench,kernel,config,mode,timer,n_runs,mean_us,std_us,min_us,median_us,module_loading`
   (`config` is `;`-separated `key=value`; `timer` is `event` or `host`).
+- 2026-11-12: cuda2 runs by Claude Code on cuda2 (section 0.1). WORK=/scratch/am16489 on cuda2
+  (349 GB free; home quota 4 GB). The CIMS GPUs are shared: another user's jobs appeared on
+  both GPUs mid-run, so `run_bench.sh` logs other GPU processes (`busy_warnings.txt`) and a
+  contaminated bench run was deleted and rerun on the idle GPU 1 (same model as GPU 0).
+- 2026-11-12: Own kernels in `bench/kernels/kernels.cuh`; cuBLAS is the reference. The C++
+  replay keeps one weight buffer per GEMM row (a step streams its weights from DRAM, as in the
+  model) and zero-filled data (timing does not depend on values). In replay graph mode,
+  HtoD/DtoH copies are skipped (the captured SmolVLA loop has none); in eager mode HtoD comes
+  from pageable memory and every DtoH is followed by a stream sync, as in PyTorch.
+- 2026-11-12: ncu settings: kernel replay, `--clock-control none` (boost clocks like the timed
+  runs), `--cache-control none` (warm, real sequence) plus one `all` (flushed) run as the cold
+  bound on DRAM bytes.
 - ____
 
 ---
@@ -402,15 +485,17 @@ node), and the user runs the CIMS steps (cuda2 is not reachable from here).
 ├── bench/                   # CUDA C++ (must build on cuda2)
 │   ├── common/harness.cuh   # timing harness, CSV output, CUDA-graph capture helper
 │   ├── calib/               # device_info, launch_latency, bandwidth (L2 sweep)
-│   ├── kernels/             # GEMM, attention, norm, rope, activation kernels (todo)
-│   ├── chains/              # VLA step chains rebuilt from traces, eager + graph (todo)
+│   ├── kernels/             # kernels.cuh (our GEMM, attention, norm, rope, ...), kernels_bench.cu
+│   ├── chains/              # chain_replay.cu + smolvla_{flow,full}.csv (from profile/extract_chain.py)
 │   └── Makefile             # ARCHS ?= 75
 ├── traces/                  # nsys exports, kernel lists (small files only)
-├── profile/                 # ncu metric scripts, per-GPU feature tables (CSV)
+├── profile/                 # extract_chain.py, ncu_smolvla.py, ncu_features.py
+├── results/bench/           # kernels_bench + chain_replay CSVs per GPU run (scripts/run_bench.sh)
+├── results/ncu/             # per-kernel ncu feature tables per GPU run (scripts/run_ncu.sh)
 ├── model/                   # Python predictor, baselines, ablations
 ├── results/calib/           # calibration CSVs per GPU run
 ├── validate/                # measured results per GPU (CSV), error analysis
-├── scripts/                 # run_calib.sh, check_profilers.sh, cluster/ (sbatch, site.sh)
+├── scripts/                 # run_calib.sh, run_bench.sh, run_ncu.sh, run_cuda2.sh, check_profilers.sh, cluster/
 └── paper/                   # LaTeX, figures
 ```
 

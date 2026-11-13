@@ -1,0 +1,25 @@
+gpu,bench,kernel,config,mode,timer,n_runs,mean_us,std_us,min_us,median_us,module_loading
+NVIDIA TITAN V,chain,smolvla_flow,gemm=own;steps=1;rows=1194;launched=1194;traced_kernels=1148;traced_gpu_us=3447.2,eager,event,20,6562.4496,3.0855,6556.6721,6562.8161,EAGER
+NVIDIA TITAN V,chain,smolvla_flow,gemm=own;steps=1;rows=1194;launched=1194;traced_kernels=1148;traced_gpu_us=3447.2,eager,host,20,6567.3609,4.6302,6558.5430,6567.7715,EAGER
+NVIDIA TITAN V,chain,smolvla_flow,gemm=own;steps=1;rows=1194;launched=1192;traced_kernels=1148;traced_gpu_us=3447.2,graph,event,20,6383.7136,7.0987,6373.3759,6383.6000,EAGER
+NVIDIA TITAN V,chain,smolvla_flow,gemm=own;steps=1;rows=1194;launched=1192;traced_kernels=1148;traced_gpu_us=3447.2,graph,host,20,6385.6887,3.5427,6376.7980,6385.5405,EAGER
+NVIDIA TITAN V,chain,smolvla_flow,gemm=own;steps=10;rows=1194;launched=11940;traced_kernels=11480;traced_gpu_us=34471.7,eager,event,20,65104.0638,13.1985,65085.4416,65102.7985,EAGER
+NVIDIA TITAN V,chain,smolvla_flow,gemm=own;steps=10;rows=1194;launched=11940;traced_kernels=11480;traced_gpu_us=34471.7,eager,host,20,65122.4994,67.5420,65084.7420,65110.9720,EAGER
+NVIDIA TITAN V,chain,smolvla_flow,gemm=own;steps=10;rows=1194;launched=11920;traced_kernels=11480;traced_gpu_us=34471.7,graph,event,20,63811.4267,16.5819,63782.9132,63814.0945,EAGER
+NVIDIA TITAN V,chain,smolvla_flow,gemm=own;steps=10;rows=1194;launched=11920;traced_kernels=11480;traced_gpu_us=34471.7,graph,host,20,63829.7509,22.2896,63794.7570,63827.4790,EAGER
+NVIDIA TITAN V,chain,smolvla_full,gemm=own;steps=1;rows=13937;launched=13937;traced_kernels=13340;traced_gpu_us=63926.0,eager,event,10,147193.9590,78.9955,147046.4020,147216.3696,EAGER
+NVIDIA TITAN V,chain,smolvla_full,gemm=own;steps=1;rows=13937;launched=13937;traced_kernels=13340;traced_gpu_us=63926.0,eager,host,10,147194.4368,70.7114,147081.7980,147219.5575,EAGER
+NVIDIA TITAN V,chain,smolvla_full,gemm=own;steps=1;rows=13937;launched=13901;traced_kernels=13340;traced_gpu_us=63926.0,graph,event,10,145612.5961,40.7718,145559.5551,145620.4834,EAGER
+NVIDIA TITAN V,chain,smolvla_full,gemm=own;steps=1;rows=13937;launched=13901;traced_kernels=13340;traced_gpu_us=63926.0,graph,host,10,145602.7203,44.9565,145528.8660,145617.3055,EAGER
+NVIDIA TITAN V,chain,smolvla_flow,gemm=cublas;steps=1;rows=1194;launched=1194;traced_kernels=1148;traced_gpu_us=3447.2,eager,event,20,5261.4623,3.7657,5256.1922,5261.8239,EAGER
+NVIDIA TITAN V,chain,smolvla_flow,gemm=cublas;steps=1;rows=1194;launched=1194;traced_kernels=1148;traced_gpu_us=3447.2,eager,host,20,5260.3320,2.6947,5256.0680,5260.6480,EAGER
+NVIDIA TITAN V,chain,smolvla_flow,gemm=cublas;steps=1;rows=1194;launched=1192;traced_kernels=1148;traced_gpu_us=3447.2,graph,event,20,5272.2160,7.3410,5264.3838,5271.0400,EAGER
+NVIDIA TITAN V,chain,smolvla_flow,gemm=cublas;steps=1;rows=1194;launched=1192;traced_kernels=1148;traced_gpu_us=3447.2,graph,host,20,5274.3991,3.4812,5266.9580,5275.5050,EAGER
+NVIDIA TITAN V,chain,smolvla_flow,gemm=cublas;steps=10;rows=1194;launched=11940;traced_kernels=11480;traced_gpu_us=34471.7,eager,event,20,52635.6911,9.3719,52625.3777,52633.0872,EAGER
+NVIDIA TITAN V,chain,smolvla_flow,gemm=cublas;steps=10;rows=1194;launched=11940;traced_kernels=11480;traced_gpu_us=34471.7,eager,host,20,52634.8597,8.6696,52624.9320,52633.6880,EAGER
+NVIDIA TITAN V,chain,smolvla_flow,gemm=cublas;steps=10;rows=1194;launched=11920;traced_kernels=11480;traced_gpu_us=34471.7,graph,event,20,52839.1630,15.3218,52811.7752,52839.4241,EAGER
+NVIDIA TITAN V,chain,smolvla_flow,gemm=cublas;steps=10;rows=1194;launched=11920;traced_kernels=11480;traced_gpu_us=34471.7,graph,host,20,52842.8193,17.2398,52795.2180,52844.6370,EAGER
+NVIDIA TITAN V,chain,smolvla_full,gemm=cublas;steps=1;rows=13937;launched=13937;traced_kernels=13340;traced_gpu_us=63926.0,eager,event,10,86862.2337,50.6312,86758.3694,86875.6485,EAGER
+NVIDIA TITAN V,chain,smolvla_full,gemm=cublas;steps=1;rows=13937;launched=13937;traced_kernels=13340;traced_gpu_us=63926.0,eager,host,10,86861.5007,42.4349,86782.8790,86858.9550,EAGER
+NVIDIA TITAN V,chain,smolvla_full,gemm=cublas;steps=1;rows=13937;launched=13901;traced_kernels=13340;traced_gpu_us=63926.0,graph,event,10,86795.9740,23.0531,86754.3030,86791.1339,EAGER
+NVIDIA TITAN V,chain,smolvla_full,gemm=cublas;steps=1;rows=13937;launched=13901;traced_kernels=13340;traced_gpu_us=63926.0,graph,host,10,86805.0085,26.1284,86760.3610,86803.1195,EAGER

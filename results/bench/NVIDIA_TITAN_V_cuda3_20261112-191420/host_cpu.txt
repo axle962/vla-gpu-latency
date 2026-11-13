@@ -1,0 +1,1 @@
+model name	: Intel(R) Xeon(R) Gold 5118 CPU @ 2.30GHz

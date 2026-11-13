@@ -11,12 +11,19 @@ GENCODE += -gencode arch=compute_$(LAST),code=compute_$(LAST)
 
 BUILD  ?= build
 CALIB  := device_info launch_latency bandwidth
-BINS   := $(addprefix $(BUILD)/,$(CALIB))
+BINS   := $(addprefix $(BUILD)/,$(CALIB)) $(BUILD)/kernels_bench $(BUILD)/chain_replay
 
 all: $(BINS)
 
 $(BUILD)/%: calib/%.cu common/harness.cuh | $(BUILD)
 	$(NVCC) $(NVFLAGS) $(GENCODE) -o $@ $<
+
+# Our kernels (bench/kernels) and the trace-replay chains; cuBLAS is the GEMM reference.
+$(BUILD)/kernels_bench: kernels/kernels_bench.cu kernels/kernels.cuh common/harness.cuh | $(BUILD)
+	$(NVCC) $(NVFLAGS) $(GENCODE) -o $@ $< -lcublas
+
+$(BUILD)/chain_replay: chains/chain_replay.cu kernels/kernels.cuh common/harness.cuh | $(BUILD)
+	$(NVCC) $(NVFLAGS) $(GENCODE) -o $@ $< -lcublas
 
 $(BUILD):
 	mkdir -p $(BUILD)

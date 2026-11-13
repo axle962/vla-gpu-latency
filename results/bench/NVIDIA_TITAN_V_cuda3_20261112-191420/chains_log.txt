@@ -1,0 +1,10 @@
+smolvla_flow: 1194 rows (1148 traced kernels, traced GPU 3447.2 us per step), weights 250.1 MB, activation buffers 4 x 4.15 MB, gemm=own, steps=1
+smolvla_flow: 1194 rows (1148 traced kernels, traced GPU 3447.2 us per step), weights 250.1 MB, activation buffers 4 x 4.15 MB, gemm=own, steps=10
+smolvla_full: 13937 rows (13340 traced kernels, traced GPU 63926.0 us per step), weights 3474.2 MB, activation buffers 4 x 6.97 MB, gemm=own, steps=1
+smolvla_flow: 1194 rows (1148 traced kernels, traced GPU 3447.2 us per step), weights 250.1 MB, activation buffers 4 x 4.15 MB, gemm=cublas, steps=1
+smolvla_flow: 1194 rows (1148 traced kernels, traced GPU 3447.2 us per step), weights 250.1 MB, activation buffers 4 x 4.15 MB, gemm=cublas, steps=10
+smolvla_full: 13937 rows (13340 traced kernels, traced GPU 63926.0 us per step), weights 3474.2 MB, activation buffers 4 x 6.97 MB, gemm=cublas, steps=1
+smolvla_flow: 1194 rows (1148 traced kernels, traced GPU 3447.2 us per step), weights 250.1 MB, activation buffers 4 x 4.15 MB, gemm=own, steps=1
+wrote results/bench/NVIDIA_TITAN_V_cuda3_20261112-191420/perop_flow_own.csv
+smolvla_flow: 1194 rows (1148 traced kernels, traced GPU 3447.2 us per step), weights 250.1 MB, activation buffers 4 x 4.15 MB, gemm=cublas, steps=1
+wrote results/bench/NVIDIA_TITAN_V_cuda3_20261112-191420/perop_flow_cublas.csv

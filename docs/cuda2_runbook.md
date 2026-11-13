@@ -90,10 +90,11 @@ scripts/run_cuda2.sh calib
 Builds `bench/` for sm_75 (`make -C bench`), runs `scripts/check_profilers.sh`, then
 `scripts/run_calib.sh`, which writes `results/calib/NVIDIA_GeForce_RTX_2080_Ti_cuda2_<stamp>/`.
 
-- `check_profilers.sh` failing with `ERR_NVGPUCTRPERM` (or any ncu permission error) is
-  important: Nsight Compute counters are blocked for users. Report it prominently; the user
-  must email the CIMS helpdesk for GPU performance-counter access. The remaining stages do
-  not need ncu, so continue.
+- ncu needs a private `TMPDIR` on cuda2 (`run_cuda2.sh` sets `TMPDIR=$WORK/tmp`): the lock
+  file `/tmp/nsight-compute-lock` belongs to another user, and without it ncu fails with
+  `InterprocessLockFailed`. That is not a permission problem. Checked 2026-11-12: with the
+  private TMPDIR, counters work for users on cuda2 (no `ERR_NVGPUCTRPERM`). Only a real
+  `ERR_NVGPUCTRPERM` needs a CIMS helpdesk email; the other stages do not need ncu.
 - Expect `bandwidth_summary.txt` to show DRAM bandwidth near 616 GB/s spec (roughly 500 to
   600 GB/s) and an L2 knee around the 5.5 MB L2. If the GPU was busy, run_calib prints a
   warning; rerun the stage when idle.
@@ -124,31 +125,64 @@ Optional, only if time allows and the GPU stays idle: `scripts/run_cuda2.sh trac
 reruns the baseline config once (~4 min) to measure run-to-run variance on this GPU, as was
 done on the A100.
 
-### 3.6 results
+### 3.6 bench (~1 min): standalone CUDA C++ benchmarks (course requirement)
+```bash
+scripts/run_cuda2.sh bench
+```
+Builds and runs `scripts/run_bench.sh`, writing `results/bench/NVIDIA_GeForce_RTX_2080_Ti_cuda2_<stamp>/`:
+- `kernels.csv`: our kernels (`bench/kernels/kernels.cuh`: WMMA FP16 GEMM with split-K, FP32
+  GEMM, attention, softmax, LayerNorm/RMSNorm, RoPE, activations, elementwise) and cuBLAS at
+  the traced SmolVLA shapes, eager vs graph. `kernels_check.txt` must end with
+  `all correctness checks passed` (every kernel is checked against cuBLAS or a CPU reference).
+- `chains.csv`: `bench/chains/chain_replay` replays the traced SmolVLA step as C++ (one flow
+  step, the 10-step loop, the full step; our kernels or cuBLAS GEMMs), eager vs graph.
+- `perop_flow_{own,cublas}.csv`: every launch of one flow step timed alone.
+The kernel lists `bench/chains/smolvla_{flow,full}.csv` come from
+`profile/extract_chain.py <trace run> --region flow|full`.
+The GPUs are shared: if `busy_warnings.txt` appears, another process ran during a stage;
+delete that output directory and rerun when `nvidia-smi` shows no other process.
+
+### 3.7 ncu (~20 min): per-kernel counters (milestone 4)
+```bash
+scripts/run_cuda2.sh ncu
+```
+Runs `scripts/run_ncu.sh`: Nsight Compute on the C++ flow-step replay (our kernels with warm
+and with flushed L2, and with cuBLAS) and on one eager step of the real SmolVLA
+(`profile/ncu_smolvla.py`). Per-kernel feature tables (duration, DRAM and L2 bytes, L2 hit
+rate, occupancy, FLOPs, tensor instructions, launch config) go to
+`results/ncu/NVIDIA_GeForce_RTX_2080_Ti_cuda2_<stamp>/*.csv.gz`; raw ncu CSVs stay in
+`$WORK/ncu_raw`. Needs an idle GPU too (DRAM counters are GPU-wide).
+
+### 3.8 results
 ```bash
 scripts/run_cuda2.sh results
 ```
 Lists the new directories. Expected: one `results/calib/NVIDIA_GeForce_RTX_2080_Ti_*`
 directory and 7 (or 8) `traces/smolvla_*/NVIDIA_GeForce_RTX_2080_Ti_*` directories, each with
 `meta.json`, `latency.csv`, `ops.csv`, `launch_api_calls.csv`, `kernels.csv.gz` and
-`kernels_graph.csv.gz`. Raw `trace*.json.gz` files are git-ignored by design.
+`kernels_graph.csv.gz`, plus `results/bench/*2080*` and `results/ncu/*2080*`. Raw
+`trace*.json.gz` files are git-ignored by design.
 
 ## 4. Send the results back
 
 ```bash
-git add results/calib traces
+git add results/calib traces results/bench results/ncu
 git -c user.name="Aditya Maddur Guruprakash" -c user.email="am16489@nyu.edu" \
     commit -m "cuda2 RTX 2080 Ti: calibration, dispatch table, SmolVLA traces"
 git push            # needs GitHub credentials on cuda2; see below
 ```
 
-The clone is HTTPS, so `git push` asks for a username and a GitHub personal access token
-(the user provides these; Claude must not ask for or store the token). If pushing is not
+On cuda2 the clone now pushes over SSH (`git@github.com:axle962/vla-gpu-latency.git`, key
+`~/.ssh/id_ed25519` registered on GitHub, 2026-11-12), so `git push` needs no input. For a
+fresh HTTPS clone, `git push` asks for a username and a personal access token, which only works
+from the user's own terminal (`unset SSH_ASKPASS GIT_ASKPASS` first); Claude must not ask for
+or store the token. If pushing is not
 possible, make a tarball instead and tell the user to copy it to
 `/scratch/am16489/vla-gpu-latency` on the cluster:
 
 ```bash
-tar czf ~/cuda2_results.tgz results/calib/*2080* traces/smolvla_*/*2080*
+tar czf ~/cuda2_results.tgz results/calib/*2080* traces/smolvla_*/*2080* results/bench/*2080* \
+    results/ncu/*2080*
 ```
 
 ## 5. Final report to the user
@@ -158,9 +192,33 @@ result; DRAM bandwidth and L2 knee; for the baseline config the eager step, eage
 eager denoise, graph denoise and hybrid medians (from its meta.json) and the graph speedup;
 anything that failed or was rerun; and whether results were pushed or tarred.
 
-## 6. Other CIMS GPUs (optional)
+## 6. Other CIMS GPUs
 
-If `cuda1`, `cuda3`, `cuda4` or `cuda5` have a different GPU model (check with `nvidia-smi`
-over ssh), the same stages 3.1 to 3.5 there give a free extra GPU that also satisfies the
-course's "runs on CIMS" rule. Report the models found; do not run there without asking the
-user.
+Checked 2026-11-12 (`nvidia-smi` over ssh from cuda2; passwordless once
+`~/.ssh/id_ed25519.pub` is in `~/.ssh/authorized_keys`, which the shared home makes valid on
+every CIMS host):
+
+| Host | GPU | Notes |
+|---|---|---|
+| cuda1 | unreachable ("No route to host") | |
+| cuda2 | 2x RTX 2080 Ti (Turing sm_75) | source GPU |
+| cuda3 | 2x TITAN V (Volta sm_70, tensor cores, HBM2) | /scratch has ~35 GB free |
+| cuda4 | 2x GTX TITAN X (Maxwell sm_52, no tensor cores) | C++ calibration only (our WMMA GEMM needs sm_70+) |
+| cuda5 | 1x RTX 4070 (Ada sm_89, large L2) | GPU often shared with other users |
+
+All hosts share the home directory, so they see this repo; `scripts/run_cuda2.sh` therefore
+uses a per-host build dir (`bench/build-<host>`, CUDA arch from `nvidia-smi`), per-host logs
+and per-host result directories. torch 2.10.0+cu128 includes sm_70, so the TITAN V uses the
+same torch build as cuda2 and the A100 (setup switches to cu126 only if the arch is missing).
+
+`scripts/run_cims_host.sh full|calib-only` runs the stages unattended and waits before each
+GPU stage until a GPU has no other process. Start it detached from cuda2 (the user approved
+runs on cuda3, cuda4 and cuda5 on 2026-11-12):
+
+```bash
+ssh -n cuda3.cims.nyu.edu 'cd ~/fall2026/GPU/vla-gpu-latency && WORK=/scratch/am16489 \
+  setsid nohup scripts/run_cims_host.sh full > logs/cuda3-pipeline.log 2>&1 < /dev/null & disown'
+```
+(the ssh command may not return by itself; the detached pipeline keeps running, and
+`logs/<host>-pipeline.log` is visible from every host). The `/tmp/nsight-compute-lock`
+clash exists on cuda3 and cuda5 too; `run_cuda2.sh` sets a private `TMPDIR` everywhere.

@@ -5,7 +5,7 @@
 #   module load cuda-12.4 && make -C bench && scripts/check_profilers.sh
 set -uo pipefail
 cd "$(dirname "$0")/.."
-BIN=bench/build/launch_latency
+BIN=${BUILD:-bench/build}/launch_latency
 OUT="${TMPDIR:-/tmp}/vla_profcheck_$USER"
 mkdir -p "$OUT"
 

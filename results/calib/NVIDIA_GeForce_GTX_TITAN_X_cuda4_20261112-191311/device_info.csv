@@ -1,0 +1,24 @@
+gpu,key,value
+NVIDIA GeForce GTX TITAN X,device_index,0
+NVIDIA GeForce GTX TITAN X,cc_major,5
+NVIDIA GeForce GTX TITAN X,cc_minor,2
+NVIDIA GeForce GTX TITAN X,sm_count,24
+NVIDIA GeForce GTX TITAN X,l2_bytes,3145728
+NVIDIA GeForce GTX TITAN X,persisting_l2_max_bytes,0
+NVIDIA GeForce GTX TITAN X,global_mem_bytes,12792889344
+NVIDIA GeForce GTX TITAN X,smem_per_sm_bytes,98304
+NVIDIA GeForce GTX TITAN X,smem_per_block_optin_bytes,49152
+NVIDIA GeForce GTX TITAN X,regs_per_sm,65536
+NVIDIA GeForce GTX TITAN X,max_threads_per_sm,2048
+NVIDIA GeForce GTX TITAN X,max_blocks_per_sm,32
+NVIDIA GeForce GTX TITAN X,warp_size,32
+NVIDIA GeForce GTX TITAN X,sm_clock_khz,1215500
+NVIDIA GeForce GTX TITAN X,mem_clock_khz,3505000
+NVIDIA GeForce GTX TITAN X,mem_bus_bits,384
+NVIDIA GeForce GTX TITAN X,theoretical_dram_bw_mbps,336480
+NVIDIA GeForce GTX TITAN X,async_engines,2
+NVIDIA GeForce GTX TITAN X,concurrent_kernels,1
+NVIDIA GeForce GTX TITAN X,ecc_enabled,0
+NVIDIA GeForce GTX TITAN X,pci_bus_id,59
+NVIDIA GeForce GTX TITAN X,driver_version,13000
+NVIDIA GeForce GTX TITAN X,runtime_version,12040
