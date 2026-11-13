@@ -40,6 +40,7 @@ Usage (login node is fine, ~1 GB RAM):
 from __future__ import annotations
 
 import csv
+import re
 import json
 import sys
 from dataclasses import dataclass, replace
@@ -73,6 +74,8 @@ class GPU:
     slot_us: dict          # op class -> PyTorch graph-mode time per kernel (slot)
     cold_slot_us: dict     # op class -> cold-cache slot (workloads/torch_probe.py), or {}
     py_us: dict            # host Python probes (us per call), or {}
+    clk_mhz: float         # sustained SM clock under the C++ flow chain (clock_probe.sh), or nan
+    cpp_slot_us: dict      # op class -> summed C++ replay slot time of the flow step, or {}
 
 
 def _one(pattern: str) -> Path:
@@ -146,6 +149,31 @@ def probe_tables(probe_csv: Path | None) -> tuple[dict, dict]:
     return cold, py
 
 
+def sustained_clock(calib_dir: Path) -> float:
+    f = calib_dir / "sm_clock_summary.txt"
+    if not f.exists():
+        return float("nan")
+    m = re.search(r"SM clock under load: median (\d+) MHz", f.read_text())
+    return float(m.group(1)) if m else float("nan")
+
+
+# C++ replay categories (results/bench/*/perop_flow_cublas.csv) per traced op class.
+CPP_CATS = {"linear": ["gemm"], "linear_gemv": ["gemm"],
+            "add_n": ["elementwise", "reduce", "scan", "memset", "softmax"],
+            "add_alloc": ["elementwise", "reduce", "scan", "memset", "softmax"],
+            "sdpa": ["gemm", "softmax"]}
+
+
+def cpp_slots(bench_dir: Path) -> dict:
+    f = bench_dir / "perop_flow_cublas.csv"
+    if not f.exists():
+        return {}
+    tot: dict = {}
+    for r in csv.DictReader(open(f)):
+        tot[r["cat"]] = tot.get(r["cat"], 0.0) + float(r["graph_us_per_launch"])
+    return {c: sum(tot.get(k, 0.0) for k in cats) for c, cats in CPP_CATS.items()}
+
+
 def load_gpu(key: str, calib_glob: str, dispatch_glob: str, bench_glob: str,
              probe_glob: str) -> GPU:
     cdir = _one(calib_glob)
@@ -156,7 +184,8 @@ def load_gpu(key: str, calib_glob: str, dispatch_glob: str, bench_glob: str,
     return GPU(key, str(info["gpu"]), c, bw["bw_dram_gbps"],
                float(info["theoretical_dram_bw_mbps"]) / 1e3,
                small_kernels(_one(bench_glob)), c.dispatch_us, slot_table(dcsv),
-               *probe_tables(max(ROOT.glob(probe_glob), default=None)))
+               *probe_tables(max(ROOT.glob(probe_glob), default=None)),
+               sustained_clock(cdir), cpp_slots(_one(bench_glob)))
 
 
 GPUS = {
@@ -226,6 +255,13 @@ def transfer_slots(tr: StepTrace, src: GPU, tgt: GPU, tail_bw: bool = True,
     return np.maximum(u_t - tgt.calib.delta_node_us, 0.5)
 
 
+def transfer_ratio(tr: StepTrace, src: GPU, tgt: GPU, ratio: dict) -> np.ndarray:
+    """Scale each kernel's graph slot by a per-op-class ratio (target/source)."""
+    u = tr.t_us + src.calib.delta_node_us
+    r = np.array([ratio[c] for c in tr.cls])
+    return np.maximum(u * r - tgt.calib.delta_node_us, 0.5)
+
+
 def runs_for(gpu_key: str) -> list[tuple[Path, dict]]:
     out = []
     for meta_p in sorted((ROOT / "traces").glob(f"smolvla_*/*{TRACE_KEY[gpu_key]}*/meta.json")):
@@ -293,12 +329,23 @@ def main() -> None:
                 tr = traces[cfg]
                 has_probe = bool(src.cold_slot_us and tgt.cold_slot_us)
                 for mode in ("same", "spec_bw", "bw", "lat", "lat_bw", "slot_class",
-                             "slot", "slot_cold", "slot_cold_py"):
+                             "slot", "slot_cold", "slot_cold_py", "clock", "slot_cpp"):
+                    if mode == "clock" and not (np.isfinite(src.clk_mhz)
+                                                and np.isfinite(tgt.clk_mhz)):
+                        continue
+                    if mode == "slot_cpp" and not (src.cpp_slot_us and tgt.cpp_slot_us):
+                        continue
                     if mode.startswith("lat") and not np.isfinite(rl):
                         continue
                     if mode.startswith("slot_cold") and not has_probe:
                         continue
-                    if mode.startswith("slot_cold"):
+                    if mode == "clock":
+                        k = src.clk_mhz / tgt.clk_mhz
+                        t_new = transfer_ratio(tr, src, tgt, {c: k for c in set(tr.cls)})
+                    elif mode == "slot_cpp":
+                        t_new = transfer_ratio(tr, src, tgt, {
+                            c: tgt.cpp_slot_us[c] / src.cpp_slot_us[c] for c in set(tr.cls)})
+                    elif mode.startswith("slot_cold"):
                         t_new = transfer_slots(tr, src, tgt, tail_bw=False, cold=True)
                     elif mode.startswith("slot"):
                         t_new = transfer_slots(tr, src, tgt, tail_bw=(mode == "slot"))

@@ -26,7 +26,8 @@ INK, INK2, GRID = "#0b0b0b", "#52514e", "#e4e3df"
 VARIANT_LABEL = {"same": "unchanged", "spec_bw": "spec BW ratio", "bw": "measured BW ratio",
                  "lat": "C++ latency ratio", "lat_bw": "C++ latency + BW",
                  "slot_class": "slot per op class", "slot": "slot + BW tail",
-                 "slot_cold": "cold slot", "slot_cold_py": "cold slot + Python host"}
+                 "slot_cold": "cold slot", "slot_cold_py": "cold slot + Python host",
+                 "clock": "sustained clock ratio", "slot_cpp": "C++ replay slot ratio"}
 
 
 def style(ax) -> None:

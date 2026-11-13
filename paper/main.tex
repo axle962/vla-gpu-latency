@@ -61,12 +61,28 @@ percentage error per case, against spec-ratio and roofline baselines.
 \textbf{Analytical GPU models.} Hong and Kim~\cite{hongkim} model memory-level and
 thread-level parallelism; GPUPerf~\cite{gpuperf} extends this to identify optimization
 potential; Wang, Liu and Chu~\cite{wang} predict performance under frequency scaling by
-cross-benchmarking. All target kernels that fill the GPU. \pending{the two handout DOIs}
+cross-benchmarking. All target kernels that fill the GPU.
+\textbf{Static and program-level analysis.} Alavani, Varma and Sarkar~\cite{alavani} predict a
+CUDA kernel's execution time from static features of its code, and Muller and
+Hoffmann~\cite{muller} give a program logic that bounds a kernel's resource cost (divergence,
+uncoalesced accesses, bank conflicts). Both reason about one kernel in isolation; in our regime
+most of the step's time is outside any kernel body (dispatch, launch, node gaps).
+\textbf{Cross-GPU prediction for deep learning.} Habitat~\cite{habitat} predicts DNN
+training iteration time on a target GPU from a trace on a source GPU, scaling kernels by
+``wave scaling'' with GPU specs and using small MLPs for a few kernel types; it targets
+training kernels that occupy the GPU and does not model host dispatch or CUDA graphs.
+Daydream~\cite{daydream} replays a dependency graph of CPU and GPU tasks to answer what-if
+questions on one machine; our two-timeline replay is the same idea, specialized to batch-1
+inference and moved across GPUs. Cycle-level simulators such as Accel-Sim~\cite{accelsim}
+are accurate but orders of magnitude too slow for 13{,}000-kernel steps on many targets.
 \textbf{VLA performance.} VLA-Perf~\cite{vlaperf} predicts an upper bound with
 $T_o = \max(\mathrm{FLOPs}_o/P, \mathrm{Bytes}_o/B)$ per operator, validated on one platform
 ($\pi_0$ on an RTX 4090, 73 to 83\% fidelity). Real-time VLA work~\cite{realtime} reports about
 2$\times$ from CUDA graphs on $\pi_0$, but no one predicts when graphs pay off.
-\textbf{Launch overhead.} \pending{CUDA graph papers, PyTorch dispatch overhead studies}
+\textbf{Launch overhead and CUDA graphs.} CUDA graphs~\cite{cudagraphs} record a sequence of
+kernels once and replay it with one launch, removing per-kernel CPU launch cost; PyTorch
+exposes them for static-shape regions~\cite{ptgraphs}. Their benefit depends on how much of
+the step is CPU-side launch and framework overhead, which we measure and model directly.
 
 \section{Problem Definition and Challenges}
 Given a profiled step on a source GPU $S$ (per-kernel durations, launching ops, sync points)
@@ -98,7 +114,13 @@ same class (elementwise, allocating op, GEMM, attention) replayed as a CUDA grap
 the source slot of that op, and $r_{\mathrm{bw}}$ the measured DRAM bandwidth ratio
 (variant \emph{slot}; \emph{slot per op class} omits the tail term). Host costs on $T$ come
 from $T$'s dispatch table; $p_T = p_S \cdot h$ with $h$ the host speed ratio.
-\pending{cold-cache slot and Python host probes (workloads/torch\_probe.py)}
+\textbf{Hypotheses we tested and rejected.} (i) Small kernels on cold data: in the real loop
+the GEMMs stream about 250\,MB of weights per step, so we measured small PyTorch ops over a
+512\,MB tensor pool. Cold data costs about 30\% more per kernel, but almost equally on every
+GPU, so cold-cache slot ratios do not improve the transfer (graph loop MAPE 22\% vs 16\%).
+(ii) Host Python speed: pure-Python and \texttt{nn.Module} call benchmarks run at the same
+speed on all three hosts (within 10\%), so $p$ does not scale with Python speed; the hosts
+differ in the aten/C++ dispatch path, which is what $h$ measures.
 
 \section{Experimental Setup}
 \begin{table}[t]\centering\small
@@ -154,7 +176,12 @@ Figures~\ref{fig:pvm} and~\ref{fig:mape}. With slot ratios per op class the MAPE
 scaling gives 64\% on the graph loop. Between the 2080 Ti and the A100 every quantity is within
 6\%. Pairs with the TITAN V are worst (graph loop 17 to 29\%): the hot-cache microbenchmarks
 see a 1.2 to 1.5$\times$ slot ratio where the real loop has 1.54$\times$.
-\pending{cold-cache probe results}
+The missing factor is the \emph{sustained} SM clock. Sampling \texttt{nvidia-smi} while
+the C++ replay of the loop runs shows the TITAN V holding 1335\,MHz (spec maximum 1912) and
+the 2080 Ti 1950\,MHz; the ratio, 1.46, matches the real per-kernel ratio of 1.54. Scaling all
+slots by the sustained-clock ratio predicts the graph loop between these two GPUs within 6 to
+7\% in both directions (versus 17 to 22\% with slot ratios), so latency-bound kernels scale
+with the clock the GPU actually runs at, not its spec boost clock. \pending{A100 sustained clock}
 
 \subsection{Ordering inversion}
 Measured eager step: TITAN V 340\,ms $<$ A100 383 $<$ 2080 Ti 484; graph loop: A100 35.6 $<$
@@ -182,5 +209,19 @@ Identifying Potential Benefits in GPGPU Applications. PPoPP 2012.
 \bibitem{wang} Q.~Wang, C.~Liu, X.~Chu. GPGPU Performance Estimation for Frequency Scaling
 Using Cross-Benchmarking.
 \bibitem{realtime} Ma et al. Running VLAs at Real-time Speed. 2025.
+% TODO verify bibliographic details of the entries below before submission.
+\bibitem{alavani} G.~Alavani, K.~Varma, S.~Sarkar. Predicting Execution Time of CUDA Kernel
+Using Static Analysis. IEEE ISPA/IUCC/BDCloud 2018. doi:10.1109/BDCloud.2018.00139
+\bibitem{muller} S.~K.~Muller, J.~Hoffmann. Modeling and Analyzing Evaluation Cost of CUDA
+Kernels. ACM Transactions on Parallel Computing, 2024. doi:10.1145/3639403
+\bibitem{habitat} G.~X.~Yu, Y.~Gao, P.~Golikov, G.~Pekhimenko. Habitat: A Runtime-Based
+Computational Performance Predictor for Deep Neural Network Training. USENIX ATC 2021.
+\bibitem{daydream} H.~Zhu, A.~Phanishayee, G.~Pekhimenko. Daydream: Accurately Estimating the
+Efficacy of Optimizations for DNN Training. USENIX ATC 2020.
+\bibitem{accelsim} M.~Khairy, Z.~Shen, T.~M.~Aamodt, T.~G.~Rogers. Accel-Sim: An Extensible
+Simulation Framework for Validated GPU Modeling. ISCA 2020.
+\bibitem{cudagraphs} A.~Gray. Getting Started with CUDA Graphs. NVIDIA Technical Blog, 2019.
+\bibitem{ptgraphs} PyTorch team and NVIDIA. Accelerating PyTorch with CUDA Graphs. PyTorch
+Blog, 2021.
 \end{thebibliography}
 \end{document}

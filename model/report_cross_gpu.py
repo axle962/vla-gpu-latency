@@ -42,7 +42,7 @@ def main() -> None:
     d["ape"] = d.error_pct.abs()
     x = d[d.source != d.target]
     variants = [v for v in ["same", "spec_bw", "bw", "lat", "lat_bw", "slot_class", "slot",
-                            "slot_cold", "slot_cold_py"] if v in set(d.kernel_transfer)]
+                            "slot_cold", "slot_cold_py", "clock", "slot_cpp"] if v in set(d.kernel_transfer)]
 
     print("## MAPE (%) over cross-GPU pairs and configs\n")
     t = x.pivot_table(index="quantity", columns="kernel_transfer", values="ape", aggfunc="mean")
@@ -70,6 +70,8 @@ def main() -> None:
                 continue
             taus.append(kendall(grp.measured.tolist(), grp.predicted.tolist()))
             exact.append(taus[-1] == 1.0)
+        if not taus:
+            continue  # variant lacks data for some GPU (e.g. clock before every GPU has one)
         rows.append({"variant": var, "cases": len(taus),
                      "exact_ranking_pct": 100 * sum(exact) / len(exact),
                      "mean_kendall_tau": sum(taus) / len(taus)})
