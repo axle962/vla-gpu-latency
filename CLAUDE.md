@@ -297,6 +297,11 @@ State:
   knee 16 to 24 MB. The bound is the weights' DRAM time (250 MB/step at 1.48 TB/s = 1.7 ms of
   32 ms), so the cache term is second order for SmolVLA. CIMS stage `l2` / mode `l2-only` added
   (runbook section 8); cuda5 `full` now includes it.
+- **L2 sweep on the CIMS GPUs done 2026-11-13 13:10 to 13:16** (`results/bench/*cuda{2,3,5}*/l2_sweep.csv`,
+  no contention). Knee at each GPU's L2: 2080 Ti and TITAN V 4 to 8 MB, RTX 4070 24 to 48 MB.
+  Graph loop saving with the weights in L2 vs streamed, cuBLAS / own GEMM: 2080 Ti 6.3 / 5.1%,
+  TITAN V 3.0 / 1.0%, RTX 4070 9.1 / 12.8% (A100 3.1 / 12.4%). Cache term second order on all
+  four; the real expert's 250 MB per step exceeds every L2. Paper \pending{} filled.
 - **RTX 4070 (cuda5) done 2026-11-13** (Claude Code on cuda2; host Xeon E5-2650 v2, 2013,
   16 threads; torch 2.10.0+cu128 like every other GPU):
   - Calibration (DRAM 475 GB/s of 504, L2 ~1.5 TB/s up to 32 MB, 36 MB L2, 46 SMs), dispatch
@@ -323,8 +328,6 @@ State:
   - Paper: RTX 4070 row in Table 1, new subsection "A fourth GPU", limitations updated; the
     headline numbers stay on the three-GPU set. No \pending{} left.
 - **Next:**
-  0. CIMS: `l2` sweep on cuda2, cuda3 and cuda5 (runbook section 8; cuda5's `full` run happened
-     before the stage existed, so it needs `l2-only` too).
   1. Model: transfer of the Python share of host time between very different hosts (the 4070
      eager failure); e.g. split p into a dispatch-scaled and a Python-scaled part fitted on the
      three similar hosts and test on cuda5. Decide whether the paper headline should move to

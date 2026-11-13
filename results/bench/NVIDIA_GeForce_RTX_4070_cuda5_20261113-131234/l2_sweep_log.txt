@@ -1,0 +1,26 @@
+smolvla_flow: 1194 rows (1148 traced kernels, traced GPU 3447.2 us per step), weights 250.1 MB, activation buffers 4 x 4.15 MB, gemm=cublas, steps=10, weight pool off
+smolvla_flow: 1194 rows (1148 traced kernels, traced GPU 3447.2 us per step), weights 250.1 MB, activation buffers 4 x 4.15 MB, gemm=cublas, steps=10, weight pool 3 MB
+smolvla_flow: 1194 rows (1148 traced kernels, traced GPU 3447.2 us per step), weights 250.1 MB, activation buffers 4 x 4.15 MB, gemm=cublas, steps=10, weight pool 3 MB
+smolvla_flow: 1194 rows (1148 traced kernels, traced GPU 3447.2 us per step), weights 250.1 MB, activation buffers 4 x 4.15 MB, gemm=cublas, steps=10, weight pool 4 MB
+smolvla_flow: 1194 rows (1148 traced kernels, traced GPU 3447.2 us per step), weights 250.1 MB, activation buffers 4 x 4.15 MB, gemm=cublas, steps=10, weight pool 8 MB
+smolvla_flow: 1194 rows (1148 traced kernels, traced GPU 3447.2 us per step), weights 250.1 MB, activation buffers 4 x 4.15 MB, gemm=cublas, steps=10, weight pool 16 MB
+smolvla_flow: 1194 rows (1148 traced kernels, traced GPU 3447.2 us per step), weights 250.1 MB, activation buffers 4 x 4.15 MB, gemm=cublas, steps=10, weight pool 24 MB
+smolvla_flow: 1194 rows (1148 traced kernels, traced GPU 3447.2 us per step), weights 250.1 MB, activation buffers 4 x 4.15 MB, gemm=cublas, steps=10, weight pool 32 MB
+smolvla_flow: 1194 rows (1148 traced kernels, traced GPU 3447.2 us per step), weights 250.1 MB, activation buffers 4 x 4.15 MB, gemm=cublas, steps=10, weight pool 48 MB
+smolvla_flow: 1194 rows (1148 traced kernels, traced GPU 3447.2 us per step), weights 250.1 MB, activation buffers 4 x 4.15 MB, gemm=cublas, steps=10, weight pool 64 MB
+smolvla_flow: 1194 rows (1148 traced kernels, traced GPU 3447.2 us per step), weights 250.1 MB, activation buffers 4 x 4.15 MB, gemm=cublas, steps=10, weight pool 96 MB
+smolvla_flow: 1194 rows (1148 traced kernels, traced GPU 3447.2 us per step), weights 250.1 MB, activation buffers 4 x 4.15 MB, gemm=cublas, steps=10, weight pool 128 MB
+smolvla_flow: 1194 rows (1148 traced kernels, traced GPU 3447.2 us per step), weights 250.1 MB, activation buffers 4 x 4.15 MB, gemm=cublas, steps=10, weight pool 256 MB
+smolvla_flow: 1194 rows (1148 traced kernels, traced GPU 3447.2 us per step), weights 250.1 MB, activation buffers 4 x 4.15 MB, gemm=own, steps=10, weight pool off
+smolvla_flow: 1194 rows (1148 traced kernels, traced GPU 3447.2 us per step), weights 250.1 MB, activation buffers 4 x 4.15 MB, gemm=own, steps=10, weight pool 3 MB
+smolvla_flow: 1194 rows (1148 traced kernels, traced GPU 3447.2 us per step), weights 250.1 MB, activation buffers 4 x 4.15 MB, gemm=own, steps=10, weight pool 3 MB
+smolvla_flow: 1194 rows (1148 traced kernels, traced GPU 3447.2 us per step), weights 250.1 MB, activation buffers 4 x 4.15 MB, gemm=own, steps=10, weight pool 4 MB
+smolvla_flow: 1194 rows (1148 traced kernels, traced GPU 3447.2 us per step), weights 250.1 MB, activation buffers 4 x 4.15 MB, gemm=own, steps=10, weight pool 8 MB
+smolvla_flow: 1194 rows (1148 traced kernels, traced GPU 3447.2 us per step), weights 250.1 MB, activation buffers 4 x 4.15 MB, gemm=own, steps=10, weight pool 16 MB
+smolvla_flow: 1194 rows (1148 traced kernels, traced GPU 3447.2 us per step), weights 250.1 MB, activation buffers 4 x 4.15 MB, gemm=own, steps=10, weight pool 24 MB
+smolvla_flow: 1194 rows (1148 traced kernels, traced GPU 3447.2 us per step), weights 250.1 MB, activation buffers 4 x 4.15 MB, gemm=own, steps=10, weight pool 32 MB
+smolvla_flow: 1194 rows (1148 traced kernels, traced GPU 3447.2 us per step), weights 250.1 MB, activation buffers 4 x 4.15 MB, gemm=own, steps=10, weight pool 48 MB
+smolvla_flow: 1194 rows (1148 traced kernels, traced GPU 3447.2 us per step), weights 250.1 MB, activation buffers 4 x 4.15 MB, gemm=own, steps=10, weight pool 64 MB
+smolvla_flow: 1194 rows (1148 traced kernels, traced GPU 3447.2 us per step), weights 250.1 MB, activation buffers 4 x 4.15 MB, gemm=own, steps=10, weight pool 96 MB
+smolvla_flow: 1194 rows (1148 traced kernels, traced GPU 3447.2 us per step), weights 250.1 MB, activation buffers 4 x 4.15 MB, gemm=own, steps=10, weight pool 128 MB
+smolvla_flow: 1194 rows (1148 traced kernels, traced GPU 3447.2 us per step), weights 250.1 MB, activation buffers 4 x 4.15 MB, gemm=own, steps=10, weight pool 256 MB

@@ -1,0 +1,24 @@
+gpu,key,value
+NVIDIA TITAN V,device_index,0
+NVIDIA TITAN V,cc_major,7
+NVIDIA TITAN V,cc_minor,0
+NVIDIA TITAN V,sm_count,80
+NVIDIA TITAN V,l2_bytes,4718592
+NVIDIA TITAN V,persisting_l2_max_bytes,0
+NVIDIA TITAN V,global_mem_bytes,12635668480
+NVIDIA TITAN V,smem_per_sm_bytes,98304
+NVIDIA TITAN V,smem_per_block_optin_bytes,98304
+NVIDIA TITAN V,regs_per_sm,65536
+NVIDIA TITAN V,max_threads_per_sm,2048
+NVIDIA TITAN V,max_blocks_per_sm,32
+NVIDIA TITAN V,warp_size,32
+NVIDIA TITAN V,sm_clock_khz,1455000
+NVIDIA TITAN V,mem_clock_khz,850000
+NVIDIA TITAN V,mem_bus_bits,3072
+NVIDIA TITAN V,theoretical_dram_bw_mbps,652800
+NVIDIA TITAN V,async_engines,7
+NVIDIA TITAN V,concurrent_kernels,1
+NVIDIA TITAN V,ecc_enabled,0
+NVIDIA TITAN V,pci_bus_id,59
+NVIDIA TITAN V,driver_version,13000
+NVIDIA TITAN V,runtime_version,12040

@@ -200,7 +200,12 @@ GEMM (12\%), with the knee between 16 and 24\,MB. The saving is bounded by the D
 weights: 250\,MB per denoising step at 1.48\,TB/s is about 1.7\,ms of a 32\,ms loop, while the
 rest is per-kernel latency. On the 2080 Ti, flushing L2 before every kernel costs 18\% (Nsight
 Compute). So for small VLAs the cache term is second order next to launch and per-kernel
-latency, which is why our model does without one. \pending{same sweep on 2080 Ti, TITAN V, RTX 4070}
+latency, which is why our model does without one. The same sweep on the CIMS GPUs puts each
+knee at that GPU's L2 (4 to 8\,MB on the 2080 Ti and TITAN V, 24 to 48\,MB on the RTX 4070) and
+bounds the saving at 6.3\%, 3.0\% and 9.1\% with cuBLAS (5.1\%, 1.0\% and 12.8\% with our
+GEMM). The RTX 4070, with the largest L2 relative to its bandwidth, gains most, but the real
+expert's 250\,MB of weights per step exceed every L2 we measured, so in the actual loop they
+stream from DRAM on all four GPUs.
 
 \subsection{Comparison with VLA-Perf}
 \begin{table}[t]\centering\small

@@ -268,3 +268,6 @@ ssh -n cuda3.cims.nyu.edu 'cd ~/fall2026/GPU/vla-gpu-latency && WORK=/scratch/am
 # cuda5 (RTX 4070, 36 MB L2): the full pipeline now includes l2 (section 7 command)
 ```
 Commit `results/bench/*/l2_sweep.csv` and push.
+
+Status 2026-11-13: done on cuda2, cuda3 and cuda5 (13:10 to 13:16). No CIMS GPU work is left
+in this runbook.
