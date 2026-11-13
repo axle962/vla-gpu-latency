@@ -222,3 +222,26 @@ ssh -n cuda3.cims.nyu.edu 'cd ~/fall2026/GPU/vla-gpu-latency && WORK=/scratch/am
 (the ssh command may not return by itself; the detached pipeline keeps running, and
 `logs/<host>-pipeline.log` is visible from every host). The `/tmp/nsight-compute-lock`
 clash exists on cuda3 and cuda5 too; `run_cuda2.sh` sets a private `TMPDIR` everywhere.
+
+## 7. Round 2 (2026-11-13): probes for the cross-GPU model
+
+`model/cross_gpu.py` needs two more target-side measurements on each CIMS GPU that has
+traces: host Python speed and cold-cache small PyTorch kernels (`workloads/torch_probe.py`,
+stage `probe`, ~1 min, pinned to the GPU's NUMA node when `numactl` exists). It writes
+`torch_probe_smolvla_env.csv` into the host's latest `results/calib/` dir. The A100 run is
+done (job 30624).
+
+```bash
+# on cuda2 (module load cuda-12.4 not needed for this stage)
+cd ~/fall2026/GPU/vla-gpu-latency && git pull
+WORK=/scratch/am16489 scripts/run_cuda2.sh probe
+# cuda3, from cuda2 (waits for an idle GPU):
+ssh -n cuda3.cims.nyu.edu 'cd ~/fall2026/GPU/vla-gpu-latency && WORK=/scratch/am16489 \
+  setsid nohup scripts/run_cims_host.sh probe-only > logs/cuda3-probe.log 2>&1 < /dev/null & disown'
+# cuda5 (RTX 4070), when its GPU is free: the full pipeline, which now includes probe
+ssh -n cuda5.cims.nyu.edu 'cd ~/fall2026/GPU/vla-gpu-latency && WORK=/scratch/am16489 \
+  setsid nohup scripts/run_cims_host.sh full > logs/cuda5-pipeline.log 2>&1 < /dev/null & disown'
+```
+Then commit `results/calib/*/torch_probe_smolvla_env.csv` (and the cuda5 results) and push.
+On the cluster: rerun `model/cross_gpu.py`, `model/report_cross_gpu.py`, `model/figures.py`.
+For cuda5, add an `RTX4070` entry to `GPUS` and `TRACE_KEY` in `model/cross_gpu.py`.

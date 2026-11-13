@@ -237,23 +237,30 @@ State:
     1.54x the 2080 Ti per kernel, the PyTorch graph-mode microbenchmarks say 1.17 to 1.5x and
     the C++ replay 1.34x). Eager errors (~7 to 10% with the TITAN V host) come from scaling p by
     the C++-dispatch host ratio: Python-heavy code scales differently (true p ratio 0.61, h 0.70).
+- **Round 2 on 2026-11-13 (cluster session):**
+  - Profiler bias is NOT GPU specific: profiling adds 11.3 ms to a SmolVLA graph replay on
+    all three GPUs (~0.95 us per kernel). The TITAN V's small PyTorch kernels really are ~1.5x
+    the 2080 Ti's in the real loop (median 3.65 vs 2.44 us traced), while hot-cache
+    microbenchmarks show ~1.2x. Hypothesis: weight streaming evicts L2, so small kernels pay
+    DRAM latency (HBM2 on the TITAN V). `workloads/torch_probe.py` measures small PyTorch ops
+    on cold data (pool of 512 MB) plus host Python speed; A100 done (job 30624, cold adds
+    ~1.3x hot). Variants `slot_cold`, `slot_cold_py` in `model/cross_gpu.py` switch on once
+    the 2080 Ti and TITAN V probes exist (stage `probe`, `docs/cuda2_runbook.md` section 7).
+  - `model/report_cross_gpu.py` (markdown tables: MAPE per variant/pair, GPU ordering,
+    inversion) and `model/figures.py` (`paper/figures/`). Best variant `slot_class`: eager
+    7.5%, hybrid 5.2%, graph loop 16%, loop graph speedup 22% MAPE; exact 3-GPU ranking in 79%
+    of cases (bandwidth ratio 35%); reproduces the eager/graph inversion from every source.
+  - `paper/main.tex`: first full draft (all required sections; orange \pending{} marks).
+    No LaTeX on the cluster: compile on Overleaf or locally.
 - **Next:**
-  0. Cross-GPU model: find the missing TITAN V graph slowdown (clock under load? per-kernel
-     heterogeneity in graph replays? check SM clocks in nvidia_smi.txt and the bias-per-class
-     split), add a pure-Python host benchmark for scaling p, then report per-pair errors and
-     the GPU-ordering inversion (eager: TITAN V fastest; graph: TITAN V slowest).
-  1. Cross-GPU (flavor B): the 2080 Ti traces are in (`git pull`); extend `launch_model.py` to take
-     a source run and a target GPU: dispatch table and b, p from the source host; kernel times
-     scaled to the target (per-kernel roofline transfer with the L2 term, section 4.2);
-     g_eager, delta_node from the target's C++ calibration. Validate on the A100 sweep.
-  2. Run `scripts/run_bench.sh bench/build-cluster` on the A100 (C++ kernels and replay on the
-     target GPU: validation of per-kernel transfer on code we control); build with
-     `make -C bench ARCHS="75 70 80 89" BUILD=build-cluster` (needs cuBLAS from the conda
-     CUDA 12.4 env). ~2 GPU-minutes.
-  3. cuda2 is done (section above). Use the ncu feature tables as per-kernel source features
-     (DRAM/L2 bytes, occupancy; FLOPs from shapes) for the transfer model. TITAN V (cuda3) is a
-     second validation target with full traces; the RTX 4070 (cuda5) is pending.
-- GPU-hours used on `csci_ga_3033_025-2026fa`: 3.24 of 300 (2026-11-13 03:30).
+  1. User on CIMS: probe stage on cuda2 and cuda3, cuda5 full pipeline when free
+     (`docs/cuda2_runbook.md` section 7). Then rerun cross_gpu/report/figures, pick the final
+     variant, add the RTX 4070 as a target (large-L2 test).
+  2. Paper: survey (handout DOIs, CUDA-graph and dispatch-overhead papers), fill \pending{}.
+  3. Optional: spec-only what-if predictions for H100/H200/L40S (section 3 anomalies) need a
+     specs-to-slot mapping; with three measured GPUs this is underdetermined, so state it as a
+     limitation unless more targets become available.
+- GPU-hours used on `csci_ga_3033_025-2026fa`: 3.26 of 300 (2026-11-13 03:45).
 - Pending for the user (CIMS): see "Needs the user" in section 1 and the cuda2 commands in
   section 6. The user asked for a full "what to run on cuda machines and elsewhere" list once
   the cluster runs are finished.
