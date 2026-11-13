@@ -4,6 +4,7 @@
 #   WORK=/scratch/$USER scripts/run_cims_host.sh [full|calib-only]
 #     full        preflight setup calib dispatch probe bench trace trace-baseline
 #     probe-only  preflight probe (needs an earlier calib run on this host)
+#     l2-only     preflight l2 (L2 working-set sweep; builds the C++ benchmarks)
 #     calib-only  preflight calib (C++ microbenchmarks only, e.g. for GPUs without tensor cores)
 # Start it detached so it survives the SSH session, for example from cuda2:
 #   ssh cuda3.cims.nyu.edu 'cd ~/fall2026/GPU/vla-gpu-latency && WORK=/scratch/$USER \
@@ -70,12 +71,15 @@ if [[ $MODE == calib-only ]]; then
   stage calib gpu
 elif [[ $MODE == probe-only ]]; then
   stage probe gpu
+elif [[ $MODE == l2-only ]]; then
+  stage l2 gpu
 else
   stage setup
   stage calib gpu
   stage dispatch gpu
   stage probe gpu
   stage bench gpu
+  stage l2 gpu
   stage trace gpu
   stage trace-baseline gpu
 fi

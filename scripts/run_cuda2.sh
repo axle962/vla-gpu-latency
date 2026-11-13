@@ -16,6 +16,7 @@
 #   scripts/run_cuda2.sh trace       # SmolVLA, same 7 configs as the A100 sweep (~25 min)
 #   scripts/run_cuda2.sh trace-baseline   # optional: repeat the baseline (variance)
 #   scripts/run_cuda2.sh bench       # our CUDA kernels + C++ replay of the traced step (~6 min)
+#   scripts/run_cuda2.sh l2          # L2 working-set sweep on the C++ replay (~2 min)
 #   scripts/run_cuda2.sh ncu         # Nsight Compute per-kernel counters (~20 min)
 #   scripts/run_cuda2.sh results     # list what to commit
 # Full instructions (also for a Claude Code session on cuda2): docs/cuda2_runbook.md
@@ -151,6 +152,11 @@ bench)
   command -v nvcc >/dev/null || { echo "run: module load cuda-12.4"; exit 1; }
   build
   scripts/run_bench.sh "$BUILD"
+  ;;
+l2)
+  command -v nvcc >/dev/null || { echo "run: module load cuda-12.4"; exit 1; }
+  build
+  scripts/l2_sweep.sh "$BUILD"
   ;;
 ncu)
   command -v ncu >/dev/null || { echo "run: module load cuda-12.4"; exit 1; }

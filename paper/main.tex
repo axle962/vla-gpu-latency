@@ -188,6 +188,18 @@ MAPE on the graph loop. Per-op-class slot ratios measured on the target capture 
 architecture and the clock it runs at, which is why they are our default; a target's
 sustained clock is a cheap extra feature when source and target share an SM design.
 
+\subsection{How much does L2 residency matter?}
+To isolate the cache term we rerun our C++ replay of the 10-step loop with all GEMM weights
+sharing a pool of $N$ MB, so the loop touches $N$ MB of distinct weights with unchanged shapes
+and kernels, and sweep $N$ from 3 to 256\,MB. On the A100 (40\,MB L2, about 20 to 27\,MB
+effective in our bandwidth sweep) the graphed loop takes 31.2\,ms when the weights fit in L2 and
+32.2\,ms when they stream from DRAM with cuBLAS GEMMs (3\%), and 43.5 vs 49.6\,ms with our own
+GEMM (12\%), with the knee between 16 and 24\,MB. The saving is bounded by the DRAM time of the
+weights: 250\,MB per denoising step at 1.48\,TB/s is about 1.7\,ms of a 32\,ms loop, while the
+rest is per-kernel latency. On the 2080 Ti, flushing L2 before every kernel costs 18\% (Nsight
+Compute). So for small VLAs the cache term is second order next to launch and per-kernel
+latency, which is why our model does without one. \pending{same sweep on 2080 Ti, TITAN V, RTX 4070}
+
 \subsection{Comparison with VLA-Perf}
 \begin{table}[t]\centering\small
 \begin{tabular}{lrr}\toprule

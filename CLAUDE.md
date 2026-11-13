@@ -292,8 +292,15 @@ State:
   OpenVLA A100: 68 vs 311 ms eager, 47 vs 85 ms graph decode. Its GPU order (by peak FLOP/s)
   matches neither the eager nor the graph ordering. In the paper (Table "Comparison with
   VLA-Perf"), framed as an upper bound, not a mistake.
+- **L2 working-set sweep (2026-11-13, job 31229, `scripts/l2_sweep.sh`, `chain_replay
+  --weight-pool-mb`, `results/bench/NVIDIA_A100*_b-19-35_*/l2_sweep.csv`).** A100 10-step graph
+  loop: cuBLAS 31.2 ms (weights in L2) vs 32.2 ms (streamed, 3%); own GEMM 43.5 vs 49.6 ms (12%);
+  knee 16 to 24 MB. The bound is the weights' DRAM time (250 MB/step at 1.48 TB/s = 1.7 ms of
+  32 ms), so the cache term is second order for SmolVLA. CIMS stage `l2` / mode `l2-only` added
+  (runbook section 8); cuda5 `full` now includes it.
 - **Next:**
-  1. User on CIMS: cuda5 (RTX 4070) full pipeline when its GPU is free (large-L2 test); then
+  1. User on CIMS: `l2` sweep on cuda2 and cuda3 (runbook section 8); cuda5 (RTX 4070) full
+     pipeline when its GPU is free (large-L2 test, includes l2); then
      add `RTX4070` to `GPUS`/`TRACE_KEY` in `model/cross_gpu.py`, rerun cross_gpu, report,
      figures, and fill the last \pending{} in the paper.
   2. Paper: verify bibliography, compile on Overleaf, tighten; presentation slides.

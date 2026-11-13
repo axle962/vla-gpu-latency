@@ -249,3 +249,21 @@ clock under the workload; `run_bench.sh` now runs it too). cuda5's full pipeline
 with `MAX_WAIT_S=43200` and waits for the RTX 4070 (held by another user's job).
 On the cluster: rerun `model/cross_gpu.py`, `model/report_cross_gpu.py`, `model/figures.py`.
 For cuda5, add an `RTX4070` entry to `GPUS` and `TRACE_KEY` in `model/cross_gpu.py`.
+
+## 8. Round 3 (2026-11-13): L2 working-set sweep
+
+`scripts/l2_sweep.sh` (stage `l2`, ~2 to 3 min) reruns the C++ replay of the 10-step SmolVLA
+loop with all GEMM weights sharing a pool of 1 to 256 MB (`chain_replay --weight-pool-mb`;
+pools below the largest weight, ~3 MB, are rounded up to it). It measures how much keeping the
+weights in L2 saves on each GPU. A100 done (job 31229): cuBLAS graph loop 31.2 ms with the
+weights in L2 vs 32.2 ms streamed (3%), our GEMM 43.5 vs 49.6 ms (12%), knee 16 to 24 MB.
+
+```bash
+# from cuda2 (pull first): cuda2 and cuda3 sweeps, one command each
+cd ~/fall2026/GPU/vla-gpu-latency && git pull && module load cuda-12.4
+WORK=/scratch/am16489 scripts/run_cuda2.sh l2
+ssh -n cuda3.cims.nyu.edu 'cd ~/fall2026/GPU/vla-gpu-latency && WORK=/scratch/am16489 \
+  setsid nohup scripts/run_cims_host.sh l2-only > logs/cuda3-l2.log 2>&1 < /dev/null & disown'
+# cuda5 (RTX 4070, 36 MB L2): the full pipeline now includes l2 (section 7 command)
+```
+Commit `results/bench/*/l2_sweep.csv` and push.

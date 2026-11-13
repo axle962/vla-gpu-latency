@@ -20,6 +20,10 @@
 //   --per-op       also time every launch alone (CUDA graph of 20 copies, per-launch us)
 //   --profile-once run one eager pass between cudaProfilerStart/Stop and exit (for
 //                  `ncu --profile-from-start off`)
+//   --weight-pool-mb=N  L2 working-set experiment: all GEMM weights share one pool of N MB
+//                  (each weight at the next offset, wrapping), so the step touches about
+//                  N MB of distinct weight data instead of the model's full weights. Shapes
+//                  and kernels are unchanged. 0 (default) = one buffer per weight.
 #include <cublas_v2.h>
 #include <cuda_profiler_api.h>
 
@@ -225,6 +229,7 @@ int main(int argc, char** argv) {
   const int reps = bench::arg_int(argc, argv, "reps", 20);
   const int warmup = bench::arg_int(argc, argv, "warmup", 3);
   const bool profile_once = has_flag(argc, argv, "profile-once");
+  const int pool_mb = bench::arg_int(argc, argv, "weight-pool-mb", 0);
 
   std::vector<Op> ops = load(list);
   std::string name = list.substr(list.find_last_of('/') + 1);
@@ -246,11 +251,28 @@ int main(int argc, char** argv) {
     CUDA_CHECK(cudaMalloc(&c.act[i], amax));
     CUDA_CHECK(cudaMemset(c.act[i], 0, amax));
   }
+  size_t pool_bytes = 0, pool_off = 0;
+  char* pool = nullptr;
+  if (pool_mb > 0) {
+    size_t wmax = 0;
+    for (auto& o : ops)
+      if (o.cat == "gemm" && o.weight) wmax = std::max(wmax, (size_t)(o.k * o.n * o.in_bytes));
+    pool_bytes = std::max((size_t)pool_mb << 20, wmax);
+    CUDA_CHECK(cudaMalloc(&pool, pool_bytes));
+    CUDA_CHECK(cudaMemset(pool, 0, pool_bytes));
+  }
   for (auto& o : ops) {
     if (o.cat != "gemm" || !o.weight) continue;
     size_t wb = (size_t)o.k * o.n * o.in_bytes;
-    CUDA_CHECK(cudaMalloc(&o.w, wb));
-    CUDA_CHECK(cudaMemset(o.w, 0, wb));
+    if (pool) {
+      pool_off = (pool_off + 255) & ~(size_t)255;  // keep 256-byte alignment for cuBLAS/WMMA
+      if (pool_off + wb > pool_bytes) pool_off = 0;
+      o.w = pool + pool_off;
+      pool_off += wb;
+    } else {
+      CUDA_CHECK(cudaMalloc(&o.w, wb));
+      CUDA_CHECK(cudaMemset(o.w, 0, wb));
+    }
     wbytes += wb;
     if (o.bias) {
       CUDA_CHECK(cudaMalloc(&o.wb, (size_t)o.n * o.in_bytes));
@@ -287,9 +309,10 @@ int main(int argc, char** argv) {
 
   std::fprintf(stderr,
                "%s: %zu rows (%d traced kernels, traced GPU %.1f us per step), weights %.1f MB, "
-               "activation buffers 4 x %.2f MB, gemm=%s, steps=%d\n",
+               "activation buffers 4 x %.2f MB, gemm=%s, steps=%d, weight pool %s\n",
                name.c_str(), ops.size(), traced_k, traced, wbytes / 1e6, amax / 1e6,
-               gemm.c_str(), steps);
+               gemm.c_str(), steps,
+               pool ? (std::to_string(pool_bytes >> 20) + " MB").c_str() : "off");
 
   if (profile_once) {
     eager(s);  // warm up (module loading, cuBLAS heuristics)
@@ -305,8 +328,9 @@ int main(int argc, char** argv) {
   auto cfg = [&](int launched) {
     char b[256];
     std::snprintf(b, sizeof b, "gemm=%s;steps=%d;rows=%zu;launched=%d;traced_kernels=%d;"
-                  "traced_gpu_us=%.1f",
-                  gemm.c_str(), steps, ops.size(), launched, traced_k * steps, traced * steps);
+                  "traced_gpu_us=%.1f%s",
+                  gemm.c_str(), steps, ops.size(), launched, traced_k * steps, traced * steps,
+                  pool_mb > 0 ? (";weight_pool_mb=" + std::to_string(pool_mb)).c_str() : "");
     return std::string(b);
   };
   auto ev = bench::time_events(s, eager, warmup, reps);
