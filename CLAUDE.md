@@ -273,18 +273,21 @@ State:
     24% / 41% for `slot`. Not yet a variant in `model/cross_gpu.py` (model change left to the
     modeling session). Clock alone does not cross architectures: the A100 (1410 MHz) is faster
     per kernel than the 2080 Ti. A100 sustained clock was not sampled.
+- **Cluster session 2026-11-13 afternoon:** A100 sustained clock under the C++ flow chain is
+  1410 MHz (job 31175, `results/calib/NVIDIA_A100*_b-19-11_*/sm_clock_summary.txt`). New
+  variants in `model/cross_gpu.py`: `clock` (all slots x clk_S/clk_T) and `slot_cpp` (per-class
+  C++ replay slot ratios). `clock` fixes 2080 Ti<->TITAN V (graph loop 6 to 7%) but fails across
+  architectures (33% overall: the A100 is slower clocked yet as fast per small kernel);
+  `slot_cpp` 21%. **Final model: `slot_class`** (report default). Paper survey now covers the
+  two handout papers (Alavani et al. 2018, Muller and Hoffmann 2024), Habitat, Daydream,
+  Accel-Sim and CUDA-graph references (bib details marked TODO verify).
 - **Next:**
-  0. Model: add a sustained-clock feature (`sm_clock_summary.txt`) to the slot transfer, e.g.
-     slot(target) = slot(source) * clk_s / clk_t within an architecture family, plus an
-     architecture term; sample the A100 clock under load if the cluster is used again.
-  1. User on CIMS: probe stage on cuda2 and cuda3 (done 2026-11-13), cuda5 full pipeline when free
-     (`docs/cuda2_runbook.md` section 7). Then rerun cross_gpu/report/figures, pick the final
-     variant, add the RTX 4070 as a target (large-L2 test).
-  2. Paper: survey (handout DOIs, CUDA-graph and dispatch-overhead papers), fill \pending{}.
-  3. Optional: spec-only what-if predictions for H100/H200/L40S (section 3 anomalies) need a
-     specs-to-slot mapping; with three measured GPUs this is underdetermined, so state it as a
-     limitation unless more targets become available.
-- GPU-hours used on `csci_ga_3033_025-2026fa`: 3.26 of 300 (2026-11-13 03:45).
+  1. User on CIMS: cuda5 (RTX 4070) full pipeline when its GPU is free (large-L2 test); then
+     add `RTX4070` to `GPUS`/`TRACE_KEY` in `model/cross_gpu.py`, rerun cross_gpu, report,
+     figures, and fill the last \pending{} in the paper.
+  2. Paper: verify bibliography, compile on Overleaf, tighten; presentation slides.
+  3. Optional: spec-only what-if predictions for H100/H200/L40S remain a stated limitation.
+- GPU-hours used on `csci_ga_3033_025-2026fa`: 3.26 of 300 (2026-11-13 17:00).
 - Pending for the user (CIMS): see "Needs the user" in section 1 and the cuda2 commands in
   section 6. The user asked for a full "what to run on cuda machines and elsewhere" list once
   the cluster runs are finished.
