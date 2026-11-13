@@ -70,9 +70,13 @@ pat = ["*.json", "*.safetensors", "*.txt", "*.model", "*.jinja", "*.py"]
 print(snapshot_download("lerobot/smolvla_base", allow_patterns=pat))
 print(snapshot_download("HuggingFaceTB/SmolVLM2-500M-Video-Instruct", allow_patterns=pat))
 PY
-  # The cu128 wheels of recent torch drop older archs (e.g. Volta sm_70); cu126 still has them.
-  if ! "$PY" -c "import torch, sys; c = 'sm_%d%d' % torch.cuda.get_device_capability(0); \
-      sys.exit(0 if torch.cuda.is_available() and c in torch.cuda.get_arch_list() else 1)"; then
+  # Use the cu128 wheel (same build as every other GPU) unless it has no binary for this GPU.
+  # A binary for sm_XY runs on sm_XZ with Z >= Y (e.g. cu128 has sm_86, which runs on the
+  # RTX 4070's sm_89), so test compatibility by major version, not by exact name.
+  if ! "$PY" -c "import torch, sys; M, m = torch.cuda.get_device_capability(0); \
+      arch = [a[3:] for a in torch.cuda.get_arch_list() if a.startswith('sm_')]; \
+      ok = any(int(a[:-1]) == M and int(a[-1]) <= m for a in arch if a.isdigit()); \
+      sys.exit(0 if torch.cuda.is_available() and ok else 1)"; then
     tv=$("$PY" -c "import torch; print(torch.__version__.split('+')[0])")
     vv=$("$PY" -c "import torchvision; print(torchvision.__version__.split('+')[0])")
     echo "GPU arch not in this torch build: installing torch $tv / torchvision $vv for cu126"
