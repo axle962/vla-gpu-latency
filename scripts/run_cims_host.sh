@@ -2,7 +2,8 @@
 # Run the scripts/run_cuda2.sh stages on this CIMS cudaN host, unattended, waiting before each
 # GPU stage until the chosen GPU has no other process (CIMS GPUs are shared with other users).
 #   WORK=/scratch/$USER scripts/run_cims_host.sh [full|calib-only]
-#     full        preflight setup calib dispatch bench trace trace-baseline
+#     full        preflight setup calib dispatch probe bench trace trace-baseline
+#     probe-only  preflight probe (needs an earlier calib run on this host)
 #     calib-only  preflight calib (C++ microbenchmarks only, e.g. for GPUs without tensor cores)
 # Start it detached so it survives the SSH session, for example from cuda2:
 #   ssh cuda3.cims.nyu.edu 'cd ~/fall2026/GPU/vla-gpu-latency && WORK=/scratch/$USER \
@@ -67,10 +68,13 @@ export CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES:-0}
 stage preflight
 if [[ $MODE == calib-only ]]; then
   stage calib gpu
+elif [[ $MODE == probe-only ]]; then
+  stage probe gpu
 else
   stage setup
   stage calib gpu
   stage dispatch gpu
+  stage probe gpu
   stage bench gpu
   stage trace gpu
   stage trace-baseline gpu

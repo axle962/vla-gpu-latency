@@ -12,6 +12,7 @@
 #                                    # switches to the cu126 torch wheel if cu128 lacks the GPU arch
 #   scripts/run_cuda2.sh calib       # C++ microbenchmarks + ncu/nsys check (~2 min)
 #   scripts/run_cuda2.sh dispatch    # PyTorch per-op dispatch table (~1 min)
+#   scripts/run_cuda2.sh probe       # host Python speed + cold-cache small kernels (~2 min)
 #   scripts/run_cuda2.sh trace       # SmolVLA, same 7 configs as the A100 sweep (~25 min)
 #   scripts/run_cuda2.sh trace-baseline   # optional: repeat the baseline (variance)
 #   scripts/run_cuda2.sh bench       # our CUDA kernels + C++ replay of the traced step (~6 min)
@@ -99,6 +100,22 @@ dispatch)
   grep -m1 "model name" /proc/cpuinfo > "$out/host_cpu.txt"
   CUDA_MODULE_LOADING=EAGER "$PY" workloads/torch_dispatch.py > "$out/torch_dispatch_smolvla_env.csv"
   echo "wrote $out/torch_dispatch_smolvla_env.csv ($(wc -l < "$out/torch_dispatch_smolvla_env.csv") lines)"
+  ;;
+probe)
+  # Target-side probes for model/cross_gpu.py (workloads/torch_probe.py). Pinned to the GPUs'
+  # NUMA node when numactl exists (cuda2 has an OS-scheduling slow mode on unpinned runs).
+  out=$(latest_calib)
+  [[ -n "$out" ]] || { echo "run the calib stage first"; exit 1; }
+  grep -m1 "model name" /proc/cpuinfo > "$out/host_cpu.txt"
+  pin=()
+  if command -v numactl >/dev/null; then
+    node=$(cat /sys/bus/pci/devices/0000:$(nvidia-smi -i "$DEV" --query-gpu=pci.bus_id \
+      --format=csv,noheader | cut -d: -f2-3 | tr 'A-F' 'a-f')/numa_node 2>/dev/null || echo -1)
+    [[ $node -ge 0 ]] && pin=(numactl --cpunodebind="$node" --membind="$node")
+  fi
+  echo "probe on GPU $DEV ${pin[*]:-(unpinned)}"
+  CUDA_MODULE_LOADING=EAGER "${pin[@]}" "$PY" workloads/torch_probe.py > "$out/torch_probe_smolvla_env.csv"
+  echo "wrote $out/torch_probe_smolvla_env.csv ($(wc -l < "$out/torch_probe_smolvla_env.csv") lines)"
   ;;
 trace)
   export HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 CUDA_MODULE_LOADING=EAGER

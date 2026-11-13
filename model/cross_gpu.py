@@ -71,6 +71,8 @@ class GPU:
     small_us: dict         # src tag -> graph-mode duration of the small kernel set (C++)
     dispatch_med: dict     # op class -> dispatch cost (same as calib.dispatch_us)
     slot_us: dict          # op class -> PyTorch graph-mode time per kernel (slot)
+    cold_slot_us: dict     # op class -> cold-cache slot (workloads/torch_probe.py), or {}
+    py_us: dict            # host Python probes (us per call), or {}
 
 
 def _one(pattern: str) -> Path:
@@ -117,7 +119,35 @@ def slot_table(dispatch_csv: Path) -> dict:
     return out
 
 
-def load_gpu(key: str, calib_glob: str, dispatch_glob: str, bench_glob: str) -> GPU:
+# Cold-cache rows of workloads/torch_probe.py per op class (kernel id, config substring).
+COLD_ROWS = {
+    "add_n": [("add_cold", "50x720;dtype=float16"), ("add_cold", "241x960"),
+              ("add_f32_cold", ""), ("cast_cold", ""), ("rmsnorm6_cold", "")],
+    "add_alloc": [("cast_cold", ""), ("add_cold", "50x720;dtype=float16")],
+    "linear": [("linear_cold", "n=2048"), ("linear_cold", "n=720")],
+}
+
+
+def probe_tables(probe_csv: Path | None) -> tuple[dict, dict]:
+    if probe_csv is None:
+        return {}, {}
+    rows = list(csv.DictReader(open(probe_csv)))
+    py = {r["kernel"]: float(r["median_us"]) for r in rows if r["mode"] == "host"}
+    cold = {}
+    for cls, keys in COLD_ROWS.items():
+        vals = []
+        for kid, sub in keys:
+            for r in rows:
+                if r["mode"] == "graph" and r["kernel"] == kid and sub in r["config"]:
+                    kpo = int(r["config"].split("kernels_per_op=")[1].split(";")[0])
+                    vals.append(float(r["median_us"]) / kpo)
+        if vals:
+            cold[cls] = float(np.exp(np.mean(np.log(vals))))
+    return cold, py
+
+
+def load_gpu(key: str, calib_glob: str, dispatch_glob: str, bench_glob: str,
+             probe_glob: str) -> GPU:
     cdir = _one(calib_glob)
     info = device_info(cdir / "device_info.csv")
     bw = bandwidth_params(_one(calib_glob + "/bandwidth.csv"), float(info["l2_bytes"]))
@@ -125,19 +155,23 @@ def load_gpu(key: str, calib_glob: str, dispatch_glob: str, bench_glob: str) -> 
     c = load_calib(cdir, dcsv)
     return GPU(key, str(info["gpu"]), c, bw["bw_dram_gbps"],
                float(info["theoretical_dram_bw_mbps"]) / 1e3,
-               small_kernels(_one(bench_glob)), c.dispatch_us, slot_table(dcsv))
+               small_kernels(_one(bench_glob)), c.dispatch_us, slot_table(dcsv),
+               *probe_tables(max(ROOT.glob(probe_glob), default=None)))
 
 
 GPUS = {
     "A100": dict(calib_glob="results/calib/NVIDIA_A100-SXM4-40GB_b-19-11_*",
                  dispatch_glob="results/calib/NVIDIA_A100-SXM4-40GB_b-19-28_*",
-                 bench_glob="results/bench/NVIDIA_A100*"),
+                 bench_glob="results/bench/NVIDIA_A100*",
+                 probe_glob="results/calib/NVIDIA_A100*/torch_probe_smolvla_env.csv"),
     "2080Ti": dict(calib_glob="results/calib/NVIDIA_GeForce_RTX_2080_Ti_cuda2_*",
                    dispatch_glob="results/calib/NVIDIA_GeForce_RTX_2080_Ti_cuda2_*",
-                   bench_glob="results/bench/NVIDIA_GeForce_RTX_2080_Ti_cuda2_*"),
+                   bench_glob="results/bench/NVIDIA_GeForce_RTX_2080_Ti_cuda2_*",
+                   probe_glob="results/calib/NVIDIA_GeForce_RTX_2080_Ti_cuda2_*/torch_probe_*.csv"),
     "TITANV": dict(calib_glob="results/calib/NVIDIA_TITAN_V_cuda3_*",
                    dispatch_glob="results/calib/NVIDIA_TITAN_V_cuda3_*",
-                   bench_glob="results/bench/NVIDIA_TITAN_V_cuda3_*"),
+                   bench_glob="results/bench/NVIDIA_TITAN_V_cuda3_*",
+                   probe_glob="results/calib/NVIDIA_TITAN_V_cuda3_*/torch_probe_*.csv"),
 }
 TRACE_KEY = {"A100": "A100", "2080Ti": "RTX_2080_Ti", "TITANV": "TITAN_V"}
 
@@ -145,6 +179,12 @@ TRACE_KEY = {"A100": "A100", "2080Ti": "RTX_2080_Ti", "TITANV": "TITAN_V"}
 def r_lat(src: GPU, tgt: GPU) -> float:
     common = sorted(set(src.small_us) & set(tgt.small_us))
     return float(np.exp(np.mean([np.log(tgt.small_us[k] / src.small_us[k]) for k in common])))
+
+
+def py_ratio(src: GPU, tgt: GPU) -> float:
+    """Host Python speed ratio (target/source) from the torch_probe host probes."""
+    common = sorted(set(src.py_us) & set(tgt.py_us))
+    return float(np.exp(np.mean([np.log(tgt.py_us[k] / src.py_us[k]) for k in common])))
 
 
 def host_ratio(src: GPU, tgt: GPU) -> float:
@@ -168,7 +208,8 @@ def transfer(s: np.ndarray, mode: str, src: GPU, tgt: GPU, tau: float = TAU_US) 
     raise ValueError(mode)
 
 
-def transfer_slots(tr: StepTrace, src: GPU, tgt: GPU, tail_bw: bool = True) -> np.ndarray:
+def transfer_slots(tr: StepTrace, src: GPU, tgt: GPU, tail_bw: bool = True,
+                   cold: bool = False) -> np.ndarray:
     """Proposed transfer. A kernel's graph slot on the source is u = t + delta_S (t already
     bias corrected). Up to the size of its class's calibration op (tau_c = source slot time of
     that op), the slot scales with the measured class ratio r_c = slot_T / slot_S; the part
@@ -176,8 +217,10 @@ def transfer_slots(tr: StepTrace, src: GPU, tgt: GPU, tail_bw: bool = True) -> n
     durations on the target, t_T = u_T - delta_T."""
     u = tr.t_us + src.calib.delta_node_us
     cls = np.array(tr.cls)
-    tau = np.array([src.slot_us[c] for c in cls])
-    r = np.array([tgt.slot_us[c] / src.slot_us[c] for c in cls])
+    st = {**src.slot_us, **(src.cold_slot_us if cold else {})}
+    tt = {**tgt.slot_us, **(tgt.cold_slot_us if cold else {})}
+    tau = np.array([st[c] for c in cls])
+    r = np.array([tt[c] / st[c] for c in cls])
     rb = src.bw_dram / tgt.bw_dram if tail_bw else 1.0
     u_t = r * np.minimum(u, tau) + (rb if tail_bw else r) * np.maximum(u - tau, 0.0)
     return np.maximum(u_t - tgt.calib.delta_node_us, 0.5)
@@ -228,8 +271,8 @@ def main() -> None:
               f"g_eager {g.calib.g_eager_us:.2f} us, delta_node {g.calib.delta_node_us:.2f} us, "
               f"small kernels {len(g.small_us)}", file=sys.stderr)
     out = csv.writer(sys.stdout)
-    out.writerow(["source", "target", "config", "quantity", "measured_ms", "kernel_transfer",
-                  "predicted_ms", "error_pct", "r_lat", "r_bw", "host_ratio"])
+    out.writerow(["source", "target", "config", "quantity", "unit", "measured",
+                  "kernel_transfer", "predicted", "error_pct", "r_lat", "r_bw", "host_ratio"])
     for sk, src in gpus.items():
         src_runs = measured_by_cfg(sk)
         base_r, base_m = src_runs[(3, 10, 50)]
@@ -248,21 +291,33 @@ def main() -> None:
                 if cfg not in traces:
                     continue
                 tr = traces[cfg]
+                has_probe = bool(src.cold_slot_us and tgt.cold_slot_us)
                 for mode in ("same", "spec_bw", "bw", "lat", "lat_bw", "slot_class",
-                             "slot"):
+                             "slot", "slot_cold", "slot_cold_py"):
                     if mode.startswith("lat") and not np.isfinite(rl):
                         continue
-                    if mode.startswith("slot"):
+                    if mode.startswith("slot_cold") and not has_probe:
+                        continue
+                    if mode.startswith("slot_cold"):
+                        t_new = transfer_slots(tr, src, tgt, tail_bw=False, cold=True)
+                    elif mode.startswith("slot"):
                         t_new = transfer_slots(tr, src, tgt, tail_bw=(mode == "slot"))
                     else:
                         t_new = transfer(tr.t_us, mode, src, tgt)
                     t2 = replace(tr, t_us=t_new)
-                    pred = predict(t2, tgt.calib, p_us * h)
-                    for q, us in pred.items():
-                        meas = tr_m[QUANT[q]]
-                        out.writerow([sk, tk, "cam{}_steps{}_chunk{}".format(*cfg), q,
-                                      f"{meas:.3f}", mode, f"{us / 1e3:.3f}",
-                                      f"{100 * (us / 1e3 - meas) / meas:.1f}",
+                    hp = py_ratio(src, tgt) if mode == "slot_cold_py" else h
+                    pred = predict(t2, tgt.calib, p_us * hp)
+                    vals = {q: (tr_m[QUANT[q]], us / 1e3, "ms") for q, us in pred.items()}
+                    # CUDA-graph speedups: loop only, and end to end (eager vs hybrid)
+                    vals["speedup_loop"] = (tr_m["eager_denoise_ms_median"]
+                                            / tr_m["graph_denoise_ms_median"],
+                                            pred["eager_loop"] / pred["graph_loop"], "x")
+                    vals["speedup_e2e"] = (tr_m["eager_ms_median"] / tr_m["hybrid_ms_median"],
+                                           pred["eager"] / pred["hybrid"], "x")
+                    for q, (meas, pv, unit) in vals.items():
+                        out.writerow([sk, tk, "cam{}_steps{}_chunk{}".format(*cfg), q, unit,
+                                      f"{meas:.3f}", mode, f"{pv:.3f}",
+                                      f"{100 * (pv - meas) / meas:.1f}",
                                       f"{rl:.3f}", f"{rb:.3f}", f"{h:.3f}"])
 
 
