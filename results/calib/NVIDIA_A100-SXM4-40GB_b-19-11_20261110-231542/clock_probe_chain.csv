@@ -1,0 +1,5 @@
+gpu,bench,kernel,config,mode,timer,n_runs,mean_us,std_us,min_us,median_us,module_loading
+NVIDIA A100-SXM4-40GB,chain,smolvla_flow,gemm=cublas;steps=10;rows=1194;launched=11940;traced_kernels=11480;traced_gpu_us=34471.7,eager,event,60,47815.6631,1391.5673,47501.3123,47553.0243,EAGER
+NVIDIA A100-SXM4-40GB,chain,smolvla_flow,gemm=cublas;steps=10;rows=1194;launched=11940;traced_kernels=11480;traced_gpu_us=34471.7,eager,host,60,47815.2940,406.3336,47542.1130,47659.6385,EAGER
+NVIDIA A100-SXM4-40GB,chain,smolvla_flow,gemm=cublas;steps=10;rows=1194;launched=11920;traced_kernels=11480;traced_gpu_us=34471.7,graph,event,60,32246.6132,28.6926,32214.0160,32239.1033,EAGER
+NVIDIA A100-SXM4-40GB,chain,smolvla_flow,gemm=cublas;steps=10;rows=1194;launched=11920;traced_kernels=11480;traced_gpu_us=34471.7,graph,host,60,32260.3591,37.4033,32203.8950,32251.1850,EAGER

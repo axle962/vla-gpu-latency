@@ -1,0 +1,5 @@
+host b-19-44, GPU 0 (NVIDIA A100-SXM4-40GB)
+spec: 1410 MHz, [Requested functionality has been deprecated] (max SM, application clock)
+SM clock under load: median 1410 MHz, min 1095, max 1410 (63 of 68 samples)
+chain 10 flow steps, cuBLAS, eager: 47.55 ms
+chain 10 flow steps, cuBLAS, graph: 32.24 ms

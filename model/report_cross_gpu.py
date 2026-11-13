@@ -36,7 +36,7 @@ def kendall(a: list[float], b: list[float]) -> float:
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("csv", nargs="?", default=str(ROOT / "results/predictions_cross_gpu.csv"))
-    ap.add_argument("--variant", default="slot")
+    ap.add_argument("--variant", default="slot_class")
     a = ap.parse_args()
     d = pd.read_csv(a.csv)
     d["ape"] = d.error_pct.abs()

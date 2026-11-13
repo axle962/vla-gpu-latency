@@ -2,24 +2,24 @@
 
 | quantity     |   same |   spec_bw |   bw |   lat |   lat_bw |   slot_class |   slot |   slot_cold |   slot_cold_py |   clock |   slot_cpp |
 |:-------------|-------:|----------:|-----:|------:|---------:|-------------:|-------:|------------:|---------------:|--------:|-----------:|
-| eager        |    6.6 |       7.1 |  7   |   7.4 |      6.9 |          7.5 |    7   |         7.3 |           20.1 |    10.4 |        7.2 |
-| eager_prefix |    6.3 |       5.6 |  5.2 |  10.4 |      5.2 |          8.6 |    5.7 |         8   |           16.8 |    15.6 |        8.5 |
-| eager_loop   |    7.7 |       7.7 |  7.7 |   7.7 |      7.7 |          7.7 |    7.7 |         7.7 |           20.7 |     8.9 |        7.7 |
-| graph_loop   |   37.9 |      63.8 | 64.2 |  23.2 |     23.8 |         16.2 |   21.2 |        22.1 |           22.1 |     6.6 |       21.3 |
-| hybrid       |   15.5 |      26.6 | 26.8 |  11.3 |      8.9 |          5.2 |    7.4 |         7.8 |            8.2 |     5.3 |        9.3 |
-| speedup_loop |   46   |      68.5 | 68.9 |  30.5 |     31.3 |         22.3 |   26.3 |        29.1 |           41.8 |    15.5 |       27.4 |
-| speedup_e2e  |   22   |      26.3 | 26.5 |  16.3 |     15.6 |         10.9 |   13   |        14.3 |           20.3 |     5.5 |       14.1 | 
+| eager        |    6.6 |       7.1 |  7   |   7.4 |      6.9 |          7.5 |    7   |         7.3 |           20.1 |     7.6 |        7.2 |
+| eager_prefix |    6.3 |       5.6 |  5.2 |  10.4 |      5.2 |          8.6 |    5.7 |         8   |           16.8 |    11.8 |        8.5 |
+| eager_loop   |    7.7 |       7.7 |  7.7 |   7.7 |      7.7 |          7.7 |    7.7 |         7.7 |           20.7 |     7.7 |        7.7 |
+| graph_loop   |   37.9 |      63.8 | 64.2 |  23.2 |     23.8 |         16.2 |   21.2 |        22.1 |           22.1 |    33.4 |       21.3 |
+| hybrid       |   15.5 |      26.6 | 26.8 |  11.3 |      8.9 |          5.2 |    7.4 |         7.8 |            8.2 |    18.5 |        9.3 |
+| speedup_loop |   46   |      68.5 | 68.9 |  30.5 |     31.3 |         22.3 |   26.3 |        29.1 |           41.8 |    38.5 |       27.4 |
+| speedup_e2e  |   22   |      26.3 | 26.5 |  16.3 |     15.6 |         10.9 |   13   |        14.3 |           20.3 |    19.7 |       14.1 | 
 
-## MAPE (%) per pair, variant `slot`
+## MAPE (%) per pair, variant `slot_class`
 
 |                      |   eager |   eager_prefix |   eager_loop |   graph_loop |   hybrid |   speedup_loop |   speedup_e2e |
 |:---------------------|--------:|---------------:|-------------:|-------------:|---------:|---------------:|--------------:|
-| ('2080Ti', 'A100')   |     1.2 |            3.7 |          2.9 |         12.6 |      7.6 |           17.8 |           9.2 |
-| ('2080Ti', 'TITANV') |     7.5 |            3.1 |          9   |         24.3 |     12.1 |           44   |          22.5 |
-| ('A100', '2080Ti')   |     4.3 |            7.3 |          5.3 |         36.4 |      8   |           27.2 |          10.2 |
-| ('A100', 'TITANV')   |     9.6 |            4.8 |         11.1 |          5.9 |      1.7 |           18.2 |          11.2 |
-| ('TITANV', '2080Ti') |     9.6 |            5.5 |          8.8 |         40.8 |     11.3 |           35.2 |          18.1 |
-| ('TITANV', 'A100')   |    10.1 |            9.6 |          9.1 |          7.2 |      3.5 |           15.2 |           6.8 | 
+| ('2080Ti', 'A100')   |     1.3 |            2.4 |          2.9 |          6.2 |      1.4 |            4.1 |           1.5 |
+| ('2080Ti', 'TITANV') |    10   |           17.9 |          9   |         16.6 |      2.8 |           30.8 |          11.4 |
+| ('A100', '2080Ti')   |     4.3 |            9.1 |          5.3 |          4   |      6   |            6   |           4.8 |
+| ('A100', 'TITANV')   |     8.8 |            2.3 |         11.1 |         19.6 |     10.9 |           38.5 |          22.3 |
+| ('TITANV', '2080Ti') |    10.3 |           10.2 |          8.8 |         21.7 |      4.6 |           25   |          10.9 |
+| ('TITANV', 'A100')   |    10.1 |            9.5 |          9.1 |         29   |      5.7 |           29.5 |          14.4 | 
 
 ## Same-GPU baseline (source == target), variant-independent
 
@@ -42,6 +42,7 @@
 | slot         |     147 |              51.02  |              0.673 |
 | slot_cold    |     147 |              78.231 |              0.855 |
 | slot_cold_py |     147 |              51.02  |              0.624 |
+| clock        |     147 |              68.707 |              0.755 |
 | slot_cpp     |     147 |              70.068 |              0.8   | 
 
 ## Eager vs graph ordering inversion, baseline config (cam3_steps10_chunk50)
@@ -50,7 +51,7 @@ measured (ms): {'eager': {'2080Ti': 484.4, 'A100': 382.7, 'TITANV': 340.5}, 'gra
 - spec_bw, source 2080Ti: eager order ['TITANV', 'A100', '2080Ti'], graph order ['A100', 'TITANV', '2080Ti'], differs from measured
 - spec_bw, source A100: eager order ['TITANV', 'A100', '2080Ti'], graph order ['A100', 'TITANV', '2080Ti'], differs from measured
 - spec_bw, source TITANV: eager order ['TITANV', 'A100', '2080Ti'], graph order ['A100', 'TITANV', '2080Ti'], differs from measured
-- slot, source 2080Ti: eager order ['TITANV', 'A100', '2080Ti'], graph order ['A100', '2080Ti', 'TITANV'], matches measured
-- slot, source A100: eager order ['TITANV', 'A100', '2080Ti'], graph order ['A100', '2080Ti', 'TITANV'], matches measured
-- slot, source TITANV: eager order ['TITANV', 'A100', '2080Ti'], graph order ['A100', '2080Ti', 'TITANV'], matches measured
+- slot_class, source 2080Ti: eager order ['TITANV', 'A100', '2080Ti'], graph order ['A100', '2080Ti', 'TITANV'], matches measured
+- slot_class, source A100: eager order ['TITANV', 'A100', '2080Ti'], graph order ['A100', '2080Ti', 'TITANV'], matches measured
+- slot_class, source TITANV: eager order ['TITANV', 'A100', '2080Ti'], graph order ['A100', '2080Ti', 'TITANV'], matches measured
 

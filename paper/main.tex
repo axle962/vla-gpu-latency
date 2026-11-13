@@ -181,7 +181,12 @@ the C++ replay of the loop runs shows the TITAN V holding 1335\,MHz (spec maximu
 the 2080 Ti 1950\,MHz; the ratio, 1.46, matches the real per-kernel ratio of 1.54. Scaling all
 slots by the sustained-clock ratio predicts the graph loop between these two GPUs within 6 to
 7\% in both directions (versus 17 to 22\% with slot ratios), so latency-bound kernels scale
-with the clock the GPU actually runs at, not its spec boost clock. \pending{A100 sustained clock}
+with the clock the GPU actually runs at, not its spec boost clock. The clock alone does not
+transfer across architectures, though: the A100 sustains only 1410\,MHz, below the 2080 Ti,
+yet runs small kernels in the same time, and clock-only scaling over all six pairs gives 33\%
+MAPE on the graph loop. Per-op-class slot ratios measured on the target capture both the
+architecture and the clock it runs at, which is why they are our default; a target's
+sustained clock is a cheap extra feature when source and target share an SM design.
 
 \subsection{Ordering inversion}
 Measured eager step: TITAN V 340\,ms $<$ A100 383 $<$ 2080 Ti 484; graph loop: A100 35.6 $<$
