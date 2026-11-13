@@ -29,7 +29,7 @@ build a two-timeline model (host dispatch and GPU execution) whose kernel term t
 kernel's \emph{graph slot} with ratios measured by small PyTorch microbenchmarks on the target.
 Across the six source/target pairs and seven configurations it predicts the eager step with
 7.5\% MAPE, the hybrid (eager prefix plus graphed loop) step with 5.2\%, and the CUDA-graph
-loop with 16\%, versus 64\% for bandwidth-ratio scaling, and it reproduces the ordering
+loop with 16\%, versus 64\% for bandwidth-ratio scaling and 86 to 98\% for the VLA-Perf roofline, and it reproduces the ordering
 inversion where the TITAN V host is fastest in eager mode while its GPU is slowest under
 graphs.
 \end{abstract}
@@ -187,6 +187,35 @@ yet runs small kernels in the same time, and clock-only scaling over all six pai
 MAPE on the graph loop. Per-op-class slot ratios measured on the target capture both the
 architecture and the clock it runs at, which is why they are our default; a target's
 sustained clock is a cheap extra feature when source and target share an SM design.
+
+\subsection{Comparison with VLA-Perf}
+\begin{table}[t]\centering\small
+\begin{tabular}{lrr}\toprule
+Quantity (SmolVLA) & VLA-Perf & Ours (cross-GPU)\\\midrule
+Eager step & 97.7 & 7.5\\
+Eager prefix & 90.1 & 8.6\\
+Graph loop & 93.2 & 16.2\\
+Hybrid step & 91.5 & 5.2\\
+Graph speedup (loop) & 85.8 & 22.3\\\bottomrule
+\end{tabular}
+\caption{MAPE (\%) of VLA-Perf, run on the same models and GPUs, vs our model. VLA-Perf uses
+spec sheets only; ours uses a source trace plus target microbenchmarks.}\label{tab:vlaperf}
+\end{table}
+We ran VLA-Perf's code~\cite{vlaperf} on our workloads: SmolVLA component configurations
+matching \texttt{smolvla\_base} as traced (vision prefill per camera, VLM prefill over the
+prefix, flow steps $\times$ action-expert parallel decode, as in its $\pi_0$ pipeline), and its
+own OpenVLA model with our prefix length, at batch 1 on one GPU in FP16, with spec-sheet
+entries for the 2080 Ti and TITAN V in its own convention. It predicts 3.9\,ms for a SmolVLA
+step on the A100, against 383\,ms measured eager, 95\,ms hybrid and 35.6\,ms for the graph loop
+alone; its expert time (1.5\,ms for 10 passes) is exactly the time to stream the expert's
+weights at peak bandwidth, a correct roofline. For OpenVLA on the A100 it predicts 68\,ms vs
+311\,ms eager and 47\,ms vs 85\,ms for the graphed decode, closer because OpenVLA's decode
+GEMVs are bandwidth bound. Table~\ref{tab:vlaperf} summarizes: VLA-Perf errs by 86 to 98\% on
+SmolVLA, and its GPU ordering (A100, TITAN V, 2080 Ti, by peak FLOP/s) matches neither the
+measured eager ordering (TITAN V, A100, 2080 Ti) nor the graph ordering (A100, 2080 Ti, TITAN V).
+This is not a flaw in its arithmetic: it is designed as an achievable upper bound. It shows
+that for small batch-1 VLAs the gap between that bound and reality is one to two orders of
+magnitude, and that the gap is launch, dispatch and per-kernel latency, which it does not model.
 
 \subsection{Ordering inversion}
 Measured eager step: TITAN V 340\,ms $<$ A100 383 $<$ 2080 Ti 484; graph loop: A100 35.6 $<$

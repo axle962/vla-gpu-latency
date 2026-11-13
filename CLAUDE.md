@@ -281,6 +281,17 @@ State:
   `slot_cpp` 21%. **Final model: `slot_class`** (report default). Paper survey now covers the
   two handout papers (Alavani et al. 2018, Muller and Hoffmann 2024), Habitat, Daydream,
   Accel-Sim and CUDA-graph references (bib details marked TODO verify).
+- **VLA-Perf baseline run (2026-11-13, `model/vlaperf_baseline.py` -> `results/vlaperf_baseline.csv`).**
+  Their code cloned to `/scratch/am16489/ext/vla-perf` (commit 1e2b9a7), env `envs/vlaperf`
+  (git-ignored). SmolVLA component configs added in the driver (SigLIP-B 1024 patches/camera,
+  16-layer 960-wide VLM, 16-layer 720-wide expert, pi0-style pipeline); their own OpenVLA
+  model (decode x tokens, as in their openvla_perf.py); 2080 Ti / TITAN V spec entries added at
+  runtime (53.8 / 110 TFLOPS FP16-FP32acc, 616 / 653 GB/s). Batch 1, 1 GPU, FP16.
+  SmolVLA A100: 3.9 ms predicted vs 383 eager / 95 hybrid / 35.6 graph loop. MAPE over 3 GPUs x
+  7 configs: eager 97.7%, prefix 90.1%, graph loop 93.2%, hybrid 91.5%, speedup 85.8% (=1.0x).
+  OpenVLA A100: 68 vs 311 ms eager, 47 vs 85 ms graph decode. Its GPU order (by peak FLOP/s)
+  matches neither the eager nor the graph ordering. In the paper (Table "Comparison with
+  VLA-Perf"), framed as an upper bound, not a mistake.
 - **Next:**
   1. User on CIMS: cuda5 (RTX 4070) full pipeline when its GPU is free (large-L2 test); then
      add `RTX4070` to `GPUS`/`TRACE_KEY` in `model/cross_gpu.py`, rerun cross_gpu, report,
