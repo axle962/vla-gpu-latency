@@ -27,7 +27,8 @@ VARIANT_LABEL = {"same": "unchanged", "spec_bw": "spec BW ratio", "bw": "measure
                  "lat": "C++ latency ratio", "lat_bw": "C++ latency + BW",
                  "slot_class": "slot per op class", "slot": "slot + BW tail",
                  "slot_cold": "cold slot", "slot_cold_py": "cold slot + Python host",
-                 "clock": "sustained clock ratio", "slot_cpp": "C++ replay slot ratio"}
+                 "clock": "sustained clock ratio", "slot_cpp": "C++ replay slot ratio",
+                 "slot_drv": "slot + driver-corrected host"}
 
 
 def style(ax) -> None:

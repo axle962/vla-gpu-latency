@@ -42,7 +42,7 @@ def main() -> None:
     d["ape"] = d.error_pct.abs()
     x = d[d.source != d.target]
     variants = [v for v in ["same", "spec_bw", "bw", "lat", "lat_bw", "slot_class", "slot",
-                            "slot_cold", "slot_cold_py", "clock", "slot_cpp"] if v in set(d.kernel_transfer)]
+                            "slot_cold", "slot_cold_py", "clock", "slot_cpp", "slot_drv"] if v in set(d.kernel_transfer)]
 
     print("## MAPE (%) over cross-GPU pairs and configs\n")
     t = x.pivot_table(index="quantity", columns="kernel_transfer", values="ape", aggfunc="mean")

@@ -32,6 +32,8 @@ slots, not raw traced durations, are what transfers.
 
 Host side on the target: per-op dispatch costs from the target host's table; Python residual
 p_T = p_S * h, with h the median target/source ratio of the dispatch-table costs.
+  slot_drv    kernels as slot_class; h computed after subtracting each host's C++ driver
+              launch cost from the table entries (framework_ratio)
 
 Usage (login node is fine, ~1 GB RAM):
   envs/smolvla/bin/python model/cross_gpu.py > results/predictions_cross_gpu.csv
@@ -226,6 +228,20 @@ def host_ratio(src: GPU, tgt: GPU) -> float:
     return float(np.median([tgt.dispatch_med[k] / src.dispatch_med[k] for k in common]))
 
 
+# kernels issued per op of each dispatch-table class (workloads/torch_dispatch.py)
+KPO = {"rmsnorm6": 6}
+
+
+def framework_ratio(src: GPU, tgt: GPU) -> float:
+    """Like host_ratio, but each dispatch-table cost minus its driver launch cost
+    (kernels_per_op x the C++ cudaLaunchKernel call time of that host). The Python residual p
+    issues no kernels, so it should scale with the framework part only. Matters for the cuda5
+    host, whose cudaLaunchKernel costs 8.7 us vs 1.9 to 2.6 us on the others."""
+    common = sorted(set(src.dispatch_med) & set(tgt.dispatch_med))
+    f = lambda g, k: g.dispatch_med[k] - KPO.get(k, 1) * g.calib.launch_call_us  # noqa: E731
+    return float(np.median([f(tgt, k) / f(src, k) for k in common]))
+
+
 def transfer(s: np.ndarray, mode: str, src: GPU, tgt: GPU, tau: float = TAU_US) -> np.ndarray:
     if mode == "same":
         return s
@@ -334,7 +350,7 @@ def main() -> None:
                 tr = traces[cfg]
                 has_probe = bool(src.cold_slot_us and tgt.cold_slot_us)
                 for mode in ("same", "spec_bw", "bw", "lat", "lat_bw", "slot_class",
-                             "slot", "slot_cold", "slot_cold_py", "clock", "slot_cpp"):
+                             "slot", "slot_cold", "slot_cold_py", "clock", "slot_cpp", "slot_drv"):
                     if mode == "clock" and not (np.isfinite(src.clk_mhz)
                                                 and np.isfinite(tgt.clk_mhz)):
                         continue
@@ -357,7 +373,8 @@ def main() -> None:
                     else:
                         t_new = transfer(tr.t_us, mode, src, tgt)
                     t2 = replace(tr, t_us=t_new)
-                    hp = py_ratio(src, tgt) if mode == "slot_cold_py" else h
+                    hp = (py_ratio(src, tgt) if mode == "slot_cold_py"
+                          else framework_ratio(src, tgt) if mode == "slot_drv" else h)
                     pred = predict(t2, tgt.calib, p_us * hp)
                     vals = {q: (tr_m[QUANT[q]], us / 1e3, "ms") for q, us in pred.items()}
                     # CUDA-graph speedups: loop only, and end to end (eager vs hybrid)

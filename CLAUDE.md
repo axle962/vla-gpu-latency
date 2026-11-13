@@ -327,11 +327,25 @@ State:
     graph loop 15%, hybrid 15%; exact 4-GPU ranking 64%.
   - Paper: RTX 4070 row in Table 1, new subsection "A fourth GPU", limitations updated; the
     headline numbers stay on the three-GPU set. No \pending{} left.
+- **Host-transfer analysis (cluster session 2026-11-13 evening, no GPU jobs):**
+  - The cuda5 host's C++ `cudaLaunchKernel` call costs 8.7 us (others 1.9 to 2.6 us). Its aten
+    dispatch microbenchmarks are 2.3 to 2.5x the A100/TITAN V hosts (2.1 to 2.4x even after
+    subtracting the driver cost), but in situ the traced eager steps show 1.6 to 2.0x per
+    kernel (GPU start-to-start intervals, GPU starved) and the unprofiled eager step is 1.59x /
+    1.78x. Microbenchmarks overstate the old host's slowdown; Python probes say 1.2 to 1.35x.
+  - The p ratio actually needed (p fitted on each target's own baseline) follows h among the
+    three original hosts (2080 Ti p = 22.5 us is high: dispatch-like, not Python-like) but
+    follows the Python ratio into cuda5 (1.1 to 1.4x). No single microbenchmark index fits
+    both; blends h^a * py^(1-a) trade one set against the other.
+  - New variant **`slot_drv`** (kernels as `slot_class`; p scaled by `framework_ratio`, the
+    dispatch-table ratio after subtracting kernels_per_op x the host's C++ launch call).
+    Cross-pair MAPE vs `slot_class`: 3 GPUs eager 6.6 vs 7.5%, prefix 7.1 vs 8.6, hybrid 5.5 vs
+    5.2, loop speedup 21.7 vs 22.3; 4070 pairs eager 34 vs 41%, hybrid 20 vs 26%; 4 GPUs eager
+    20 vs 24%, hybrid 13 vs 15%, graph loop unchanged (15%). Paper still uses `slot_class`.
 - **Next:**
-  1. Model: transfer of the Python share of host time between very different hosts (the 4070
-     eager failure); e.g. split p into a dispatch-scaled and a Python-scaled part fitted on the
-     three similar hosts and test on cuda5. Decide whether the paper headline should move to
-     four GPUs.
+  1. Decide: paper default `slot_drv` instead of `slot_class` (better almost everywhere), and
+     whether the headline moves to four GPUs. The residual 4070 eager error (~34%) is a
+     host-side limitation: aten microbenchmarks on an old host overstate in-situ dispatch.
   2. Paper: verify bibliography, compile on Overleaf, tighten; presentation slides.
   3. Optional: spec-only what-if predictions for H100/H200/L40S remain a stated limitation.
 - GPU-hours used on `csci_ga_3033_025-2026fa`: 3.31 of 300 (2026-11-13 18:10).
