@@ -20,6 +20,7 @@
 #   scripts/run_cuda2.sh ncu         # Nsight Compute per-kernel counters (~20 min)
 #   scripts/run_cuda2.sh more        # extra workloads: Diffusion Policy + ACT sweep, conv
 #                                    # dispatch rows (~45 min; downloads ~1.3 GB of weights)
+#   scripts/run_cuda2.sh diffbench   # Diffusion Policy sweep with cudnn.benchmark=True (~25 min)
 #   scripts/run_cuda2.sh results     # list what to commit
 # Full instructions (also for a Claude Code session on cuda2): docs/cuda2_runbook.md
 #
@@ -142,7 +143,7 @@ trace)
       || echo "FAILED: $c (see $log)"
   done
   ;;
-more)
+more|diffbench)
   # Extra workloads (workloads/trace_diffusion.py, trace_act.py; same configs as
   # scripts/cluster/trace_more.sbatch) plus the conv rows of the dispatch table. Pinned to the
   # GPU's NUMA node when numactl exists.
@@ -164,13 +165,22 @@ for r in ("lerobot/diffusion_pusht", "lerobot/act_aloha_sim_transfer_cube_human"
     [[ $node -ge 0 ]] && pin=(numactl --cpunodebind="$node" --membind="$node")
   fi
   echo "extra workloads on GPU $DEV ${pin[*]:-(unpinned)}"
-  "${pin[@]}" "$PY" workloads/torch_dispatch.py --set conv > "$out/torch_dispatch_conv_smolvla_env.csv" \
-    && echo "wrote $out/torch_dispatch_conv_smolvla_env.csv" || echo "FAILED: conv dispatch"
+  if [[ $1 == diffbench ]]; then
+    runs=("trace_diffusion.py --cudnn-benchmark --num-steps 100"
+          "trace_diffusion.py --cudnn-benchmark --num-steps 10"
+          "trace_diffusion.py --cudnn-benchmark --num-steps 25"
+          "trace_diffusion.py --cudnn-benchmark --num-steps 50"
+          "trace_diffusion.py --cudnn-benchmark --num-steps 100")
+  else
+    "${pin[@]}" "$PY" workloads/torch_dispatch.py --set conv > "$out/torch_dispatch_conv_smolvla_env.csv" \
+      && echo "wrote $out/torch_dispatch_conv_smolvla_env.csv" || echo "FAILED: conv dispatch"
+    runs=("trace_diffusion.py --num-steps 100" "trace_diffusion.py --num-steps 10"
+          "trace_diffusion.py --num-steps 25" "trace_diffusion.py --num-steps 50"
+          "trace_diffusion.py --num-steps 100" "trace_act.py --height 480 --width 640"
+          "trace_act.py --height 240 --width 320" "trace_act.py --height 480 --width 640")
+  fi
   mkdir -p logs
-  for a in "trace_diffusion.py --num-steps 100" "trace_diffusion.py --num-steps 10" \
-           "trace_diffusion.py --num-steps 25" "trace_diffusion.py --num-steps 50" \
-           "trace_diffusion.py --num-steps 100" "trace_act.py --height 480 --width 640" \
-           "trace_act.py --height 240 --width 320" "trace_act.py --height 480 --width 640"; do
+  for a in "${runs[@]}"; do
     log="logs/$HOST-$(echo "$a" | tr -d ' -' | sed 's/\.py//')-$(date +%H%M%S).log"
     echo "=== $a ($(date +%T)) -> $log"
     # shellcheck disable=SC2086
@@ -207,7 +217,7 @@ results)
   git status --short results traces
   ;;
 *)
-  sed -n '2,26p' "$0"
+  sed -n '2,27p' "$0"
   exit 1
   ;;
 esac

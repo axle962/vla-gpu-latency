@@ -72,7 +72,11 @@ def main() -> None:
     ap.add_argument("--reps", type=int, default=30)
     ap.add_argument("--prof-steps", type=int, default=3)
     ap.add_argument("--out", type=str, default=None)
+    ap.add_argument("--cudnn-benchmark", action="store_true",
+                    help="let cuDNN autotune conv algorithms (default heuristic picks a different "
+                         "algorithm per architecture, e.g. FFT on Ada); traces go to diffusionbench_*")
     args = ap.parse_args()
+    torch.backends.cudnn.benchmark = args.cudnn_benchmark
 
     torch.backends.cuda.matmul.allow_tf32 = False
     torch.backends.cudnn.allow_tf32 = False
@@ -169,8 +173,10 @@ def main() -> None:
         "graph_scope": "denoising loop only (prefix eager)",
         "variance_noise": "pre-sampled (FixedNoise)",
         "tf32": False,
+        "cudnn_benchmark": args.cudnn_benchmark,
     }
-    out = args.out or default_out(f"diffusion_steps{args.num_steps}_h{cfg.horizon}")
+    name = "diffusionbench" if args.cudnn_benchmark else "diffusion"
+    out = args.out or default_out(f"{name}_steps{args.num_steps}_h{cfg.horizon}")
     profile_and_save(out, "diffusion", full_step, meta, warmup=args.warmup, reps=args.reps,
                      prof_steps=args.prof_steps, extra_modes=extra)
     if graph_ok:

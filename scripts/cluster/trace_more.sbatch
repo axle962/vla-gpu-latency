@@ -3,6 +3,7 @@
 #   source scripts/cluster/site.sh
 #   sbatch -p c12m85-a100-1 scripts/cluster/trace_more.sbatch smoke   # ~5 min: 1 config each, few reps
 #   sbatch -p c12m85-a100-1 scripts/cluster/trace_more.sbatch sweep   # ~20 min: full config sweep
+#   sbatch -p c12m85-a100-1 scripts/cluster/trace_more.sbatch diffbench  # ~15 min: diffusion, cudnn.benchmark
 # Weights must be in $HF_HOME (lerobot/diffusion_pusht, lerobot/act_aloha_sim_transfer_cube_human)
 # and the torchvision ResNet18 file in $TORCH_HOME/hub/checkpoints (download on the login node).
 #SBATCH --job-name=trace-more
@@ -25,6 +26,12 @@ if [ "$mode" = smoke ]; then
   $PY workloads/trace_diffusion.py --num-steps 10 --warmup 2 --reps 3 --prof-steps 1 --out $o/diffusion
   $PY workloads/trace_act.py --warmup 2 --reps 3 --prof-steps 1 --out $o/act
   $PY workloads/torch_dispatch.py --set conv > $o/torch_dispatch_conv.csv && cat $o/torch_dispatch_conv.csv
+  exit 0
+fi
+if [ "$mode" = diffbench ]; then
+  for s in 100 10 25 50 100; do
+    $PY workloads/trace_diffusion.py --cudnn-benchmark --num-steps $s || echo "FAILED: diffusionbench $s"
+  done
   exit 0
 fi
 # conv dispatch rows for the model (same host as the traces)

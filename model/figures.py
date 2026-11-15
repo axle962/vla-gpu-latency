@@ -3,7 +3,7 @@
   paper/figures/pred_vs_meas.pdf   predicted vs measured, cross-GPU pairs, baseline vs proposed
   paper/figures/mape_variants.pdf  MAPE per kernel-transfer variant for four quantities
 
-Usage: envs/smolvla/bin/python model/figures.py [--variant slot_class]
+Usage: envs/smolvla/bin/python model/figures.py [--variant slot_drv]
 """
 
 from __future__ import annotations
@@ -101,10 +101,10 @@ def mape_variants(d: pd.DataFrame, variant: str, tag: str = "") -> None:
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--variant", default="slot_class")
+    ap.add_argument("--variant", default="slot_drv")
     ap.add_argument("--csv", default=str(ROOT / "results/predictions_cross_gpu.csv"))
     ap.add_argument("--gpus", default="", help="comma list of GPU keys to keep (default: all)")
-    ap.add_argument("--tag", default="", help="suffix for the output file names, e.g. _4gpu")
+    ap.add_argument("--tag", default="", help="suffix for the output file names, e.g. _3gpu")
     ap.add_argument("--workload", default="smolvla")
     a = ap.parse_args()
     OUT.mkdir(parents=True, exist_ok=True)

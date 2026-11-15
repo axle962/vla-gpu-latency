@@ -7,7 +7,7 @@
      fraction of exact rankings and the mean Kendall tau, per variant.
   4. The eager vs graph ordering inversion (TITAN V fastest eager, slowest graph): predicted?
 
-Usage: envs/smolvla/bin/python model/report_cross_gpu.py [--variant slot] [csv]
+Usage: envs/smolvla/bin/python model/report_cross_gpu.py [--variant slot_drv] [--workload smolvla] [csv]
 Writes markdown to stdout.
 """
 
@@ -33,11 +33,16 @@ def kendall(a: list[float], b: list[float]) -> float:
     return s / n if n else float("nan")
 
 
+# Baseline config per workload (model/cross_gpu.py WORKLOADS "base").
+BASE_CFG = {"smolvla": "cam3_steps10_chunk50", "diffusion": "steps100_h16",
+            "diffusionbench": "steps100_h16", "act": "res480x640_chunk100"}
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("csv", nargs="?", default=str(ROOT / "results/predictions_cross_gpu.csv"))
-    ap.add_argument("--variant", default="slot_class")
-    ap.add_argument("--workload", default="smolvla", help="smolvla, diffusion or act")
+    ap.add_argument("--variant", default="slot_drv")
+    ap.add_argument("--workload", default="smolvla", help="smolvla, diffusion, diffusionbench or act")
     a = ap.parse_args()
     d = pd.read_csv(a.csv)
     if "workload" in d:
@@ -81,8 +86,9 @@ def main() -> None:
                      "mean_kendall_tau": sum(taus) / len(taus)})
     print(pd.DataFrame(rows).round(3).to_markdown(index=False), "\n")
 
-    print("## Eager vs graph ordering inversion, baseline config (cam3_steps10_chunk50)\n")
-    b = d[(d.config == "cam3_steps10_chunk50") & d.quantity.isin(["eager", "graph_loop"])
+    base = BASE_CFG.get(a.workload, "cam3_steps10_chunk50")
+    print(f"## Eager vs graph ordering inversion, baseline config ({base})\n")
+    b = d[(d.config == base) & d.quantity.isin(["eager", "graph_loop"])
           & d.kernel_transfer.isin(["spec_bw", a.variant])]
     meas = b[b.kernel_transfer == a.variant].groupby(["quantity", "target"]).measured.first()
     print("measured (ms):", {q: meas[q].round(1).to_dict() for q in ["eager", "graph_loop"]})

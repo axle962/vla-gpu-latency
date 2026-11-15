@@ -391,14 +391,41 @@ State:
     159 ms per 10-step run): with the default heuristic each of the four architectures
     gets a different conv algorithm (Turing scudnn 128x64, Volta scudnn nhwc + layout
     transposes, Ampere implicit_convolve_sgemm, Ada FFT).
+- **Final model choice and autotuned diffusion (2026-11-15, Claude Code on cuda2; the user
+  decided):** **`slot_drv` is the final model and the headline is over all four GPUs** (A100,
+  2080 Ti, TITAN V, RTX 4070). `report_cross_gpu.py` and `figures.py` default to `slot_drv`;
+  `paper/figures/{pred_vs_meas,mape_variants}.*` are now 4-GPU `slot_drv`, the 3-GPU versions
+  are `*_3gpu.*` (the `*_4gpu.*` files were removed). Reports: `results/report_cross_gpu.md`
+  (4 GPUs), `_3gpu.md`, and per workload `results/report_cross_gpu_{act,diffusion,diffusionbench}.md`
+  (the report's inversion section crashed for non-SmolVLA workloads; it now uses each
+  workload's baseline config). **The paper text still describes `slot_class` on three GPUs:
+  update its numbers when the paper is revised** (user deferred paper and slides).
+  - Cross-GPU MAPE, `slot_drv`, 4 GPUs (3 GPUs in parentheses): SmolVLA eager 20.2 (6.6),
+    graph loop 15.3 (16.2), hybrid 13.0 (5.5), loop speedup 22.0 (21.7); exact GPU ranking
+    65% (79%) vs bandwidth scaling 27% (35%); the eager/graph inversion is predicted from every
+    source. ACT eager 28.0 (13.4), graph 12.2 (8.4), speedup 21.2 (14.1). Diffusion (default
+    cuDNN) eager 39.8 (13.4), graph loop 41.9 (13.7), speedup 3.6 (1.1): the 4070 pairs fail
+    because its conv algorithm differs (FFT).
+  - `trace_diffusion.py --cudnn-benchmark` writes `traces/diffusionbench_*` (separate workload
+    `diffusionbench` in `cross_gpu.py`); CIMS stage `diffbench` (`run_cims_host.sh
+    diffbench-only`), cluster `trace_more.sbatch diffbench` (**A100 not run yet**). All 16 runs
+    bit-exact. 100 steps, hybrid: 2080 Ti 1027 to 1099, TITAN V 1220, RTX 4070 1084 ms (default:
+    1490 / 1450 / 3390): autotuning removes the 4070 penalty. But (a) the algorithm choice is
+    not reproducible across processes: three 2080 Ti runs have 27.6k to 32.4k kernels per step
+    and 1008 to 1085 ms GPU time; (b) with autotuned algorithms eager is 0 to 20% slower than
+    graph on the 2080 Ti and ~8% on the 4070 (host gaps, not GPU time; TITAN V 0%), so the
+    2080 Ti baseline fits p = 23 us. Cross-GPU (2 to 3 GPUs only): graph loop 27%, eager 41%,
+    ranking 13%. Autotuning makes the GPUs closer in speed but less predictable kernel by
+    kernel; the default-heuristic runs stay the main diffusion result.
+  - `model/summarize_traces.py` now also writes `graph_ms_median` (ACT) and `cudnn_benchmark`;
+    `results/traces_summary.csv` regenerated (it prints to stdout: redirect it).
 - **Next:**
-  0. Decide whether to add a `--cudnn-benchmark` flag to `trace_diffusion.py` and rerun the
-     diffusion sweep with it (CIMS ~25 min per host, A100 ~15 min), or keep the default and
-     present the FFT choice as a finding.
-  1. Decide: paper default `slot_drv` instead of `slot_class` (better almost everywhere), and
-     whether the headline moves to four GPUs. The residual 4070 eager error (~34%) is a
-     host-side limitation: aten microbenchmarks on an old host overstate in-situ dispatch.
-  2. Paper: verify bibliography, compile on Overleaf, tighten; presentation slides.
+  1. Paper and slides (deferred by the user until the teammates' work is merged): move the
+     headline to `slot_drv` on four GPUs, add ACT/Diffusion (three regimes: dispatch bound,
+     mixed, GPU bound) and the cuDNN algorithm-selection finding; verify bibliography; compile
+     on Overleaf.
+  2. Optional: A100 `diffbench` on the cluster (~15 min, `trace_more.sbatch diffbench`), then
+     rerun `model/cross_gpu.py`, the reports and figures.
   3. Optional: spec-only what-if predictions for H100/H200/L40S remain a stated limitation.
 - GPU-hours used on `csci_ga_3033_025-2026fa`: 3.65 of 300 (2026-11-15).
 - Pending for the user (CIMS): see "Needs the user" in section 1 and the cuda2 commands in

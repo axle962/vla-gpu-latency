@@ -1,0 +1,13 @@
+step,api,count
+0,cudaLaunchKernel,26723
+0,cudaMemcpyAsync,1400
+0,cudaMemsetAsync,900
+0,cudaPeekAtLastError,1818
+1,cudaLaunchKernel,26723
+1,cudaMemcpyAsync,1400
+1,cudaMemsetAsync,900
+1,cudaPeekAtLastError,1818
+2,cudaLaunchKernel,26723
+2,cudaMemcpyAsync,1400
+2,cudaMemsetAsync,900
+2,cudaPeekAtLastError,1818

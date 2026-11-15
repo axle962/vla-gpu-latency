@@ -34,6 +34,8 @@ Host side on the target: per-op dispatch costs from the target host's table; Pyt
 p_T = p_S * h, with h the median target/source ratio of the dispatch-table costs.
   slot_drv    kernels as slot_class; h computed after subtracting each host's C++ driver
               launch cost from the table entries (framework_ratio)
+Final model (2026-11-15): slot_drv, headline over all four GPUs (A100, 2080 Ti, TITAN V,
+RTX 4070); report_cross_gpu.py and figures.py default to it.
 
 Usage (login node is fine, ~1 GB RAM):
   envs/smolvla/bin/python model/cross_gpu.py > results/predictions_cross_gpu.csv
@@ -317,6 +319,10 @@ WORKLOADS = {
                     name="cam{}_steps{}_chunk{}", base=(3, 10, 50), loop=True, quant=LOOP_QUANT),
     "diffusion": dict(prefix="diffusion_", cfg=lambda m: (m["num_steps"], m["chunk_size"]),
                       name="steps{}_h{}", base=(100, 16), loop=True, quant=LOOP_QUANT),
+    # Same model and configs with cudnn.benchmark=True (trace_diffusion.py --cudnn-benchmark):
+    # the default heuristic picks a different conv algorithm on each architecture.
+    "diffusionbench": dict(prefix="diffusionbench_", cfg=lambda m: (m["num_steps"], m["chunk_size"]),
+                           name="steps{}_h{}", base=(100, 16), loop=True, quant=LOOP_QUANT),
     "act": dict(prefix="act_", cfg=lambda m: tuple(m["image_input_hw"]) + (m["chunk_size"],),
                 name="res{}x{}_chunk{}", base=(480, 640, 100), loop=False,
                 quant={"eager": "eager_ms_median", "graph_loop": "graph_ms_median"}),

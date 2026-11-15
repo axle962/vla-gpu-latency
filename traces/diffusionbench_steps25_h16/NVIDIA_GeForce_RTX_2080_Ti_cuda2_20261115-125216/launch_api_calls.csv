@@ -1,0 +1,16 @@
+step,api,count
+0,cudaLaunchKernel,8155
+0,cudaMemcpyAsync,350
+0,cudaMemsetAsync,426
+0,cudaOccupancyMaxActiveBlocksPerMultiprocessor,1
+0,cudaPeekAtLastError,828
+1,cudaLaunchKernel,8155
+1,cudaMemcpyAsync,350
+1,cudaMemsetAsync,426
+1,cudaOccupancyMaxActiveBlocksPerMultiprocessor,1
+1,cudaPeekAtLastError,828
+2,cudaLaunchKernel,8155
+2,cudaMemcpyAsync,350
+2,cudaMemsetAsync,426
+2,cudaOccupancyMaxActiveBlocksPerMultiprocessor,1
+2,cudaPeekAtLastError,828

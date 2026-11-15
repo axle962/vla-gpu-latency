@@ -15,6 +15,7 @@ COLS = [
     "model", "gpu", "host", "cpu", "torch", "dtype", "cameras", "num_steps", "chunk_size",
     "prefix_len", "eager_ms_median", "eager_ms_std", "eager_prefix_ms_median",
     "eager_denoise_ms_median", "graph_denoise_ms_median", "hybrid_ms_median",
+    "graph_ms_median", "cudnn_benchmark",
     "eager_prefill_ms_median", "decode_ms_per_token", "kernels_per_step",
     "gpu_busy_ms_per_step", "gpu_busy_frac", "kernel_dur_us_median",
     "frac_kernels_under_5us", "memcpy_per_step", "run",
@@ -34,6 +35,8 @@ def main() -> None:
             row["graph_denoise_speedup"] = round(
                 m["eager_denoise_ms_median"] / m["graph_denoise_ms_median"], 3)
             row["hybrid_speedup"] = round(m["eager_ms_median"] / m["hybrid_ms_median"], 3)
+        elif m.get("graph_ms_median"):  # whole step captured (ACT)
+            row["hybrid_speedup"] = round(m["eager_ms_median"] / m["graph_ms_median"], 3)
         w.writerow(row)
 
 
