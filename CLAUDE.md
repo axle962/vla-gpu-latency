@@ -342,13 +342,41 @@ State:
     Cross-pair MAPE vs `slot_class`: 3 GPUs eager 6.6 vs 7.5%, prefix 7.1 vs 8.6, hybrid 5.5 vs
     5.2, loop speedup 21.7 vs 22.3; 4070 pairs eager 34 vs 41%, hybrid 20 vs 26%; 4 GPUs eager
     20 vs 24%, hybrid 13 vs 15%, graph loop unchanged (15%). Paper still uses `slot_class`.
+- **Extra workloads, 2026-11-15 (user asked for models with different call mixes):**
+  - `workloads/trace_diffusion.py` (lerobot/diffusion_pusht, 263M, FP32: ResNet18 prefix +
+    Conv1d UNet DDPM loop; variance noise pre-sampled so eager/graph are bit-exact) and
+    `workloads/trace_act.py` (lerobot/act_aloha_sim_transfer_cube_human, 52M, FP32, one forward,
+    fully captured; its CPU latent upload is served from a cached GPU zero tensor during
+    capture). `torch_dispatch.py --set conv` adds FP32 conv rows
+    (`torch_dispatch_conv_smolvla_env.csv`). Cluster: `scripts/cluster/trace_more.sbatch
+    smoke|sweep`; CIMS: `run_cuda2.sh more` / `run_cims_host.sh more-only` (needs the
+    torchvision ResNet18 file, fetched by curl into `$TORCH_HOME`).
+  - A100 sweep (job 32740, 18 min; two earlier attempts died at node boot, one held with
+    "user env retrieval failed", `scontrol release` not allowed: cancel and resubmit), all
+    bit-exact. Diffusion is **GPU bound**: 100 steps eager 1598 ms vs graph 1555 ms (1.03x),
+    GPU busy 1570 ms, 266 kernels per DDPM step; cuDNN's default FP32 Conv1d algorithms are slow
+    (2048x2048, l=4: 887 us, ~0.2 TFLOP/s). ACT: 480x640 eager 10.4 vs graph 4.3 ms (2.4x),
+    240x320 9.8 vs 3.3 ms. Three regimes now: SmolVLA dispatch bound (9x), ACT mixed, Diffusion
+    GPU bound.
+  - Model: `WORKLOADS` table in `model/cross_gpu.py` (workload column in the predictions;
+    reports/figures default to smolvla, `--workload`); `conv` op class (dispatch and slot from
+    the conv rows; slot used only when both GPUs have them, else linear on both); host ratios on
+    the original six classes. SigLIP's patch conv is now `conv`: SmolVLA numbers move by at most
+    1.2 points. Same-GPU A100: diffusion held-out eager/graph/hybrid within 1.2%; ACT graph 0.3%,
+    eager at 240x320 +16% (ACT's Python work is per-token views that launch no kernels and shrink
+    with resolution; host time per kernel misses it).
+  - **p is a host property:** A100 p = 16.9 (SmolVLA), 16.7 (OpenVLA), 19.9 us (ACT). The
+    diffusion baseline is GPU bound, so p fits to 0 and the host-bound prefix came out -42%;
+    the model now borrows SmolVLA's p on the same source host when the fit is < 1 us
+    (`P_MIN_US`): prefix +6 to +11%, eager within 1%.
+  - Waiting on: `more` on cuda2/cuda3/cuda5 for cross-GPU errors of the new workloads.
 - **Next:**
   1. Decide: paper default `slot_drv` instead of `slot_class` (better almost everywhere), and
      whether the headline moves to four GPUs. The residual 4070 eager error (~34%) is a
      host-side limitation: aten microbenchmarks on an old host overstate in-situ dispatch.
   2. Paper: verify bibliography, compile on Overleaf, tighten; presentation slides.
   3. Optional: spec-only what-if predictions for H100/H200/L40S remain a stated limitation.
-- GPU-hours used on `csci_ga_3033_025-2026fa`: 3.31 of 300 (2026-11-13 18:10).
+- GPU-hours used on `csci_ga_3033_025-2026fa`: 3.65 of 300 (2026-11-15).
 - Pending for the user (CIMS): see "Needs the user" in section 1 and the cuda2 commands in
   section 6. The user asked for a full "what to run on cuda machines and elsewhere" list once
   the cluster runs are finished.

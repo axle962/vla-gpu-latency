@@ -1,0 +1,16 @@
+gpu,bench,kernel,config,mode,timer,n_runs,mean_us,std_us,min_us,median_us,module_loading
+NVIDIA A100-SXM4-40GB,torch_dispatch,conv,conv1d;c=512x512;l=16;k=5;shape=diffusion_unet_512;kernels_per_op=2;torch=2.10.0+cu128;cuda=12.8;n_ops=400,eager,host,20,137.3634,7.6923,135.4888,135.5819,EAGER
+NVIDIA A100-SXM4-40GB,torch_dispatch,conv,conv1d;c=512x512;l=16;k=5;shape=diffusion_unet_512;kernels_per_op=2;torch=2.10.0+cu128;cuda=12.8;n_ops=400,issue,host,20,43.4270,4.3912,41.6126,42.0091,EAGER
+NVIDIA A100-SXM4-40GB,torch_dispatch,conv,conv1d;c=512x512;l=16;k=5;shape=diffusion_unet_512;kernels_per_op=2;torch=2.10.0+cu128;cuda=12.8;n_ops=400,graph,host,20,133.0122,0.0464,132.9420,133.0090,EAGER
+NVIDIA A100-SXM4-40GB,torch_dispatch,conv,conv1d;c=2048x2048;l=4;k=5;shape=diffusion_unet_2048;kernels_per_op=2;torch=2.10.0+cu128;cuda=12.8;n_ops=400,eager,host,20,887.0127,0.0665,886.8589,887.0189,EAGER
+NVIDIA A100-SXM4-40GB,torch_dispatch,conv,conv1d;c=2048x2048;l=4;k=5;shape=diffusion_unet_2048;kernels_per_op=2;torch=2.10.0+cu128;cuda=12.8;n_ops=400,issue,host,20,43.4202,2.7703,42.0277,42.6777,EAGER
+NVIDIA A100-SXM4-40GB,torch_dispatch,conv,conv1d;c=2048x2048;l=4;k=5;shape=diffusion_unet_2048;kernels_per_op=2;torch=2.10.0+cu128;cuda=12.8;n_ops=400,graph,host,20,883.7163,0.1034,883.5317,883.6930,EAGER
+NVIDIA A100-SXM4-40GB,torch_dispatch,conv,conv2d;c=64;hw=120x160;k=3;shape=act_layer1;kernels_per_op=2;torch=2.10.0+cu128;cuda=12.8;n_ops=400,eager,host,20,57.1545,0.1139,57.0729,57.1148,EAGER
+NVIDIA A100-SXM4-40GB,torch_dispatch,conv,conv2d;c=64;hw=120x160;k=3;shape=act_layer1;kernels_per_op=2;torch=2.10.0+cu128;cuda=12.8;n_ops=400,issue,host,20,29.6569,0.2134,29.3257,29.6161,EAGER
+NVIDIA A100-SXM4-40GB,torch_dispatch,conv,conv2d;c=64;hw=120x160;k=3;shape=act_layer1;kernels_per_op=2;torch=2.10.0+cu128;cuda=12.8;n_ops=400,graph,host,20,55.1790,0.0507,55.1124,55.1819,EAGER
+NVIDIA A100-SXM4-40GB,torch_dispatch,conv,conv2d;c=64;hw=24x24;k=3;shape=diffusion_layer1;kernels_per_op=2;torch=2.10.0+cu128;cuda=12.8;n_ops=400,eager,host,20,31.9133,4.0236,29.6193,29.8727,EAGER
+NVIDIA A100-SXM4-40GB,torch_dispatch,conv,conv2d;c=64;hw=24x24;k=3;shape=diffusion_layer1;kernels_per_op=2;torch=2.10.0+cu128;cuda=12.8;n_ops=400,issue,host,20,31.6361,3.9980,29.3748,29.6106,EAGER
+NVIDIA A100-SXM4-40GB,torch_dispatch,conv,conv2d;c=64;hw=24x24;k=3;shape=diffusion_layer1;kernels_per_op=2;torch=2.10.0+cu128;cuda=12.8;n_ops=400,graph,host,20,20.1749,0.0695,20.0859,20.1652,EAGER
+NVIDIA A100-SXM4-40GB,torch_dispatch,conv,conv2d;c=512;hw=15x20;k=3;shape=act_layer4;kernels_per_op=2;torch=2.10.0+cu128;cuda=12.8;n_ops=400,eager,host,20,130.9118,0.1044,130.8175,130.8745,EAGER
+NVIDIA A100-SXM4-40GB,torch_dispatch,conv,conv2d;c=512;hw=15x20;k=3;shape=act_layer4;kernels_per_op=2;torch=2.10.0+cu128;cuda=12.8;n_ops=400,issue,host,20,30.7861,2.5212,29.8854,30.2500,EAGER
+NVIDIA A100-SXM4-40GB,torch_dispatch,conv,conv2d;c=512;hw=15x20;k=3;shape=act_layer4;kernels_per_op=2;torch=2.10.0+cu128;cuda=12.8;n_ops=400,graph,host,20,128.8285,0.0509,128.7570,128.8176,EAGER

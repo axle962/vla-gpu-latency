@@ -124,8 +124,18 @@ def slot_table(dispatch_csv: Path, extra_csvs: tuple = ()) -> dict:
                     vals.append(float(r["median_us"]) / kpo)
         if vals:
             out[cls] = float(np.exp(np.mean(np.log(vals))))
-    out.setdefault("conv", out["linear"])
-    return out
+    return out  # "conv" only when the conv rows exist (see class_slots)
+
+
+def class_slots(src: GPU, tgt: GPU, cold: bool = False) -> tuple[dict, dict]:
+    """Per-class slot tables of source and target. The conv class needs conv rows on BOTH
+    GPUs; otherwise conv kernels use the linear class on both, so a measured conv slot is
+    never divided by a fallback linear one."""
+    st = {**src.slot_us, **(src.cold_slot_us if cold else {})}
+    tt = {**tgt.slot_us, **(tgt.cold_slot_us if cold else {})}
+    if "conv" not in st or "conv" not in tt:
+        st["conv"], tt["conv"] = st["linear"], tt["linear"]
+    return st, tt
 
 
 # Cold-cache rows of workloads/torch_probe.py per op class (kernel id, config substring).
@@ -281,8 +291,7 @@ def transfer_slots(tr: StepTrace, src: GPU, tgt: GPU, tail_bw: bool = True,
     durations on the target, t_T = u_T - delta_T."""
     u = tr.t_us + src.calib.delta_node_us
     cls = np.array(tr.cls)
-    st = {**src.slot_us, **(src.cold_slot_us if cold else {})}
-    tt = {**tgt.slot_us, **(tgt.cold_slot_us if cold else {})}
+    st, tt = class_slots(src, tgt, cold)
     tau = np.array([st[c] for c in cls])
     r = np.array([tt[c] / st[c] for c in cls])
     rb = src.bw_dram / tgt.bw_dram if tail_bw else 1.0
@@ -367,12 +376,20 @@ def main() -> None:
     out = csv.writer(sys.stdout)
     out.writerow(["workload", "source", "target", "config", "quantity", "unit", "measured",
                   "kernel_transfer", "predicted", "error_pct", "r_lat", "r_bw", "host_ratio"])
+    p_host: dict = {}  # source GPU -> p fitted on SmolVLA (first workload)
     for wl, spec in WORKLOADS.items():
         for sk, src in gpus.items():
-            run_prediction(out, gpus, wl, spec, sk, src)
+            run_prediction(out, gpus, wl, spec, sk, src, p_host)
 
 
-def run_prediction(out, gpus: dict, wl: str, spec: dict, sk: str, src: GPU) -> None:
+# A GPU-bound baseline (Diffusion Policy: eager = GPU time) carries no information about host
+# cost, so p fits to ~0. Then p is taken from SmolVLA on the same source host: p is a property
+# of the host and framework (A100: SmolVLA 16.9, OpenVLA 16.7, ACT 19.9 us per kernel).
+P_MIN_US = 1.0
+
+
+def run_prediction(out, gpus: dict, wl: str, spec: dict, sk: str, src: GPU,
+                   p_host: dict) -> None:
     src_runs = measured_by_cfg(sk, wl)
     if spec["base"] not in src_runs:
         return
@@ -381,8 +398,13 @@ def run_prediction(out, gpus: dict, wl: str, spec: dict, sk: str, src: GPU) -> N
     base_tr = load_wl_step(base_r, base_m, wl)
     b_us = fit_b(base_tr, src.calib, base_m[quant["graph_loop"]] * 1e3)
     p_us = fit_p(corrected(base_tr, b_us), src.calib, base_m["eager_ms_median"] * 1e3)
-    print(f"# {wl} source {sk}: b = {b_us:.3f} us, p = {p_us:.2f} us (fit on {base_r.name})",
-          file=sys.stderr)
+    note = ""
+    if wl == "smolvla":
+        p_host[sk] = p_us
+    elif p_us < P_MIN_US and sk in p_host:
+        p_us, note = p_host[sk], " (GPU-bound baseline: p from smolvla)"
+    print(f"# {wl} source {sk}: b = {b_us:.3f} us, p = {p_us:.2f} us (fit on {base_r.name})"
+          f"{note}", file=sys.stderr)
     traces = {k: corrected(load_wl_step(r, m, wl), b_us) for k, (r, m) in src_runs.items()}
     for tk, tgt in gpus.items():
         h = host_ratio(src, tgt)
