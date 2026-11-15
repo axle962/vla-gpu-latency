@@ -32,7 +32,7 @@ cpus=$(tr ',' '\n' < /sys/devices/system/node/node$node/cpulist | \
   awk -F- '{ if (NF == 2) for (i = $1; i <= $2; i++) print i; else print $1 }')
 C=$(for c in $cpus; do
       sib=$(cut -d, -f1 < /sys/devices/system/cpu/cpu$c/topology/thread_siblings_list)
-      [[ $sib == "$c" ]] && echo "$c"
+      if [[ $sib == "$c" ]]; then echo "$c"; fi
     done | sed -n 3p)
 S=$(tr ',' '\n' < /sys/devices/system/cpu/cpu$C/topology/thread_siblings_list | grep -vx "$C" | head -1)
 echo "GPU $DEV (NUMA node $node), core $C, sibling $S"

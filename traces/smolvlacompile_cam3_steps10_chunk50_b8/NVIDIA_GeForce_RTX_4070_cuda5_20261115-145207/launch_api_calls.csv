@@ -1,0 +1,16 @@
+step,api,count
+0,cuLaunchKernel,2290
+0,cudaDeviceGetAttribute,480
+0,cudaLaunchKernel,1010
+0,cudaMemsetAsync,20
+0,cudaOccupancyMaxActiveBlocksPerMultiprocessor,330
+1,cuLaunchKernel,2290
+1,cudaDeviceGetAttribute,480
+1,cudaLaunchKernel,1010
+1,cudaMemsetAsync,20
+1,cudaOccupancyMaxActiveBlocksPerMultiprocessor,330
+2,cuLaunchKernel,2290
+2,cudaDeviceGetAttribute,480
+2,cudaLaunchKernel,1010
+2,cudaMemsetAsync,20
+2,cudaOccupancyMaxActiveBlocksPerMultiprocessor,330

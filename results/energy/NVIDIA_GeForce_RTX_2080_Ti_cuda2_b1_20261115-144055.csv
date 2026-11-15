@@ -1,0 +1,5 @@
+gpu,host,mode,batch,steps,wall_s,ms_per_step,energy_j,j_per_step,j_per_step_above_idle,power_mean_w,power_max_w,idle_w,sm_clock_mhz_end
+NVIDIA GeForce RTX 2080 Ti,cuda2,idle,1,400,20.044,50.111,569.021,1.4226,-0.0000,49.57,68.83,28.39,300
+NVIDIA GeForce RTX 2080 Ti,cuda2,eager,1,43,20.263,471.240,819.083,19.0484,5.6709,69.60,86.36,28.39,1350
+NVIDIA GeForce RTX 2080 Ti,cuda2,hybrid,1,175,20.072,114.698,1757.105,10.0406,6.7845,164.34,174.82,28.39,1920
+NVIDIA GeForce RTX 2080 Ti,cuda2,graph_loop,1,497,20.021,40.284,1845.916,3.7141,2.5705,167.22,168.88,28.39,1920

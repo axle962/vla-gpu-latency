@@ -1,0 +1,3 @@
+Time (%),Total Time (ns),Instances,Avg (ns),Med (ns),Min (ns),Max (ns),StdDev (ns),Name
+50.3,1778563,256,6947.5,6688.0,5727,9120,925.3,"needle_cuda_shared_1(int *, int *, int, int, int, int)"
+49.7,1760611,255,6904.4,6624.0,5536,8928,900.4,"needle_cuda_shared_2(int *, int *, int, int, int, int)"

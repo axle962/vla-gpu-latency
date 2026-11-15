@@ -29,6 +29,9 @@ import cross_gpu as cg  # noqa: E402
 from ablation import spec_clock_mhz  # noqa: E402
 
 GPU_KEY = {"A100": "A100", "RTX_2080_Ti": "2080Ti", "TITAN_V": "TITANV", "RTX_4070": "RTX4070"}
+# srad_v2 reads out of bounds at the image border (compute-sanitizer: invalid __global__ read
+# in srad_cuda_1); the read faults on Turing/Ada (no kernels run) but not on the TITAN V.
+EXCLUDE = {"srad_v2"}
 MODES = ["same", "spec_bw", "spec_clock", "spec_mix", "meas_mix"]
 
 
@@ -39,6 +42,8 @@ def load() -> pd.DataFrame:
         if key is None:
             continue
         for f in sorted(run.glob("*.csv")):
+            if f.stem in EXCLUDE or f.stat().st_size == 0:
+                continue
             d = pd.read_csv(f)
             d = d.rename(columns={"Total Time (ns)": "total_ns", "Instances": "n",
                                   "Avg (ns)": "avg_ns", "Name": "kernel"})

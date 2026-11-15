@@ -1,0 +1,3 @@
+Time (%),Total Time (ns),Instances,Avg (ns),Med (ns),Min (ns),Max (ns),StdDev (ns),Name
+77.1,1707389,1,1707389.0,1707389.0,1707389,1707389,0.0,"bpnn_adjust_weights_cuda(float *, int, float *, int, float *, float *)"
+22.9,506560,1,506560.0,506560.0,506560,506560,0.0,"bpnn_layerforward_CUDA(float *, float *, float *, float *, int, int)"

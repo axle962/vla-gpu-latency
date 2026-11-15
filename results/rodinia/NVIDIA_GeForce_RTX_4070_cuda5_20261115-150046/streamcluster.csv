@@ -1,0 +1,2 @@
+Time (%),Total Time (ns),Instances,Avg (ns),Med (ns),Min (ns),Max (ns),StdDev (ns),Name
+100.0,245907918,1611,152643.0,150722.0,149121,159970,3633.7,"kernel_compute_cost(int, int, long, Point *, int, int, float *, float *, int *, bool *)"

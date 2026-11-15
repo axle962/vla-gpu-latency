@@ -1,0 +1,48 @@
+op,op_input_dims,kernels,gpu_us
+aten::mm,"[[400, 720], [720, 2048], [400, 2048]]",320.0,10565.28
+aten::mm,"[[400, 2048], [2048, 720], [400, 720]]",160.0,4435.922666666666
+aten::bmm,"[[120, 50, 64], [120, 64, 291], [120, 50, 291]]",80.0,3795.9976666666666
+aten::mm,"[[400, 720], [720, 960], [400, 960]]",160.0,3426.1776666666665
+aten::bmm,"[[120, 50, 64], [120, 64, 241], [120, 50, 241]]",80.0,2897.584666666666
+aten::mm,"[[400, 960], [960, 720], [400, 720]]",160.0,2349.5453333333335
+aten::mm,"[[1928, 320], [320, 320], [1928, 320]]",160.0,2020.311
+triton_red_fused__softmax__to_copy_bitwise_and_cat_exp_expand_le_mul_prepare_softmax_online_scalar_tensor_sub_unsqueeze_view_where_12,"[[8, 241], [8, 50], [120, 50, 291], [8, 15, 50, 291], [], []]",80.0,1944.64
+triton_poi_fused__to_copy__unsafe_view_add_arange_clone_copy_cos_cumsum_div_mul_pow_sin_slice_split_sub_transpose_unsqueeze_view_20,"[[400, 960], [8], [8, 1], [8, 15, 50, 64], []]",80.0,1393.307
+triton_poi_fused__to_copy__unsafe_view_add_arange_clone_copy_cos_cumsum_div_mul_pow_sin_slice_split_sub_transpose_unsqueeze_view_9,"[[400, 960], [8], [8, 15, 50, 64], []]",80.0,1386.8310000000001
+triton_red_fused__softmax__to_copy_bitwise_and_cat_exp_expand_le_mul_prepare_softmax_online_scalar_tensor_slice_sub_unsqueeze_view_where_22,"[[8, 241], [8, 50], [120, 50, 241], [8, 15, 50, 241], [], []]",80.0,1245.3686666666665
+aten::mm,"[[400, 720], [720, 320], [400, 320]]",160.0,1157.741
+triton_poi_fused__to_copy__unsafe_view_cat_clone_expand_transpose_unsqueeze_11,"[[8, 241, 5, 64], [8, 50, 5, 64], [8, 15, 64, 291], [], []]",80.0,1140.355
+triton_poi_fused__to_copy__unsafe_view_clone_expand_transpose_unsqueeze_view_21,"[[1928, 320], [8, 15, 64, 241], [], []]",80.0,971.9699999999999
+aten::bmm,"[[120, 50, 291], [120, 291, 64], [120, 50, 64]]",80.0,907.756
+aten::bmm,"[[120, 50, 241], [120, 241, 64], [120, 50, 64]]",80.0,781.7923333333333
+aten::mm,"[[400, 1440], [1440, 720], [400, 720]]",10.0,681.8236666666667
+triton_poi_fused__to_copy__unsafe_view_add_arange_copy_cos_cumsum_div_mul_pow_sin_slice_split_sub_unsqueeze_view_10,"[[8, 50, 5, 64], [400, 320], [8], []]",80.0,662.4276666666667
+triton_poi_fused__unsafe_view_mul_silu_17,"[[8, 50, 2048], [400, 2048], []]",160.0,559.2206666666667
+triton_poi_fused__unsafe_view_cat_clone_expand_permute_unsqueeze_view_13,"[[8, 241, 5, 64], [400, 320], [8, 15, 291, 64], []]",80.0,454.2196666666666
+triton_poi_fused__unsafe_view_clone_expand_permute_unsqueeze_view_23,"[[1928, 320], [8, 15, 241, 64], []]",80.0,368.8486666666666
+aten::mm,"[[400, 720], [720, 720], [400, 720]]",10.0,350.42533333333336
+triton_poi_fused_mm_t_view_16,"[[8, 50, 720], [400, 720], [400, 720], []]",160.0,296.6176666666667
+triton_poi_fused_clone_permute_view_14,"[[120, 50, 64], [8, 50, 15, 64], []]",160.0,258.05966666666666
+triton_per_fused__to_copy__unsafe_view_add_mean_mul_pow_rsqrt_29,"[[8, 50, 720], [400, 720], [400, 720], [400, 720], [400, 720], [720], [8, 50, 720], [], []]",70.0,257.2323333333333
+triton_per_fused__to_copy__unsafe_view_add_mean_mul_pow_rsqrt_28,"[[400, 720], [400, 720], [400, 720], [8, 50, 720], [720], [8, 50, 720], [], []]",70.0,219.30233333333334
+triton_per_fused__to_copy__unsafe_view_add_mean_mul_pow_rsqrt_27,"[[400, 720], [400, 720], [8, 50, 720], [720], [8, 50, 720], [], []]",70.0,202.28066666666666
+triton_poi_fused__to_copy_add_addmm_mean_mm_mul_pow_rsqrt_t_view_5,"[[8, 50, 720], [400, 720], [400, 720], [400, 720], []]",80.0,187.06499999999997
+triton_per_fused__to_copy__unsafe_view_add_mean_mul_pow_rsqrt_25,"[[400, 720], [8, 50, 720], [720], [8, 50, 720], [], []]",70.0,167.96
+triton_poi_fused__to_copy__unsafe_view_add_addmm_mean_mm_mul_pow_rsqrt_t_view_19,"[[8, 50, 720], [400, 720], []]",80.0,109.517
+aten::mm,"[[400, 720], [720, 32], [400, 32]]",20.0,79.34066666666666
+triton_poi_fused__to_copy_cat_cos_linspace_mul_pow_reciprocal_sin_unsqueeze_0,"[[8], [8, 720], []]",10.0,76.48166666666667
+aten::addmm,"[[720], [400, 32], [32, 720], [], [], [400, 720]]",10.0,59.50966666666667
+triton_per_fused__to_copy__unsafe_view_add_addmm_mean_mul_pow_rsqrt_view_24,"[[400, 720], [400, 720], [400, 720], [720], [400, 720], [720], [8, 50, 720], [8, 50, 720], [], []]",10.0,37.73
+triton_per_fused__to_copy__unsafe_view_add_addmm_mean_mul_pow_rsqrt_view_18,"[[400, 720], [400, 720], [720], [400, 720], [720], [8, 50, 720], [], []]",10.0,31.926000000000002
+triton_per_fused_add_cumsum_min_sub_unsqueeze_26,"[[8], [8, 1], [8, 1], [], []]",30.0,29.76
+triton_per_fused__to_copy__unsafe_view_add_addmm_mean_mul_pow_rsqrt_view_15,"[[400, 720], [720], [400, 720], [720], [8, 50, 720], [], []]",10.0,29.485333333333333
+triton_per_fused__to_copy_add_addmm_mean_mul_pow_rsqrt_view_4,"[[720], [400, 720], [720], [8, 50, 720], [], []]",10.0,26.731333333333335
+triton_per_fused__to_copy__unsafe_view_add_mean_mul_pow_rsqrt_slice_30,"[[400, 720], [8, 50, 720], [720], [8, 50, 720], [], []]",10.0,26.304000000000002
+triton_poi_fused_addmm_silu_view_3,"[[8, 50, 720], [720], []]",10.0,23.423333333333332
+triton_poi_fused__to_copy_cat_cos_expand_linspace_mul_pow_reciprocal_sin_unsqueeze_view_1,"[[400, 720], [8, 50, 720], []]",10.0,20.288333333333334
+triton_per_fused_add_cumsum_min_sub_unsqueeze_7,"[[8], [8, 1], [], []]",20.0,20.150666666666666
+triton_poi_fused__to_copy_cat_cos_expand_linspace_mul_pow_reciprocal_sin_unsqueeze_view_2,"[[8, 720], [8, 50, 720], []]",10.0,18.944
+triton_poi_fused_add_addmm_mul_view_32,"[[8, 50, 32], [32], [400, 32], []]",9.0,12.191666666666668
+triton_per_fused_cumsum_expand_lift_fresh_unsqueeze_8,"[[50], [8, 50], [], []]",10.0,11.168000000000001
+triton_per_fused_sum_6,"[[8, 241], [8], [], []]",10.0,10.123333333333333
+triton_poi_fused_add_addmm_mul_view_31,"[[8, 50, 32], [8, 50, 32], [32], []]",1.0,1.3866666666666667

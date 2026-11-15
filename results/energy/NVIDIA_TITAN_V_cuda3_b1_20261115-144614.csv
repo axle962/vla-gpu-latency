@@ -1,0 +1,5 @@
+gpu,host,mode,batch,steps,wall_s,ms_per_step,energy_j,j_per_step,j_per_step_above_idle,power_mean_w,power_max_w,idle_w,sm_clock_mhz_end
+NVIDIA TITAN V,cuda3,idle,1,400,20.042,50.105,641.583,1.6040,0.0000,32.10,39.95,32.01,135
+NVIDIA TITAN V,cuda3,eager,1,59,20.237,342.998,992.698,16.8254,5.8454,48.64,119.78,32.01,1200
+NVIDIA TITAN V,cuda3,hybrid,1,169,20.105,118.964,1737.420,10.2806,6.4723,84.79,148.24,32.01,1335
+NVIDIA TITAN V,cuda3,graph_loop,1,325,20.002,61.545,1355.478,4.1707,2.2006,67.80,68.39,32.01,1335

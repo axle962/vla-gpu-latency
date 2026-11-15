@@ -1,0 +1,4 @@
+name, driver_version, clocks.max.sm [MHz]
+NVIDIA GeForce RTX 2080 Ti, 595.104.02, 2160 MHz
+model name	: Intel(R) Xeon(R) CPU E5-2660 v3 @ 2.60GHz
+rodinia on GPU 0 numactl --cpunodebind=1 --membind=1

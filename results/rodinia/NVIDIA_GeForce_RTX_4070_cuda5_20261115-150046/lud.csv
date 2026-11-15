@@ -1,0 +1,4 @@
+Time (%),Total Time (ns),Instances,Avg (ns),Med (ns),Min (ns),Max (ns),StdDev (ns),Name
+58.3,3044553,127,23972.9,18464.0,1088,68865,20351.9,"lud_internal(float *, int, int)"
+22.2,1161546,127,9146.0,9152.0,8896,10048,202.5,"lud_perimeter(float *, int, int)"
+19.5,1017804,128,7951.6,7936.0,7936,8480,49.5,"lud_diagonal(float *, int, int)"

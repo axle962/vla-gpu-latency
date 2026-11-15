@@ -1,0 +1,5 @@
+gpu,host,mode,batch,steps,wall_s,ms_per_step,energy_j,j_per_step,j_per_step_above_idle,power_mean_w,power_max_w,idle_w,sm_clock_mhz_end
+NVIDIA GeForce RTX 4070,cuda5,idle,8,398,20.039,50.348,512.985,1.2889,0.0000,27.40,37.18,25.60,210
+NVIDIA GeForce RTX 4070,cuda5,eager,8,24,20.762,865.073,1885.349,78.5562,56.4106,87.37,108.16,25.60,2745
+NVIDIA GeForce RTX 4070,cuda5,hybrid,8,65,20.231,311.245,3413.684,52.5182,44.5504,165.82,179.03,25.60,2685
+NVIDIA GeForce RTX 4070,cuda5,graph_loop,8,275,20.018,72.792,3862.752,14.0464,12.1829,192.43,194.82,25.60,2730

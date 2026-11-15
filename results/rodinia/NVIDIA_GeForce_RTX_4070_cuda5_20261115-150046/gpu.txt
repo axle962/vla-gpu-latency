@@ -1,0 +1,4 @@
+name, driver_version, clocks.max.sm [MHz]
+NVIDIA GeForce RTX 4070, 595.104.02, 3105 MHz
+model name	: Intel(R) Xeon(R) CPU E5-2650 v2 @ 2.60GHz
+rodinia on GPU 0 numactl --cpunodebind=1 --membind=1

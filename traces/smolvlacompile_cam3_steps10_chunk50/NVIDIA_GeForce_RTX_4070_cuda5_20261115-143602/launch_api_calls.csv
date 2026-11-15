@@ -1,0 +1,13 @@
+step,api,count
+0,cuLaunchKernel,2560
+0,cudaDeviceGetAttribute,960
+0,cudaLaunchKernel,560
+0,cudaOccupancyMaxActiveBlocksPerMultiprocessor,330
+1,cuLaunchKernel,2560
+1,cudaDeviceGetAttribute,960
+1,cudaLaunchKernel,560
+1,cudaOccupancyMaxActiveBlocksPerMultiprocessor,330
+2,cuLaunchKernel,2560
+2,cudaDeviceGetAttribute,960
+2,cudaLaunchKernel,560
+2,cudaOccupancyMaxActiveBlocksPerMultiprocessor,330
