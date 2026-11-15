@@ -1,0 +1,2 @@
+model name	: Intel(R) Xeon(R) CPU E5-2660 v3 @ 2.60GHz
+condition=smt_alu core=5 sibling=25 hog=alu hog_cpu=25

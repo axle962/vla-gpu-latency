@@ -1,0 +1,2 @@
+model name	: Intel(R) Xeon(R) CPU E5-2660 v3 @ 2.60GHz
+condition=alone core=5 sibling=25 hog=none hog_cpu=none

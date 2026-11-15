@@ -419,6 +419,63 @@ State:
     kernel; the default-heuristic runs stay the main diffusion result.
   - `model/summarize_traces.py` now also writes `graph_ms_median` (ACT) and `cudnn_benchmark`;
     `results/traces_summary.csv` regenerated (it prints to stdout: redirect it).
+- **Supplementary studies (2026-11-15 afternoon, Claude Code on cuda2; user asked for "all of
+  them"; CIMS GPUs only, all idle; `logs/cuda*-gpuwatch.log` recorded no other users):**
+  - **Batch sweep** (`trace_smolvla.py --batch`, `traces/smolvlabatch_b{2,4,8,16}_*`, stage
+    `extras`; `model/batch_predict.py` -> `results/batch_predictions.md`): the eager loop is flat
+    in batch (host bound: ~280 / 400 / 520 ms TITAN V / 2080 Ti / 4070), the graph loop grows;
+    loop graph speedup < 2x at batch ~10 (TITAN V), ~16 (2080 Ti), > 16 (4070). b, p fitted at
+    batch 1 hold on the same GPU (<= 5% at every batch); cross-GPU slot_drv graph loop 6 to 18%
+    up to batch 8, 27% at 16 (larger GEMMs: tensor-core throughput not in the slot ratios);
+    slot (bandwidth tail) is worse at every batch.
+  - **torch.compile** (`workloads/trace_smolvla_compile.py`, `traces/smolvlacompile_*`,
+    `model/compile_predict.py` -> `results/compile_predictions.md`): Inductor fuses the 10-step
+    loop from ~11.5k to ~3.2k kernels; compiled + CUDA graphs ~2x faster than our manual graph
+    (2080 Ti 20.8 vs 40.1, TITAN V 30.9 vs 61.4, 4070 13.8 vs 22.8 ms), max |diff| vs eager
+    <= 1.2e-3. First compile ~4.5 to 5.5 min on these hosts, ~30 s from the Inductor cache.
+    Cross-GPU from the source's compiled trace: compiled graph 12% MAPE (batch 1), 23% (batch
+    8); compiled with eager launches 21% / 11%. One cuda2 run overlapped my nsys capture and is
+    in `traces/_excluded/` (README there).
+  - **Energy** (`workloads/energy_smolvla.py`, NVML energy counter, `results/energy/`,
+    `results/energy_summary.md`): graphs cut GPU energy per inference 1.6 to 2.7x at batch 1
+    (4070 31 -> 11.5 J; eager idles at high clocks), 1.1 to 1.5x at batch 8. GPU board only.
+  - **Calibration ablation** (`model/ablation.py` -> `results/ablation_calibration*.md`), levels
+    L0 spec only .. L4 slot_drv, SmolVLA 4 GPUs: spec only eager 34%, graph loop 38%, exact
+    ranking 20%; + C++ microbenchmarks barely help; + PyTorch dispatch table ranking 57%;
+    + graph-slot table graph loop 31 -> 15%; L4 = slot_drv numbers (consistency check).
+  - **What-if** (`model/whatif.py` -> `results/whatif.md`, spec values TODO verify;
+    `results/external/yotta_vla_benchmarks_2026.csv`): spec-only transfer from the A100 traces to
+    H100/H200/L40S/4090/PRO 6000 with the A100 host. Eager OpenVLA barely moves (311 to 324 ms:
+    dispatch bound). The Yotta Labs OpenVLA latencies imply host time per kernel ~21 us (H100,
+    PRO 6000) vs ~30 us (H200, 4090): the H200 < H100 anomaly is host/software (Yotta used a
+    different torch build per GPU and reports no host CPU), not GPU.
+  - **Host CPU experiment** (`scripts/host_contention.sh`, `model/host_experiment.py` ->
+    `results/host_experiment.md`; same 2080 Ti, one core, hog on the SMT sibling (ALU or memory)
+    or time-sharing the core; `HOSTEXP-*` dirs with dashes so no other glob matches them):
+    eager slows 1.65 to 1.93x, the graph loop stays within 1 to 8% (graphs make latency host
+    independent). Dispatch-table host ratios get the magnitude (1.7 to 2.2x) but not the order
+    (overstate SMT contention, understate time slicing); eager MAPE 24% unscaled vs 16 to 20%
+    scaled, hybrid 20.5 vs 11.5%. Controlled reproduction of the cuda5 host limitation.
+  - **Rodinia** (`scripts/rodinia.sh`, `results/rodinia/`, `model/rodinia_predict.py` ->
+    `results/rodinia_predictions.md`; suite cloned to `~/fall2026/GPU/ext/gpu-rodinia`, 9c10d3e):
+    8 benchmarks (srad_v2 excluded: out-of-bounds read faults on Turing/Ada). The VLA transfer
+    rules fail on throughput kernels (~100% MAPE; lavaMD is FP64, TITAN V 20x faster than the
+    consumer GPUs); bandwidth-bound streamcluster within 2.5%. Complementary to rooflines.
+  - **Timeline figure** (`workloads/nsys_smolvla.py`, `model/timeline_figure.py`,
+    `paper/figures/timeline_loop.pdf`, kernel intervals in `results/nsys/`): nsys 2023.4 needs
+    `--cuda-graph-trace=node` for graph kernels and takes no bare `-q`. Under nsys both modes run
+    ~1.4x slower (eager 557 vs 407, graph 59 vs 40 ms); the figure labels both.
+  - Note: on cuda2 both GPUs hang off NUMA node 1, so concurrent jobs on GPU 0 and GPU 1 share
+    CPU cores; run CPU-sensitive timings one at a time there.
+- **Candidate new directions (2026-11-15, waiting for the user):** pi0 / pi0.5 / pi0-FAST
+  (`lerobot/pi0_base`, `pi05_base`, `pi0fast-base` and `*_libero*` checkpoints are public, but
+  lerobot loads the gated `google/paligemma-3b-pt-224` tokenizer: the user must accept the
+  license and log in; pi0.5-FAST has no official checkpoint; FP16 on Turing/Volta may overflow
+  Gemma, check vs BF16). LIBERO / LIBERO-Long (lerobot 0.4.4 `envs/libero.py`; cuda2 has NVIDIA
+  EGL) as FP16/compile correctness gate and latency-vs-success experiment; RoboTwin 2.0 (cuda2
+  headless Vulkan works; needs newer lerobot or their repo); MolmoSpaces low priority.
+  Multi-robot serving deadlines from the batch data (CPU only). Praxis-1 (Reactor blog,
+  2026-11-11) as independent evidence: 249 of ~800 ms Python on a B200, 21,740 -> 4,944 kernels.
 - **Next:**
   1. Paper and slides (deferred by the user until the teammates' work is merged): move the
      headline to `slot_drv` on four GPUs, add ACT/Diffusion (three regimes: dispatch bound,
