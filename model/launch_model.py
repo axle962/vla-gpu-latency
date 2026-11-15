@@ -60,6 +60,11 @@ OP_CLASS = {
     "aten::index": "add_alloc", "aten::index_put_": "add_alloc", "aten::fill_": "add_alloc",
     "aten::arange": "add_alloc", "aten::full": "add_alloc", "aten::zeros": "add_alloc",
     "aten::ones": "add_alloc", "aten::empty": "add_alloc",
+    # cuDNN convolutions (Diffusion Policy, ACT); class falls back to "linear" in tables
+    # without conv rows (torch_dispatch.py --set conv)
+    "aten::cudnn_convolution": "conv", "aten::convolution": "conv",
+    "aten::_convolution": "conv", "aten::conv1d": "conv", "aten::conv2d": "conv",
+    "aten::cudnn_convolution_add_relu": "conv", "aten::cudnn_convolution_relu": "conv",
 }
 
 
@@ -72,7 +77,7 @@ class Calib:
     dispatch_us: dict      # op class -> PyTorch CPU issue cost per op
 
 
-def load_calib(calib_dir: Path, dispatch_csv: Path) -> Calib:
+def load_calib(calib_dir: Path, dispatch_csv: Path, extra_csvs: tuple = ()) -> Calib:
     rows = list(csv.DictReader(open(calib_dir / "launch_eager_loading.csv")))
 
     def med(kernel: str, cfg: str, mode: str, timer: str) -> float:
@@ -89,7 +94,8 @@ def load_calib(calib_dir: Path, dispatch_csv: Path) -> Calib:
         ge.append((med("spin_chain_total", cfg, "eager", "event") - spin_total) / n)
         dn.append((med("spin_chain_total", cfg, "graph", "event") - spin_total) / n)
     disp: dict[str, list[float]] = {}
-    for r in csv.DictReader(open(dispatch_csv)):
+    rows_d = [r for f in (dispatch_csv, *extra_csvs) for r in csv.DictReader(open(f))]
+    for r in rows_d:
         if r["mode"] != "issue":
             continue
         cfg = r["config"]
@@ -102,6 +108,7 @@ def load_calib(calib_dir: Path, dispatch_csv: Path) -> Calib:
         disp.setdefault(kid, []).append(float(r["median_us"]) / kpo)
     dispatch = {k: float(np.median(v)) for k, v in disp.items()}
     dispatch.setdefault("linear_gemv", dispatch["linear"])
+    dispatch.setdefault("conv", dispatch["linear"])
     return Calib(
         g_eager_us=float(np.median(ge)),
         delta_node_us=float(np.median(dn)),

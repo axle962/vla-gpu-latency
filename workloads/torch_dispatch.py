@@ -15,6 +15,10 @@ the GPU becomes the bottleneck is visible in the add_n sweep.
 Prints CSV in the calibration schema (CLAUDE.md section 9):
 gpu,bench,kernel,config,mode,timer,n_runs,mean_us,std_us,min_us,median_us,module_loading
 Run under each torch build used by the workloads (torch version goes into config).
+
+--set conv measures the FP32 convolution ops of the Diffusion Policy and ACT workloads instead
+(cuDNN, TF32 off); write it to torch_dispatch_conv_<env>_env.csv next to the main table.
+kernels_per_op for these is counted with torch.profiler, since cuDNN may launch helper kernels.
 """
 
 from __future__ import annotations
@@ -71,6 +75,40 @@ def cases() -> list[tuple[str, str, Callable[[], object], int]]:
     return out
 
 
+def count_kernels(op: Callable[[], object]) -> int:
+    from torch.profiler import ProfilerActivity, profile
+    op()
+    torch.cuda.synchronize()
+    with profile(activities=[ProfilerActivity.CUDA]) as prof:
+        op()
+        torch.cuda.synchronize()
+    n = sum(1 for e in prof.events() if e.device_type == torch.autograd.DeviceType.CUDA)
+    return max(n, 1)
+
+
+def conv_cases() -> list[tuple[str, str, Callable[[], object], int]]:
+    """FP32 convolutions at Diffusion Policy (UNet Conv1d over the 16-step horizon) and ACT
+    (ResNet18 on 480x640) shapes, with bias as in the models."""
+    f32 = torch.float32
+    out = []
+    for c_in, c_out, length, tag in ((512, 512, 16, "diffusion_unet_512"),
+                                     (2048, 2048, 4, "diffusion_unet_2048")):
+        x = torch.randn(1, c_in, length, device=DEV, dtype=f32)
+        w = torch.randn(c_out, c_in, 5, device=DEV, dtype=f32)
+        b = torch.randn(c_out, device=DEV, dtype=f32)
+        op = lambda x=x, w=w, b=b: F.conv1d(x, w, b, padding=2)  # noqa: E731
+        out.append(("conv", f"conv1d;c={c_in}x{c_out};l={length};k=5;shape={tag}", op,
+                    count_kernels(op)))
+    for c, hw, tag in ((64, (120, 160), "act_layer1"), (64, (24, 24), "diffusion_layer1"),
+                       (512, (15, 20), "act_layer4")):
+        x = torch.randn(1, c, *hw, device=DEV, dtype=f32)
+        w = torch.randn(c, c, 3, 3, device=DEV, dtype=f32)
+        op = lambda x=x, w=w: F.conv2d(x, w, padding=1)  # noqa: E731
+        out.append(("conv", f"conv2d;c={c};hw={hw[0]}x{hw[1]};k=3;shape={tag}", op,
+                    count_kernels(op)))
+    return out
+
+
 def timed(fn: Callable[[], None]) -> tuple[float, float]:
     """Returns (issue_s, total_s) for one call of fn (a chain)."""
     torch.cuda.synchronize()
@@ -87,14 +125,19 @@ def stats(xs: list[float]) -> list[str]:
 
 
 def main() -> None:
+    import argparse
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--set", choices=["main", "conv"], default="main")
+    a = ap.parse_args()
     torch.backends.cuda.matmul.allow_tf32 = False
+    torch.backends.cudnn.allow_tf32 = False
     gpu = torch.cuda.get_device_name(0)
     loading = os.environ.get("CUDA_MODULE_LOADING", "LAZY(default)")
     tv = f"torch={torch.__version__};cuda={torch.version.cuda};n_ops={N_OPS}"
     w = sys.stdout.write
     w("gpu,bench,kernel,config,mode,timer,n_runs,mean_us,std_us,min_us,median_us,"
       "module_loading\n")
-    for kid, cfg, op, kpc in cases():
+    for kid, cfg, op, kpc in (conv_cases() if a.set == "conv" else cases()):
 
         def chain(op=op):
             for _ in range(N_OPS):

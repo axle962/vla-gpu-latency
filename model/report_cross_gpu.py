@@ -37,8 +37,12 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("csv", nargs="?", default=str(ROOT / "results/predictions_cross_gpu.csv"))
     ap.add_argument("--variant", default="slot_class")
+    ap.add_argument("--workload", default="smolvla", help="smolvla, diffusion or act")
     a = ap.parse_args()
     d = pd.read_csv(a.csv)
+    if "workload" in d:
+        d = d[d.workload == a.workload]
+    print(f"Workload: `{a.workload}`\n")
     d["ape"] = d.error_pct.abs()
     x = d[d.source != d.target]
     variants = [v for v in ["same", "spec_bw", "bw", "lat", "lat_bw", "slot_class", "slot",

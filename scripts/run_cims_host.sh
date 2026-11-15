@@ -5,6 +5,7 @@
 #     full        preflight setup calib dispatch probe bench trace trace-baseline
 #     probe-only  preflight probe (needs an earlier calib run on this host)
 #     l2-only     preflight l2 (L2 working-set sweep; builds the C++ benchmarks)
+#     more-only   preflight more (Diffusion Policy + ACT sweep; needs an earlier calib run)
 #     calib-only  preflight calib (C++ microbenchmarks only, e.g. for GPUs without tensor cores)
 # Start it detached so it survives the SSH session, for example from cuda2:
 #   ssh cuda3.cims.nyu.edu 'cd ~/fall2026/GPU/vla-gpu-latency && WORK=/scratch/$USER \
@@ -73,6 +74,8 @@ elif [[ $MODE == probe-only ]]; then
   stage probe gpu
 elif [[ $MODE == l2-only ]]; then
   stage l2 gpu
+elif [[ $MODE == more-only ]]; then
+  stage more gpu
 else
   stage setup
   stage calib gpu

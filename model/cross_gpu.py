@@ -107,11 +107,13 @@ SLOT_ROWS = {
     "linear": [("linear", "smolvla_expert_mlp"), ("linear", "smolvla_kv_proj")],
     "linear_gemv": [("linear", "openvla_decode_qkvo")],
     "sdpa": [("sdpa", "q=1x15x50x64")],
+    "conv": [("conv", "conv1d;"), ("conv", "conv2d;")],
 }
 
 
-def slot_table(dispatch_csv: Path) -> dict:
-    rows = [r for r in csv.DictReader(open(dispatch_csv)) if r["mode"] == "graph"]
+def slot_table(dispatch_csv: Path, extra_csvs: tuple = ()) -> dict:
+    rows = [r for f in (dispatch_csv, *extra_csvs) for r in csv.DictReader(open(f))
+            if r["mode"] == "graph"]
     out = {}
     for cls, keys in SLOT_ROWS.items():
         vals = []
@@ -120,7 +122,9 @@ def slot_table(dispatch_csv: Path) -> dict:
                 if r["kernel"] == kid and sub in r["config"]:
                     kpo = int(r["config"].split("kernels_per_op=")[1].split(";")[0])
                     vals.append(float(r["median_us"]) / kpo)
-        out[cls] = float(np.exp(np.mean(np.log(vals))))
+        if vals:
+            out[cls] = float(np.exp(np.mean(np.log(vals))))
+    out.setdefault("conv", out["linear"])
     return out
 
 
@@ -177,15 +181,16 @@ def cpp_slots(bench_dir: Path) -> dict:
 
 
 def load_gpu(key: str, calib_glob: str, dispatch_glob: str, bench_glob: str,
-             probe_glob: str) -> GPU:
+             probe_glob: str, conv_glob: str = "") -> GPU:
     cdir = _one(calib_glob)
     info = device_info(cdir / "device_info.csv")
     bw = bandwidth_params(_one(calib_glob + "/bandwidth.csv"), float(info["l2_bytes"]))
     dcsv = _one(dispatch_glob + "/torch_dispatch_smolvla_env.csv")
-    c = load_calib(cdir, dcsv)
+    conv = tuple(sorted(ROOT.glob(conv_glob))[-1:]) if conv_glob else ()
+    c = load_calib(cdir, dcsv, conv)
     return GPU(key, str(info["gpu"]), c, bw["bw_dram_gbps"],
                float(info["theoretical_dram_bw_mbps"]) / 1e3,
-               small_kernels(_one(bench_glob)), c.dispatch_us, slot_table(dcsv),
+               small_kernels(_one(bench_glob)), c.dispatch_us, slot_table(dcsv, conv),
                *probe_tables(max(ROOT.glob(probe_glob), default=None)),
                sustained_clock(cdir), cpp_slots(_one(bench_glob)))
 
@@ -194,20 +199,24 @@ GPUS = {
     "A100": dict(calib_glob="results/calib/NVIDIA_A100-SXM4-40GB_b-19-11_*",
                  dispatch_glob="results/calib/NVIDIA_A100-SXM4-40GB_b-19-28_*",
                  bench_glob="results/bench/NVIDIA_A100*",
-                 probe_glob="results/calib/NVIDIA_A100*/torch_probe_smolvla_env.csv"),
+                 probe_glob="results/calib/NVIDIA_A100*/torch_probe_smolvla_env.csv",
+                   conv_glob="results/calib/NVIDIA_A100*/torch_dispatch_conv_smolvla_env.csv"),
     "2080Ti": dict(calib_glob="results/calib/NVIDIA_GeForce_RTX_2080_Ti_cuda2_*",
                    dispatch_glob="results/calib/NVIDIA_GeForce_RTX_2080_Ti_cuda2_*",
                    bench_glob="results/bench/NVIDIA_GeForce_RTX_2080_Ti_cuda2_*",
-                   probe_glob="results/calib/NVIDIA_GeForce_RTX_2080_Ti_cuda2_*/torch_probe_*.csv"),
+                   probe_glob="results/calib/NVIDIA_GeForce_RTX_2080_Ti_cuda2_*/torch_probe_*.csv",
+                   conv_glob="results/calib/NVIDIA_GeForce_RTX_2080_Ti_cuda2_*/torch_dispatch_conv_smolvla_env.csv"),
     "TITANV": dict(calib_glob="results/calib/NVIDIA_TITAN_V_cuda3_*",
                    dispatch_glob="results/calib/NVIDIA_TITAN_V_cuda3_*",
                    bench_glob="results/bench/NVIDIA_TITAN_V_cuda3_*",
-                   probe_glob="results/calib/NVIDIA_TITAN_V_cuda3_*/torch_probe_*.csv"),
+                   probe_glob="results/calib/NVIDIA_TITAN_V_cuda3_*/torch_probe_*.csv",
+                   conv_glob="results/calib/NVIDIA_TITAN_V_cuda3_*/torch_dispatch_conv_smolvla_env.csv"),
     # CIMS cuda5, Ada sm_89, 36 MB L2 (2026-11-13): similar DRAM bandwidth to the 2080 Ti.
     "RTX4070": dict(calib_glob="results/calib/NVIDIA_GeForce_RTX_4070_cuda5_*",
                     dispatch_glob="results/calib/NVIDIA_GeForce_RTX_4070_cuda5_*",
                     bench_glob="results/bench/NVIDIA_GeForce_RTX_4070_cuda5_*",
-                    probe_glob="results/calib/NVIDIA_GeForce_RTX_4070_cuda5_*/torch_probe_*.csv"),
+                    probe_glob="results/calib/NVIDIA_GeForce_RTX_4070_cuda5_*/torch_probe_*.csv",
+                   conv_glob="results/calib/NVIDIA_GeForce_RTX_4070_cuda5_*/torch_dispatch_conv_smolvla_env.csv"),
 }
 TRACE_KEY = {"A100": "A100", "2080Ti": "RTX_2080_Ti", "TITANV": "TITAN_V", "RTX4070": "RTX_4070"}
 
@@ -223,8 +232,13 @@ def py_ratio(src: GPU, tgt: GPU) -> float:
     return float(np.exp(np.mean([np.log(tgt.py_us[k] / src.py_us[k]) for k in common])))
 
 
+# Dispatch classes that define the host ratios (the original table; conv rows, when present,
+# are used per op but do not change h, so SmolVLA predictions do not depend on them).
+BASE_CLASSES = ("add_alloc", "add_n", "linear", "linear_gemv", "rmsnorm6", "sdpa")
+
+
 def host_ratio(src: GPU, tgt: GPU) -> float:
-    common = sorted(set(src.dispatch_med) & set(tgt.dispatch_med))
+    common = [k for k in BASE_CLASSES if k in src.dispatch_med and k in tgt.dispatch_med]
     return float(np.median([tgt.dispatch_med[k] / src.dispatch_med[k] for k in common]))
 
 
@@ -237,7 +251,7 @@ def framework_ratio(src: GPU, tgt: GPU) -> float:
     (kernels_per_op x the C++ cudaLaunchKernel call time of that host). The Python residual p
     issues no kernels, so it should scale with the framework part only. Matters for the cuda5
     host, whose cudaLaunchKernel costs 8.7 us vs 1.9 to 2.6 us on the others."""
-    common = sorted(set(src.dispatch_med) & set(tgt.dispatch_med))
+    common = [k for k in BASE_CLASSES if k in src.dispatch_med and k in tgt.dispatch_med]
     f = lambda g, k: g.dispatch_med[k] - KPO.get(k, 1) * g.calib.launch_call_us  # noqa: E731
     return float(np.median([f(tgt, k) / f(src, k) for k in common]))
 
@@ -283,33 +297,56 @@ def transfer_ratio(tr: StepTrace, src: GPU, tgt: GPU, ratio: dict) -> np.ndarray
     return np.maximum(u * r - tgt.calib.delta_node_us, 0.5)
 
 
-def runs_for(gpu_key: str) -> list[tuple[Path, dict]]:
+# Workloads: trace directory prefix, config key from meta.json, the source baseline config (b
+# and p are fitted on it only), and the meta.json field measured for each predicted quantity.
+# ACT has no loop: the whole step is captured, so its "graph_loop" is the full graph step.
+LOOP_QUANT = {"eager": "eager_ms_median", "eager_prefix": "eager_prefix_ms_median",
+              "eager_loop": "eager_denoise_ms_median", "graph_loop": "graph_denoise_ms_median",
+              "hybrid": "hybrid_ms_median"}
+WORKLOADS = {
+    "smolvla": dict(prefix="smolvla_", cfg=lambda m: (m["cameras"], m["num_steps"], m["chunk_size"]),
+                    name="cam{}_steps{}_chunk{}", base=(3, 10, 50), loop=True, quant=LOOP_QUANT),
+    "diffusion": dict(prefix="diffusion_", cfg=lambda m: (m["num_steps"], m["chunk_size"]),
+                      name="steps{}_h{}", base=(100, 16), loop=True, quant=LOOP_QUANT),
+    "act": dict(prefix="act_", cfg=lambda m: tuple(m["image_input_hw"]) + (m["chunk_size"],),
+                name="res{}x{}_chunk{}", base=(480, 640, 100), loop=False,
+                quant={"eager": "eager_ms_median", "graph_loop": "graph_ms_median"}),
+}
+
+
+def runs_for(gpu_key: str, wl: str = "smolvla") -> list[tuple[Path, dict]]:
     out = []
-    for meta_p in sorted((ROOT / "traces").glob(f"smolvla_*/*{TRACE_KEY[gpu_key]}*/meta.json")):
+    pre = WORKLOADS[wl]["prefix"]
+    for meta_p in sorted((ROOT / "traces").glob(f"{pre}*/*{TRACE_KEY[gpu_key]}*/meta.json")):
         out.append((meta_p.parent, json.loads(meta_p.read_text())))
     return out
 
 
-def cfg_of(m: dict) -> tuple:
-    return (m["cameras"], m["num_steps"], m["chunk_size"])
+def cfg_of(m: dict, wl: str = "smolvla") -> tuple:
+    return WORKLOADS[wl]["cfg"](m)
 
 
-def measured_by_cfg(gpu_key: str) -> dict:
+def measured_by_cfg(gpu_key: str, wl: str = "smolvla") -> dict:
     """One measured run per config on the target: the one with the smallest eager std
     (cuda2 has an OS-scheduling slow mode on some unpinned runs, see CLAUDE.md)."""
+    gkey = WORKLOADS[wl]["quant"]["graph_loop"]
     best: dict = {}
-    for r, m in runs_for(gpu_key):
-        if not m.get("graph_denoise_ms_median"):
+    for r, m in runs_for(gpu_key, wl):
+        if not m.get(gkey):
             continue
-        k = cfg_of(m)
+        k = cfg_of(m, wl)
         if k not in best or m["eager_ms_std"] < best[k][1]["eager_ms_std"]:
             best[k] = (r, m)
     return best
 
 
-QUANT = {"eager": "eager_ms_median", "eager_prefix": "eager_prefix_ms_median",
-         "eager_loop": "eager_denoise_ms_median", "graph_loop": "graph_denoise_ms_median",
-         "hybrid": "hybrid_ms_median"}
+def load_wl_step(r: Path, m: dict, wl: str) -> StepTrace:
+    if WORKLOADS[wl]["loop"]:
+        return load_step(r, m["num_steps"])
+    return replace(load_step(r, 1), loop_start=0)
+
+
+QUANT = LOOP_QUANT
 
 
 def predict(tr: StepTrace, c: Calib, p_us: float) -> dict:
@@ -328,67 +365,79 @@ def main() -> None:
               f"g_eager {g.calib.g_eager_us:.2f} us, delta_node {g.calib.delta_node_us:.2f} us, "
               f"small kernels {len(g.small_us)}", file=sys.stderr)
     out = csv.writer(sys.stdout)
-    out.writerow(["source", "target", "config", "quantity", "unit", "measured",
+    out.writerow(["workload", "source", "target", "config", "quantity", "unit", "measured",
                   "kernel_transfer", "predicted", "error_pct", "r_lat", "r_bw", "host_ratio"])
-    for sk, src in gpus.items():
-        src_runs = measured_by_cfg(sk)
-        base_r, base_m = src_runs[(3, 10, 50)]
-        base_tr = load_step(base_r, base_m["num_steps"])
-        b_us = fit_b(base_tr, src.calib, base_m["graph_denoise_ms_median"] * 1e3)
-        p_us = fit_p(corrected(base_tr, b_us), src.calib, base_m["eager_ms_median"] * 1e3)
-        print(f"# source {sk}: b = {b_us:.3f} us, p = {p_us:.2f} us (fit on {base_r.name})",
-              file=sys.stderr)
-        traces = {k: corrected(load_step(r, m["num_steps"]), b_us)
-                  for k, (r, m) in src_runs.items()}
-        for tk, tgt in gpus.items():
-            h = host_ratio(src, tgt)
-            rl = r_lat(src, tgt) if src.small_us and tgt.small_us else float("nan")
-            rb = src.bw_dram / tgt.bw_dram
-            for cfg, (tr_r, tr_m) in measured_by_cfg(tk).items():
-                if cfg not in traces:
+    for wl, spec in WORKLOADS.items():
+        for sk, src in gpus.items():
+            run_prediction(out, gpus, wl, spec, sk, src)
+
+
+def run_prediction(out, gpus: dict, wl: str, spec: dict, sk: str, src: GPU) -> None:
+    src_runs = measured_by_cfg(sk, wl)
+    if spec["base"] not in src_runs:
+        return
+    quant = spec["quant"]
+    base_r, base_m = src_runs[spec["base"]]
+    base_tr = load_wl_step(base_r, base_m, wl)
+    b_us = fit_b(base_tr, src.calib, base_m[quant["graph_loop"]] * 1e3)
+    p_us = fit_p(corrected(base_tr, b_us), src.calib, base_m["eager_ms_median"] * 1e3)
+    print(f"# {wl} source {sk}: b = {b_us:.3f} us, p = {p_us:.2f} us (fit on {base_r.name})",
+          file=sys.stderr)
+    traces = {k: corrected(load_wl_step(r, m, wl), b_us) for k, (r, m) in src_runs.items()}
+    for tk, tgt in gpus.items():
+        h = host_ratio(src, tgt)
+        rl = r_lat(src, tgt) if src.small_us and tgt.small_us else float("nan")
+        rb = src.bw_dram / tgt.bw_dram
+        for cfg, (tr_r, tr_m) in measured_by_cfg(tk, wl).items():
+            if cfg not in traces:
+                continue
+            tr = traces[cfg]
+            has_probe = bool(src.cold_slot_us and tgt.cold_slot_us)
+            for mode in ("same", "spec_bw", "bw", "lat", "lat_bw", "slot_class",
+                         "slot", "slot_cold", "slot_cold_py", "clock", "slot_cpp", "slot_drv"):
+                if mode == "clock" and not (np.isfinite(src.clk_mhz)
+                                            and np.isfinite(tgt.clk_mhz)):
                     continue
-                tr = traces[cfg]
-                has_probe = bool(src.cold_slot_us and tgt.cold_slot_us)
-                for mode in ("same", "spec_bw", "bw", "lat", "lat_bw", "slot_class",
-                             "slot", "slot_cold", "slot_cold_py", "clock", "slot_cpp", "slot_drv"):
-                    if mode == "clock" and not (np.isfinite(src.clk_mhz)
-                                                and np.isfinite(tgt.clk_mhz)):
-                        continue
-                    if mode == "slot_cpp" and not (src.cpp_slot_us and tgt.cpp_slot_us):
-                        continue
-                    if mode.startswith("lat") and not np.isfinite(rl):
-                        continue
-                    if mode.startswith("slot_cold") and not has_probe:
-                        continue
-                    if mode == "clock":
-                        k = src.clk_mhz / tgt.clk_mhz
-                        t_new = transfer_ratio(tr, src, tgt, {c: k for c in set(tr.cls)})
-                    elif mode == "slot_cpp":
-                        t_new = transfer_ratio(tr, src, tgt, {
-                            c: tgt.cpp_slot_us[c] / src.cpp_slot_us[c] for c in set(tr.cls)})
-                    elif mode.startswith("slot_cold"):
-                        t_new = transfer_slots(tr, src, tgt, tail_bw=False, cold=True)
-                    elif mode.startswith("slot"):
-                        t_new = transfer_slots(tr, src, tgt, tail_bw=(mode == "slot"))
-                    else:
-                        t_new = transfer(tr.t_us, mode, src, tgt)
-                    t2 = replace(tr, t_us=t_new)
-                    hp = (py_ratio(src, tgt) if mode == "slot_cold_py"
-                          else framework_ratio(src, tgt) if mode == "slot_drv" else h)
-                    pred = predict(t2, tgt.calib, p_us * hp)
-                    vals = {q: (tr_m[QUANT[q]], us / 1e3, "ms") for q, us in pred.items()}
-                    # CUDA-graph speedups: loop only, and end to end (eager vs hybrid)
+                if mode == "slot_cpp" and not (src.cpp_slot_us and tgt.cpp_slot_us):
+                    continue
+                if mode.startswith("lat") and not np.isfinite(rl):
+                    continue
+                if mode.startswith("slot_cold") and not has_probe:
+                    continue
+                if mode == "clock":
+                    k = src.clk_mhz / tgt.clk_mhz
+                    t_new = transfer_ratio(tr, src, tgt, {c: k for c in set(tr.cls)})
+                elif mode == "slot_cpp":
+                    t_new = transfer_ratio(tr, src, tgt, {
+                        c: tgt.cpp_slot_us.get(c, tgt.cpp_slot_us["linear"])
+                        / src.cpp_slot_us.get(c, src.cpp_slot_us["linear"])
+                        for c in set(tr.cls)})
+                elif mode.startswith("slot_cold"):
+                    t_new = transfer_slots(tr, src, tgt, tail_bw=False, cold=True)
+                elif mode.startswith("slot"):
+                    t_new = transfer_slots(tr, src, tgt, tail_bw=(mode == "slot"))
+                else:
+                    t_new = transfer(tr.t_us, mode, src, tgt)
+                t2 = replace(tr, t_us=t_new)
+                hp = (py_ratio(src, tgt) if mode == "slot_cold_py"
+                      else framework_ratio(src, tgt) if mode == "slot_drv" else h)
+                pred = predict(t2, tgt.calib, p_us * hp)
+                vals = {q: (tr_m[key], pred[q] / 1e3, "ms") for q, key in quant.items()}
+                # CUDA-graph speedups: loop only, and end to end (eager vs hybrid)
+                if spec["loop"]:
                     vals["speedup_loop"] = (tr_m["eager_denoise_ms_median"]
                                             / tr_m["graph_denoise_ms_median"],
                                             pred["eager_loop"] / pred["graph_loop"], "x")
                     vals["speedup_e2e"] = (tr_m["eager_ms_median"] / tr_m["hybrid_ms_median"],
                                            pred["eager"] / pred["hybrid"], "x")
-                    for q, (meas, pv, unit) in vals.items():
-                        out.writerow([sk, tk, "cam{}_steps{}_chunk{}".format(*cfg), q, unit,
-                                      f"{meas:.3f}", mode, f"{pv:.3f}",
-                                      f"{100 * (pv - meas) / meas:.1f}",
-                                      f"{rl:.3f}", f"{rb:.3f}", f"{h:.3f}"])
-
+                else:
+                    vals["speedup_e2e"] = (tr_m["eager_ms_median"] / tr_m[quant["graph_loop"]],
+                                           pred["eager"] / pred["graph_loop"], "x")
+                for q, (meas, pv, unit) in vals.items():
+                    out.writerow([wl, sk, tk, spec["name"].format(*cfg), q, unit,
+                                  f"{meas:.3f}", mode, f"{pv:.3f}",
+                                  f"{100 * (pv - meas) / meas:.1f}",
+                                  f"{rl:.3f}", f"{rb:.3f}", f"{h:.3f}"])
 
 if __name__ == "__main__":
     main()

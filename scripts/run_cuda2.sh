@@ -18,6 +18,8 @@
 #   scripts/run_cuda2.sh bench       # our CUDA kernels + C++ replay of the traced step (~6 min)
 #   scripts/run_cuda2.sh l2          # L2 working-set sweep on the C++ replay (~2 min)
 #   scripts/run_cuda2.sh ncu         # Nsight Compute per-kernel counters (~20 min)
+#   scripts/run_cuda2.sh more        # extra workloads: Diffusion Policy + ACT sweep, conv
+#                                    # dispatch rows (~45 min; downloads ~1.3 GB of weights)
 #   scripts/run_cuda2.sh results     # list what to commit
 # Full instructions (also for a Claude Code session on cuda2): docs/cuda2_runbook.md
 #
@@ -140,6 +142,42 @@ trace)
       || echo "FAILED: $c (see $log)"
   done
   ;;
+more)
+  # Extra workloads (workloads/trace_diffusion.py, trace_act.py; same configs as
+  # scripts/cluster/trace_more.sbatch) plus the conv rows of the dispatch table. Pinned to the
+  # GPU's NUMA node when numactl exists.
+  out=$(latest_calib)
+  [[ -n "$out" ]] || { echo "run the calib stage first"; exit 1; }
+  export TORCH_HOME="$WORK/.cache/torch" CUDA_MODULE_LOADING=EAGER
+  ck="$TORCH_HOME/hub/checkpoints/resnet18-f37072fd.pth"
+  if [[ ! -s $ck ]]; then
+    mkdir -p "$(dirname "$ck")"
+    curl -sSL -o "$ck" https://download.pytorch.org/models/resnet18-f37072fd.pth
+  fi
+  "$PY" -c 'from huggingface_hub import snapshot_download as d
+for r in ("lerobot/diffusion_pusht", "lerobot/act_aloha_sim_transfer_cube_human"): print(d(r))'
+  export HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1
+  pin=()
+  if command -v numactl >/dev/null; then
+    node=$(cat /sys/bus/pci/devices/0000:$(nvidia-smi -i "$DEV" --query-gpu=pci.bus_id \
+      --format=csv,noheader | cut -d: -f2-3 | tr 'A-F' 'a-f')/numa_node 2>/dev/null || echo -1)
+    [[ $node -ge 0 ]] && pin=(numactl --cpunodebind="$node" --membind="$node")
+  fi
+  echo "extra workloads on GPU $DEV ${pin[*]:-(unpinned)}"
+  "${pin[@]}" "$PY" workloads/torch_dispatch.py --set conv > "$out/torch_dispatch_conv_smolvla_env.csv" \
+    && echo "wrote $out/torch_dispatch_conv_smolvla_env.csv" || echo "FAILED: conv dispatch"
+  mkdir -p logs
+  for a in "trace_diffusion.py --num-steps 100" "trace_diffusion.py --num-steps 10" \
+           "trace_diffusion.py --num-steps 25" "trace_diffusion.py --num-steps 50" \
+           "trace_diffusion.py --num-steps 100" "trace_act.py --height 480 --width 640" \
+           "trace_act.py --height 240 --width 320" "trace_act.py --height 480 --width 640"; do
+    log="logs/$HOST-$(echo "$a" | tr -d ' -' | sed 's/\.py//')-$(date +%H%M%S).log"
+    echo "=== $a ($(date +%T)) -> $log"
+    # shellcheck disable=SC2086
+    "${pin[@]}" "$PY" workloads/$a > "$log" 2>&1 \
+      && grep -E "max \|diff\||graph profile|wrote" "$log" || echo "FAILED: $a (see $log)"
+  done
+  ;;
 trace-baseline)
   # One more baseline run (3 cameras, 10 steps, chunk 50) for run-to-run variance.
   export HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 CUDA_MODULE_LOADING=EAGER
@@ -164,12 +202,12 @@ ncu)
   PY="$PY" scripts/run_ncu.sh "$BUILD" all
   ;;
 results)
-  ls -d results/calib/*_"$HOST"_* traces/smolvla_*/*_"$HOST"_* results/bench/*_"$HOST"_* \
+  ls -d results/calib/*_"$HOST"_* traces/*/*_"$HOST"_* results/bench/*_"$HOST"_* \
     results/ncu/*_"$HOST"_* 2>/dev/null
   git status --short results traces
   ;;
 *)
-  sed -n '2,24p' "$0"
+  sed -n '2,26p' "$0"
   exit 1
   ;;
 esac

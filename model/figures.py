@@ -105,9 +105,12 @@ def main() -> None:
     ap.add_argument("--csv", default=str(ROOT / "results/predictions_cross_gpu.csv"))
     ap.add_argument("--gpus", default="", help="comma list of GPU keys to keep (default: all)")
     ap.add_argument("--tag", default="", help="suffix for the output file names, e.g. _4gpu")
+    ap.add_argument("--workload", default="smolvla")
     a = ap.parse_args()
     OUT.mkdir(parents=True, exist_ok=True)
     d = pd.read_csv(a.csv)
+    if "workload" in d:
+        d = d[d.workload == a.workload]
     if a.gpus:
         keep = a.gpus.split(",")
         d = d[d.source.isin(keep) & d.target.isin(keep)]
