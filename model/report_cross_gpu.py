@@ -35,7 +35,8 @@ def kendall(a: list[float], b: list[float]) -> float:
 
 # Baseline config per workload (model/cross_gpu.py WORKLOADS "base").
 BASE_CFG = {"smolvla": "cam3_steps10_chunk50", "diffusion": "steps100_h16",
-            "diffusionbench": "steps100_h16", "act": "res480x640_chunk100"}
+            "diffusionbench": "steps100_h16", "act": "res480x640_chunk100",
+            "pi0": "steps10_chunk50", "pi05": "steps10_chunk50", "pi0fast": "decode256"}
 
 
 def main() -> None:

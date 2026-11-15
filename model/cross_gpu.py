@@ -323,6 +323,20 @@ WORKLOADS = {
     # the default heuristic picks a different conv algorithm on each architecture.
     "diffusionbench": dict(prefix="diffusionbench_", cfg=lambda m: (m["num_steps"], m["chunk_size"]),
                            name="steps{}_h{}", base=(100, 16), loop=True, quant=LOOP_QUANT),
+    # pi0 / pi0.5 (workloads/trace_pi.py, LIBERO checkpoints, FP16 so every GPU is comparable):
+    # PaliGemma prefix + 10 flow steps of the Gemma-300M expert, the SmolVLA structure.
+    "pi0": dict(prefix="pi0_libero_fp16_", cfg=lambda m: (m["num_steps"], m["chunk_size"]),
+                name="steps{}_chunk{}", base=(10, 50), loop=True, quant=LOOP_QUANT),
+    "pi05": dict(prefix="pi05_libero_fp16_", cfg=lambda m: (m["num_steps"], m["chunk_size"]),
+                 name="steps{}_chunk{}", base=(10, 50), loop=True, quant=LOOP_QUANT),
+    # pi0-FAST (workloads/trace_pi0fast.py): prefill + greedy decode of 255 FAST tokens through
+    # Gemma-2B, the OpenVLA structure; the loop is the decoder (static cache, graph-captured).
+    "pi0fast": dict(prefix="pi0fast_libero_fp16_", cfg=lambda m: (m["decode_steps"],),
+                    name="decode{}", base=(256,), loop=True, loop_iters="decode",
+                    quant={"eager": "eager_ms_median", "eager_prefix": "eager_prefill_ms_median",
+                           "eager_loop": "static_decode_ms_median",
+                           "graph_loop": "graph_decode_ms_median",
+                           "hybrid": "static_hybrid_ms_median"}),
     "act": dict(prefix="act_", cfg=lambda m: tuple(m["image_input_hw"]) + (m["chunk_size"],),
                 name="res{}x{}_chunk{}", base=(480, 640, 100), loop=False,
                 quant={"eager": "eager_ms_median", "graph_loop": "graph_ms_median"}),
@@ -357,7 +371,9 @@ def measured_by_cfg(gpu_key: str, wl: str = "smolvla") -> dict:
 
 def load_wl_step(r: Path, m: dict, wl: str) -> StepTrace:
     if WORKLOADS[wl]["loop"]:
-        return load_step(r, m["num_steps"])
+        n_iter = m["decode_steps"] - 1 if WORKLOADS[wl].get("loop_iters") == "decode" \
+            else m["num_steps"]
+        return load_step(r, n_iter)
     return replace(load_step(r, 1), loop_start=0)
 
 
@@ -453,10 +469,9 @@ def run_prediction(out, gpus: dict, wl: str, spec: dict, sk: str, src: GPU,
                 vals = {q: (tr_m[key], pred[q] / 1e3, "ms") for q, key in quant.items()}
                 # CUDA-graph speedups: loop only, and end to end (eager vs hybrid)
                 if spec["loop"]:
-                    vals["speedup_loop"] = (tr_m["eager_denoise_ms_median"]
-                                            / tr_m["graph_denoise_ms_median"],
+                    vals["speedup_loop"] = (tr_m[quant["eager_loop"]] / tr_m[quant["graph_loop"]],
                                             pred["eager_loop"] / pred["graph_loop"], "x")
-                    vals["speedup_e2e"] = (tr_m["eager_ms_median"] / tr_m["hybrid_ms_median"],
+                    vals["speedup_e2e"] = (tr_m["eager_ms_median"] / tr_m[quant["hybrid"]],
                                            pred["eager"] / pred["hybrid"], "x")
                 else:
                     vals["speedup_e2e"] = (tr_m["eager_ms_median"] / tr_m[quant["graph_loop"]],

@@ -467,15 +467,55 @@ State:
     ~1.4x slower (eager 557 vs 407, graph 59 vs 40 ms); the figure labels both.
   - Note: on cuda2 both GPUs hang off NUMA node 1, so concurrent jobs on GPU 0 and GPU 1 share
     CPU cores; run CPU-sensitive timings one at a time there.
-- **Candidate new directions (2026-11-15, waiting for the user):** pi0 / pi0.5 / pi0-FAST
-  (`lerobot/pi0_base`, `pi05_base`, `pi0fast-base` and `*_libero*` checkpoints are public, but
-  lerobot loads the gated `google/paligemma-3b-pt-224` tokenizer: the user must accept the
-  license and log in; pi0.5-FAST has no official checkpoint; FP16 on Turing/Volta may overflow
-  Gemma, check vs BF16). LIBERO / LIBERO-Long (lerobot 0.4.4 `envs/libero.py`; cuda2 has NVIDIA
-  EGL) as FP16/compile correctness gate and latency-vs-success experiment; RoboTwin 2.0 (cuda2
-  headless Vulkan works; needs newer lerobot or their repo); MolmoSpaces low priority.
-  Multi-robot serving deadlines from the batch data (CPU only). Praxis-1 (Reactor blog,
-  2026-11-11) as independent evidence: 249 of ~800 ms Python on a B200, 21,740 -> 4,944 kernels.
+- **pi0 / pi0.5 / pi0-FAST (2026-11-15 evening, user approved; HF login done on cuda2, token
+  linked into each host's `$HF_HOME`, `~/.cache/huggingface/token` is mode 600):**
+  - Separate env `envs/pi` (lerobot 0.4.4 + transformers branch `fix/lerobot_openpi`, which the
+    pi models check for; same torch 2.10.0+cu128), built by `logs/setup_pi_env.sh` (it also
+    fetches the gated PaliGemma tokenizer and the FAST tokenizers; their remote code was read:
+    numpy/scipy DCT only; the LIBERO FAST tokenizer is byte-identical code). Checkpoints: the
+    LIBERO fine-tunes `lerobot/pi0_libero_finetuned_v044`, `pi05_libero_finetuned_v044`,
+    `pi0fast-libero-v044` (BF16; pi0.5-FAST has no official checkpoint). The "missing
+    embed_tokens" load warning is harmless (tied to lm_head, checked).
+  - Tracers `workloads/trace_pi.py` (pi0, pi05: prefix + 10-step loop, like SmolVLA) and
+    `workloads/trace_pi0fast.py` (prefill + 256 greedy decode steps; static-cache decoder
+    captured as one CUDA graph). `--precision fp16` casts to FP16 for Turing/Volta: the patched
+    transformers casts activations only for BF16, so the tracer wraps the Gemma models' forward
+    and hooks the SigLIP encoder to cast inputs (lerobot calls `.forward()` directly, which
+    bypasses module hooks). CIMS stage `pi` (`run_cims_host.sh pi-only`): FP16 everywhere, BF16
+    too where supported, models fetched/dropped per run on hosts with < 40 GB free.
+  - Results (eager / graph loop / hybrid, ms; FP16): pi0 2080 Ti 507 / 54.6 / 211, TITAN V 355 /
+    83.3 / 196, 4070 600 / 37.5 / 198; pi0.5 565 / 64.8 / 229, 425 / 94.6 / 219, 713 / 48.4 /
+    229. Same eager/graph inversion as SmolVLA (loop speedup 2.9x TITAN V to 11.7x 4070). pi0-FAST
+    (256 tokens): eager 8.1 / 5.6 / 10.6 s, graph decode 3.1 / 3.2 / 3.0 s (similar DRAM
+    bandwidth: ~5.4 GB of weights per token, 70 to 80% of the bandwidth bound). lerobot decodes a
+    fixed 256 tokens although EOS comes at ~136: stopping at EOS would cut ~47% of the decode.
+  - Numerics: FP16 is safe for pi0/pi0.5 (last-layer peak |activation| 22k / 41k < 65504; FP16
+    and BF16 timings within 2 to 5%) but NOT for pi0-FAST (BF16 peak 3.5M; FP16 overflows, stock
+    FP16 decodes all zeros): FP16 pi0-FAST runs are timing-only. The static decoder matches stock
+    tokens up to BF16 near-ties (stock itself flips them run to run).
+  - Cross-GPU (slot_drv, 3 GPUs, `results/report_cross_gpu_{pi0,pi05,pi0fast}.md`): graph loop
+    13 / 10 / 9% MAPE, hybrid 11 / 18 / 7%, eager 18 / 12 / 19% (spec bandwidth: graph loop 69 /
+    58 / 19%); the inversion is predicted from every source for pi0 and pi0.5. Fitted p per host
+    is model independent (2080 Ti host 20.5 to 23.1 us, TITAN V host 12.7 to 13.8 us across
+    SmolVLA, pi0, pi0.5, pi0-FAST): p is a host property.
+  - One cuda2 pi0 run overlapped my LIBERO render test: in `traces/_excluded/` (README).
+- **LIBERO (running 2026-11-15 from ~18:00):** `workloads/libero_eval.py` (lerobot rollout
+  pipeline with whole chunks and a simulated inference delay d in 50 ms control steps: naive
+  async execution, the new chunk is planned d steps early and starts at index d; seeds torch per
+  (task, episode) so every delay sees the same scenes and noise), `scripts/run_libero.sh`
+  (waits for timing stages; per-GPU job lists). hf-libero installed in envs/smolvla and envs/pi
+  on all hosts (additions only), LIBERO config in `~/.libero`, assets in `~/.cache/libero`;
+  headless EGL rendering works. Harness = official `lerobot-eval` episode for episode for SmolVLA
+  (3/3); pi0 also poor in the official eval on LIBERO-10 task 0 (0/5), so low pi0 success there is
+  the checkpoint, not the harness. Jobs: cuda3 SmolVLA FP16 d = 0..20 + stock d = 0; cuda2 pi0
+  FP16 d = 0..20; cuda5 pi0 and pi0.5 BF16 d = 0 (precision gate), then pi0.5 FP16 d = 0..20.
+  10 tasks x 10 episodes per point. Earlier unseeded runs: `results/libero/unseeded/` (not used).
+  Stop runs with `logs/stop_libero.sh` (pgrep/pkill patterns match their own command line here).
+- **Not done:** RoboTwin 2.0 success evaluation (needs Docker or GPU Podman/CDI, neither on CIMS;
+  native build = CuRobo + pytorch3d against torch 2.7.1); a latency trace of
+  `lerobot/smolvla_robotwin` at RoboTwin shapes is possible without the simulator. MolmoSpaces
+  skipped. Praxis-1 (Reactor blog, 2026-11-11): independent evidence, 249 of ~800 ms Python on a
+  B200, 21,740 -> 4,944 kernels.
 - **Next:**
   1. Paper and slides (deferred by the user until the teammates' work is merged): move the
      headline to `slot_drv` on four GPUs, add ACT/Diffusion (three regimes: dispatch bound,

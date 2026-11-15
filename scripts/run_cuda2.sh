@@ -23,6 +23,8 @@
 #   scripts/run_cuda2.sh diffbench   # Diffusion Policy sweep with cudnn.benchmark=True (~25 min)
 #   scripts/run_cuda2.sh extras      # SmolVLA batch sweep, torch.compile, GPU energy (~1.5 h)
 #   scripts/run_cuda2.sh rodinia     # Rodinia per-kernel times under nsys (scripts/rodinia.sh)
+#   scripts/run_cuda2.sh pi          # pi0, pi0.5, pi0-FAST traces (envs/pi, logs/setup_pi_env.sh;
+#                                    # needs a Hugging Face login with the PaliGemma license)
 #   scripts/run_cuda2.sh results     # list what to commit
 # Full instructions (also for a Claude Code session on cuda2): docs/cuda2_runbook.md
 #
@@ -224,6 +226,48 @@ extras)
 rodinia)
   WORK="$WORK" scripts/rodinia.sh
   ;;
+pi)
+  # pi0 / pi0.5 (workloads/trace_pi.py) and pi0-FAST (workloads/trace_pi0fast.py), LIBERO
+  # checkpoints, FP16 on every GPU (Turing/Volta have no BF16) plus BF16 where supported (the
+  # numeric reference). On hosts with < 40 GB free in $WORK each model is fetched before its runs
+  # and removed after. Pinned to the GPU's NUMA node.
+  PYPI="$WORK/envs/pi/bin/python"
+  [[ -x $PYPI ]] || { echo "build envs/pi first: logs/setup_pi_env.sh"; exit 1; }
+  export HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 CUDA_MODULE_LOADING=EAGER
+  pin=()
+  if command -v numactl >/dev/null; then
+    node=$(cat /sys/bus/pci/devices/0000:$(nvidia-smi -i "$DEV" --query-gpu=pci.bus_id \
+      --format=csv,noheader | cut -d: -f2-3 | tr 'A-F' 'a-f')/numa_node 2>/dev/null || echo -1)
+    [[ $node -ge 0 ]] && pin=(numactl --cpunodebind="$node" --membind="$node")
+  fi
+  precs="fp16"
+  [[ $CC -ge 80 ]] && precs="fp16 bf16"
+  free_gb=$(df -BG --output=avail "$WORK" | tail -1 | tr -dc 0-9)
+  echo "pi models on GPU $DEV ${pin[*]:-(unpinned)}, precisions: $precs, $free_gb GB free"
+  mkdir -p logs
+  run_model() {  # repo, then trace commands
+    local repo=$1; shift
+    HF_HUB_OFFLINE=0 "$PYPI" -c "from huggingface_hub import snapshot_download as d; d('$repo')" \
+      > /dev/null 2>&1 || { echo "FAILED: download $repo"; return; }
+    local a log
+    for a in "$@"; do
+      log="logs/$HOST-$(echo "$a" | tr -d ' -' | sed 's/\.py//')-$(date +%H%M%S).log"
+      echo "=== $a ($(date +%T)) -> $log"
+      # shellcheck disable=SC2086
+      "${pin[@]}" "$PYPI" workloads/$a > "$log" 2>&1 \
+        && grep -E "max \|diff\||tokens|graph profile|wrote" "$log" || echo "FAILED: $a (see $log)"
+    done
+    if [[ $free_gb -lt 40 ]]; then
+      rm -rf "$HF_HOME/hub/models--${repo//\//--}" && echo "removed $repo from the cache"
+    fi
+  }
+  for p in $precs; do
+    run_model lerobot/pi0_libero_finetuned_v044 "trace_pi.py --policy pi0 --precision $p"
+    run_model lerobot/pi05_libero_finetuned_v044 "trace_pi.py --policy pi05 --precision $p"
+    run_model lerobot/pi0fast-libero-v044 "trace_pi0fast.py --precision $p"
+  done
+  run_model lerobot/pi0_libero_finetuned_v044 "trace_pi.py --policy pi0 --precision fp16"
+  ;;
 trace-baseline)
   # One more baseline run (3 cameras, 10 steps, chunk 50) for run-to-run variance.
   export HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 CUDA_MODULE_LOADING=EAGER
@@ -253,7 +297,7 @@ results)
   git status --short results traces
   ;;
 *)
-  sed -n '2,29p' "$0"
+  sed -n '2,31p' "$0"
   exit 1
   ;;
 esac

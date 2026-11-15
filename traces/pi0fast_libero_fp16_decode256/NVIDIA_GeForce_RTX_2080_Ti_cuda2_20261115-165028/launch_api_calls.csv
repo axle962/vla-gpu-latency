@@ -1,0 +1,10 @@
+step,api,count
+0,cuLaunchKernel,36
+0,cudaDeviceGetAttribute,37
+0,cudaLaunchKernel,226405
+0,cudaMemcpyAsync,256
+0,cudaMemsetAsync,373
+0,cudaOccupancyMaxActiveBlocksPerMultiprocessor,90
+0,cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags,1
+0,cudaPeekAtLastError,4
+0,cudaStreamIsCapturing,81
