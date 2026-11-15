@@ -387,7 +387,10 @@ State:
     `/scratch/am16489/tmp/diff_cudnnbench` on cuda2/cuda5): 4070 346 -> 132 ms, 2080 Ti 152 ->
     106 ms. Kernel-level transfer breaks when the library picks a different algorithm per
     architecture; the model must either assume autotuned algorithms or predict the heuristic.
-    The A100 sweep (job 32740) also used the default; check which conv kernels it picked.
+    The A100 sweep (job 32740, default too) runs the generic `implicit_convolve_sgemm` (143 of
+    159 ms per 10-step run): with the default heuristic each of the four architectures
+    gets a different conv algorithm (Turing scudnn 128x64, Volta scudnn nhwc + layout
+    transposes, Ampere implicit_convolve_sgemm, Ada FFT).
 - **Next:**
   0. Decide whether to add a `--cudnn-benchmark` flag to `trace_diffusion.py` and rerun the
      diffusion sweep with it (CIMS ~25 min per host, A100 ~15 min), or keep the default and
