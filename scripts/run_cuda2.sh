@@ -21,6 +21,8 @@
 #   scripts/run_cuda2.sh more        # extra workloads: Diffusion Policy + ACT sweep, conv
 #                                    # dispatch rows (~45 min; downloads ~1.3 GB of weights)
 #   scripts/run_cuda2.sh diffbench   # Diffusion Policy sweep with cudnn.benchmark=True (~25 min)
+#   scripts/run_cuda2.sh extras      # SmolVLA batch sweep, torch.compile, GPU energy (~1.5 h)
+#   scripts/run_cuda2.sh rodinia     # Rodinia per-kernel times under nsys (scripts/rodinia.sh)
 #   scripts/run_cuda2.sh results     # list what to commit
 # Full instructions (also for a Claude Code session on cuda2): docs/cuda2_runbook.md
 #
@@ -188,6 +190,40 @@ for r in ("lerobot/diffusion_pusht", "lerobot/act_aloha_sim_transfer_cube_human"
       && grep -E "max \|diff\||graph profile|wrote" "$log" || echo "FAILED: $a (see $log)"
   done
   ;;
+extras)
+  # SmolVLA batch sweep (traces/smolvlabatch_*), torch.compile of the denoising loop
+  # (traces/smolvlacompile_*, workloads/trace_smolvla_compile.py) and GPU energy per inference
+  # (results/energy/, workloads/energy_smolvla.py). Pinned to the GPU's NUMA node.
+  export HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 CUDA_MODULE_LOADING=EAGER
+  export TORCHINDUCTOR_CACHE_DIR="$WORK/.cache/inductor" TRITON_CACHE_DIR="$WORK/.cache/triton"
+  pin=()
+  if command -v numactl >/dev/null; then
+    node=$(cat /sys/bus/pci/devices/0000:$(nvidia-smi -i "$DEV" --query-gpu=pci.bus_id \
+      --format=csv,noheader | cut -d: -f2-3 | tr 'A-F' 'a-f')/numa_node 2>/dev/null || echo -1)
+    [[ $node -ge 0 ]] && pin=(numactl --cpunodebind="$node" --membind="$node")
+  fi
+  echo "extras on GPU $DEV ${pin[*]:-(unpinned)}"
+  mkdir -p logs results/energy
+  for a in "trace_smolvla.py --batch 2" "trace_smolvla.py --batch 4" "trace_smolvla.py --batch 8" \
+           "trace_smolvla.py --batch 16" "trace_smolvla_compile.py" "trace_smolvla_compile.py" \
+           "trace_smolvla_compile.py --batch 8"; do
+    log="logs/$HOST-$(echo "$a" | tr -d ' -' | sed 's/\.py//')-$(date +%H%M%S).log"
+    echo "=== $a ($(date +%T)) -> $log"
+    # shellcheck disable=SC2086
+    "${pin[@]}" "$PY" workloads/$a > "$log" 2>&1 \
+      && grep -E "max \|diff\||compile\+warmup|graph profile|wrote" "$log" || echo "FAILED: $a (see $log)"
+  done
+  gname=$(nvidia-smi -i "$DEV" --query-gpu=name --format=csv,noheader | tr ' ' _)
+  for b in 1 8; do
+    e="results/energy/${gname}_${HOST}_b${b}_$(date +%Y%m%d-%H%M%S).csv"
+    echo "=== energy batch $b ($(date +%T)) -> $e"
+    "${pin[@]}" "$PY" workloads/energy_smolvla.py --batch $b > "$e" 2> "logs/$HOST-energy-b$b.log" \
+      && column -s, -t < "$e" || echo "FAILED: energy batch $b (see logs/$HOST-energy-b$b.log)"
+  done
+  ;;
+rodinia)
+  WORK="$WORK" scripts/rodinia.sh
+  ;;
 trace-baseline)
   # One more baseline run (3 cameras, 10 steps, chunk 50) for run-to-run variance.
   export HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 CUDA_MODULE_LOADING=EAGER
@@ -217,7 +253,7 @@ results)
   git status --short results traces
   ;;
 *)
-  sed -n '2,27p' "$0"
+  sed -n '2,29p' "$0"
   exit 1
   ;;
 esac

@@ -1,0 +1,1 @@
+10 flow steps, 11480 kernels each, NVIDIA GeForce RTX 2080 Ti, Nsight Systems

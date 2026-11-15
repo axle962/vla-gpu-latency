@@ -7,6 +7,8 @@
 #     l2-only     preflight l2 (L2 working-set sweep; builds the C++ benchmarks)
 #     more-only   preflight more (Diffusion Policy + ACT sweep; needs an earlier calib run)
 #     diffbench-only  preflight diffbench (Diffusion Policy sweep with cudnn.benchmark=True)
+#     extras-only preflight extras (SmolVLA batch sweep, torch.compile, GPU energy)
+#     rodinia-only    preflight rodinia (Rodinia per-kernel times, scripts/rodinia.sh)
 #     calib-only  preflight calib (C++ microbenchmarks only, e.g. for GPUs without tensor cores)
 # Start it detached so it survives the SSH session, for example from cuda2:
 #   ssh cuda3.cims.nyu.edu 'cd ~/fall2026/GPU/vla-gpu-latency && WORK=/scratch/$USER \
@@ -79,6 +81,10 @@ elif [[ $MODE == more-only ]]; then
   stage more gpu
 elif [[ $MODE == diffbench-only ]]; then
   stage diffbench gpu
+elif [[ $MODE == extras-only ]]; then
+  stage extras gpu
+elif [[ $MODE == rodinia-only ]]; then
+  stage rodinia gpu
 else
   stage setup
   stage calib gpu

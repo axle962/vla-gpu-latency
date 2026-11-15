@@ -1,10 +1,11 @@
-"""Trace SmolVLA (lerobot/smolvla_base, ~450M) inference at batch 1.
+"""Trace SmolVLA (lerobot/smolvla_base, ~450M) inference (batch 1 unless --batch).
 
 One "step" is one action-chunk inference: image preprocessing, the VLM prefix pass that fills
 the KV cache (SigLIP + 16 SmolVLM layers), then num_steps flow-matching denoising steps through
 the action expert. Tokenization happens once on the CPU and is not timed.
 
-Timed modes (all batch 1, same weights and inputs):
+Timed modes (same weights and inputs; --batch B > 1 repeats the observation B times and
+writes to traces/smolvlabatch_b<B>_*, kept apart from the batch-1 runs the model uses):
   eager           stock lerobot step (prepare_images + prepare_state + sample_actions)
   eager_prefix    prefix pass only (images -> KV cache)
   eager_denoise   denoising loop only, from a fixed KV cache
@@ -106,12 +107,13 @@ def build(args):
     dev = torch.device("cuda")
     gen = torch.Generator(device=dev).manual_seed(0)
     img_keys = list(cfg.image_features)[: args.cameras]
+    B = args.batch
     batch = {}
     for k in img_keys:
         c, h, w = cfg.image_features[k].shape
-        batch[k] = torch.rand(1, c, h, w, device=dev, generator=gen)
+        batch[k] = torch.rand(B, c, h, w, device=dev, generator=gen)
     state_dim = cfg.robot_state_feature.shape[0]
-    batch[OBS_STATE] = torch.rand(1, state_dim, device=dev, generator=gen)
+    batch[OBS_STATE] = torch.rand(B, state_dim, device=dev, generator=gen)
     tok = m.vlm_with_expert.processor.tokenizer
     enc = tok(
         INSTRUCTION + "\n",
@@ -120,10 +122,10 @@ def build(args):
         truncation=True,
         return_tensors="pt",
     )
-    batch[OBS_LANGUAGE_TOKENS] = enc["input_ids"].to(dev)
-    batch[OBS_LANGUAGE_ATTENTION_MASK] = enc["attention_mask"].to(dev).bool()
+    batch[OBS_LANGUAGE_TOKENS] = enc["input_ids"].to(dev).repeat(B, 1)
+    batch[OBS_LANGUAGE_ATTENTION_MASK] = enc["attention_mask"].to(dev).bool().repeat(B, 1)
     noise = torch.randn(
-        1, cfg.chunk_size, cfg.max_action_dim, device=dev, generator=gen, dtype=torch.float32
+        B, cfg.chunk_size, cfg.max_action_dim, device=dev, generator=gen, dtype=torch.float32
     )
     return policy, batch, noise, img_keys
 
@@ -134,6 +136,7 @@ def main() -> None:
     ap.add_argument("--num-steps", type=int, default=10, help="flow-matching steps")
     ap.add_argument("--chunk-size", type=int, default=50, help="action chunk length")
     ap.add_argument("--dtype", choices=["fp16", "stock"], default="fp16")
+    ap.add_argument("--batch", type=int, default=1, help="observations per inference")
     ap.add_argument("--warmup", type=int, default=5)
     ap.add_argument("--reps", type=int, default=30)
     ap.add_argument("--prof-steps", type=int, default=3)
@@ -172,7 +175,7 @@ def main() -> None:
 
     dt = -1.0 / cfg.num_steps
     times = [
-        torch.full((1,), 1.0 + s * dt, dtype=torch.float32, device="cuda")
+        torch.full((args.batch,), 1.0 + s * dt, dtype=torch.float32, device="cuda")
         for s in range(cfg.num_steps)
     ]
 
@@ -242,7 +245,7 @@ def main() -> None:
     meta = {
         "hf_model": MODEL_ID,
         "dtype": args.dtype,
-        "batch": 1,
+        "batch": args.batch,
         "cameras": len(img_keys),
         "image_keys": img_keys,
         "image_input_hw": list(cfg.image_features[img_keys[0]].shape[1:]),
@@ -259,9 +262,9 @@ def main() -> None:
         "graph_scope": "denoising loop only (prefix eager)",
         "tf32": False,
     }
-    out = args.out or default_out(
-        f"smolvla_cam{len(img_keys)}_steps{cfg.num_steps}_chunk{cfg.chunk_size}"
-    )
+    name = f"cam{len(img_keys)}_steps{cfg.num_steps}_chunk{cfg.chunk_size}"
+    name = f"smolvla_{name}" if args.batch == 1 else f"smolvlabatch_b{args.batch}_{name}"
+    out = args.out or default_out(name)
     profile_and_save(
         out, "smolvla", full_step, meta,
         warmup=args.warmup, reps=args.reps, prof_steps=args.prof_steps, extra_modes=extra,

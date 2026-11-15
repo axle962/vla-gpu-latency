@@ -1,0 +1,21 @@
+model,gpu,latency_ms,chunk_size,framework_note
+GR00T v1.7,RTX 4090,294.4,40,torch 2.7.1+cu128 (official env)
+GR00T v1.7,H100,180.2,40,torch 2.7.1+cu128 (official env)
+GR00T v1.7,H200,296.7,40,torch 2.7.1+cu128 (official env)
+GR00T v1.7,RTX PRO 6000,177.6,40,torch 2.7.1+cu128 (official env)
+GR00T v1.7,B300,47.2,40,torch 2.7.1+cu128 (official env)
+OpenVLA,RTX 4090,276.0,1,Python 3.12.3 torch 2.12.0.dev transformers 4.40.1
+OpenVLA,H100,173.1,1,Python 3.10.12 torch 2.7.1+cu128 transformers 4.40.1
+OpenVLA,H200,272.7,1,Python 3.10 torch via conda pytorch-cuda=12.4 transformers 4.40.1
+OpenVLA,RTX PRO 6000,173.2,1,Python 3.12.3 torch 2.12.0.dev transformers 4.40.1
+OpenVLA,B300,73.0,1,Python 3.12 torch 2.12.0+cu130 transformers 4.40.1
+PI-0.5,RTX 4090,76.1,15,JAX openpi (cuda12)
+PI-0.5,H100,44.2,15,JAX openpi (cuda12)
+PI-0.5,H200,49.3,15,JAX openpi (cuda12)
+PI-0.5,RTX PRO 6000,53.9,15,JAX openpi (cuda12)
+PI-0.5,B300,35.9,15,JAX 0.7.2 cuda13
+Lingbot-VLA,RTX 4090,10234.1,50,torch 2.12.1 flash_attn_2 (exceeds 24 GB: PCIe offload)
+Lingbot-VLA,H100,884.0,50,torch 2.12.1 flash_attn_2
+Lingbot-VLA,H200,583.4,50,torch 2.12.1 flash_attn_2
+Lingbot-VLA,RTX PRO 6000,460.3,50,torch 2.12.1 flash_attn_2
+Lingbot-VLA,B300,297.5,50,torch 2.12.1 flash_attn_2

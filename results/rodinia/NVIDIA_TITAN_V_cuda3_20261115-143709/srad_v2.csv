@@ -1,0 +1,3 @@
+Time (%),Total Time (ns),Instances,Avg (ns),Med (ns),Min (ns),Max (ns),StdDev (ns),Name
+53.1,4234492,20,211724.6,211790.0,210302,212446,488.7,"srad_cuda_2(float *, float *, float *, float *, float *, float *, int, int, float, float)"
+46.9,3745055,20,187252.8,187294.0,186110,188478,633.0,"srad_cuda_1(float *, float *, float *, float *, float *, float *, int, int, float)"

@@ -1,0 +1,3 @@
+Time (%),Total Time (ns),Instances,Avg (ns),Med (ns),Min (ns),Max (ns),StdDev (ns),Name
+97.8,110078600,1023,107603.7,107423.0,107199,109118,337.6,"Fan2(float *, float *, float *, int, int, int)"
+2.2,2473955,1023,2418.3,2656.0,1504,3167,405.1,"Fan1(float *, float *, int, int)"

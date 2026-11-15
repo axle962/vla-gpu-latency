@@ -1,0 +1,4 @@
+name, driver_version, clocks.max.sm [MHz]
+NVIDIA TITAN V, 580.196.07, 1912 MHz
+model name	: Intel(R) Xeon(R) Gold 5118 CPU @ 2.30GHz
+rodinia on GPU 1 numactl --cpunodebind=1 --membind=1
