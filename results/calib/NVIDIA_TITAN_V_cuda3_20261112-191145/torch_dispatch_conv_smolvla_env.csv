@@ -1,0 +1,16 @@
+gpu,bench,kernel,config,mode,timer,n_runs,mean_us,std_us,min_us,median_us,module_loading
+NVIDIA TITAN V,torch_dispatch,conv,conv1d;c=512x512;l=16;k=5;shape=diffusion_unet_512;kernels_per_op=6;torch=2.10.0+cu128;cuda=12.8;n_ops=400,eager,host,20,176.8797,0.5108,176.5904,176.6916,EAGER
+NVIDIA TITAN V,torch_dispatch,conv,conv1d;c=512x512;l=16;k=5;shape=diffusion_unet_512;kernels_per_op=6;torch=2.10.0+cu128;cuda=12.8;n_ops=400,issue,host,20,101.7816,0.3051,101.5929,101.6602,EAGER
+NVIDIA TITAN V,torch_dispatch,conv,conv1d;c=512x512;l=16;k=5;shape=diffusion_unet_512;kernels_per_op=6;torch=2.10.0+cu128;cuda=12.8;n_ops=400,graph,host,20,184.3194,0.0177,184.2912,184.3168,EAGER
+NVIDIA TITAN V,torch_dispatch,conv,conv1d;c=2048x2048;l=4;k=5;shape=diffusion_unet_2048;kernels_per_op=6;torch=2.10.0+cu128;cuda=12.8;n_ops=400,eager,host,20,934.6553,1.4509,933.3361,933.7720,EAGER
+NVIDIA TITAN V,torch_dispatch,conv,conv1d;c=2048x2048;l=4;k=5;shape=diffusion_unet_2048;kernels_per_op=6;torch=2.10.0+cu128;cuda=12.8;n_ops=400,issue,host,20,537.5169,0.8211,536.7038,537.0083,EAGER
+NVIDIA TITAN V,torch_dispatch,conv,conv1d;c=2048x2048;l=4;k=5;shape=diffusion_unet_2048;kernels_per_op=6;torch=2.10.0+cu128;cuda=12.8;n_ops=400,graph,host,20,939.6590,0.0238,939.6036,939.6606,EAGER
+NVIDIA TITAN V,torch_dispatch,conv,conv2d;c=64;hw=120x160;k=3;shape=act_layer1;kernels_per_op=2;torch=2.10.0+cu128;cuda=12.8;n_ops=400,eager,host,20,75.9872,0.2458,75.6995,75.9406,EAGER
+NVIDIA TITAN V,torch_dispatch,conv,conv2d;c=64;hw=120x160;k=3;shape=act_layer1;kernels_per_op=2;torch=2.10.0+cu128;cuda=12.8;n_ops=400,issue,host,20,28.4566,0.1336,28.2462,28.4551,EAGER
+NVIDIA TITAN V,torch_dispatch,conv,conv2d;c=64;hw=120x160;k=3;shape=act_layer1;kernels_per_op=2;torch=2.10.0+cu128;cuda=12.8;n_ops=400,graph,host,20,76.8767,0.1304,76.6805,76.8436,EAGER
+NVIDIA TITAN V,torch_dispatch,conv,conv2d;c=64;hw=24x24;k=3;shape=diffusion_layer1;kernels_per_op=2;torch=2.10.0+cu128;cuda=12.8;n_ops=400,eager,host,20,28.1349,0.0987,27.9833,28.1213,EAGER
+NVIDIA TITAN V,torch_dispatch,conv,conv2d;c=64;hw=24x24;k=3;shape=diffusion_layer1;kernels_per_op=2;torch=2.10.0+cu128;cuda=12.8;n_ops=400,issue,host,20,28.0696,0.0968,27.9194,28.0587,EAGER
+NVIDIA TITAN V,torch_dispatch,conv,conv2d;c=64;hw=24x24;k=3;shape=diffusion_layer1;kernels_per_op=2;torch=2.10.0+cu128;cuda=12.8;n_ops=400,graph,host,20,22.6023,0.0038,22.5947,22.6016,EAGER
+NVIDIA TITAN V,torch_dispatch,conv,conv2d;c=512;hw=15x20;k=3;shape=act_layer4;kernels_per_op=2;torch=2.10.0+cu128;cuda=12.8;n_ops=400,eager,host,20,170.0183,0.0311,169.9684,170.0102,EAGER
+NVIDIA TITAN V,torch_dispatch,conv,conv2d;c=512;hw=15x20;k=3;shape=act_layer4;kernels_per_op=2;torch=2.10.0+cu128;cuda=12.8;n_ops=400,issue,host,20,28.5760,0.1396,28.2619,28.5899,EAGER
+NVIDIA TITAN V,torch_dispatch,conv,conv2d;c=512;hw=15x20;k=3;shape=act_layer4;kernels_per_op=2;torch=2.10.0+cu128;cuda=12.8;n_ops=400,graph,host,20,171.7093,0.0263,171.6564,171.7086,EAGER

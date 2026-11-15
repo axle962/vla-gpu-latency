@@ -369,8 +369,29 @@ State:
     diffusion baseline is GPU bound, so p fits to 0 and the host-bound prefix came out -42%;
     the model now borrows SmolVLA's p on the same source host when the fit is < 1 us
     (`P_MIN_US`): prefix +6 to +11%, eager within 1%.
-  - Waiting on: `more` on cuda2/cuda3/cuda5 for cross-GPU errors of the new workloads.
+- **Extra workloads on the CIMS GPUs done 2026-11-15 00:20 to 00:55** (Claude Code on cuda2;
+  stage `more` on cuda2, `more-only` on cuda3 and cuda5, all GPUs idle, pinned to the GPU's
+  NUMA node; logs `logs/cuda{2,3,5}-more.log`). Conv dispatch rows in each host's latest calib
+  dir (`torch_dispatch_conv_smolvla_env.csv`); traces in `traces/{diffusion_steps*,act_res*}/`.
+  All 24 runs graph-vs-eager bit-exact (one 6e-8 FP32 diff, cuda2 diffusion 100 steps rep 2).
+  `model/summarize_traces.py` does not list these workloads yet (read `meta.json`).
+  - ACT (FP32, full step graphed), 480x640: eager 12.6 / 9.1 / 15.5 ms, graph 5.3 / 5.5 / 4.4
+    ms, speedup 2.4 / 1.6 / 3.5x on 2080 Ti / TITAN V / RTX 4070 (240x320: 3.1 / 2.6 / 6.8x).
+    Same inversion as SmolVLA: TITAN V fastest eager, 4070 slowest eager and fastest graph.
+  - Diffusion Policy (FP32, DDPM loop graphed) is GPU bound everywhere (busy 97 to 100%,
+    graph speedup 1.00): 10 steps 152 / 148 / 346 ms; 100 steps 1466 to 1485 / 1448 to 1451 /
+    3399 ms. **The RTX 4070 is 2.3x slower than the 2080 Ti because cuDNN's default heuristic
+    (`cudnn.benchmark=False`) picks FFT convolution on Ada** (`fft1d_r2c_32` + `gemvx`, 286 of
+    340 ms per step) while Turing/Volta run implicit-GEMM `scudnn` kernels. One-off check
+    (10 steps, wrapper setting `torch.backends.cudnn.benchmark=True`, outputs only in
+    `/scratch/am16489/tmp/diff_cudnnbench` on cuda2/cuda5): 4070 346 -> 132 ms, 2080 Ti 152 ->
+    106 ms. Kernel-level transfer breaks when the library picks a different algorithm per
+    architecture; the model must either assume autotuned algorithms or predict the heuristic.
+    The A100 sweep (job 32740) also used the default; check which conv kernels it picked.
 - **Next:**
+  0. Decide whether to add a `--cudnn-benchmark` flag to `trace_diffusion.py` and rerun the
+     diffusion sweep with it (CIMS ~25 min per host, A100 ~15 min), or keep the default and
+     present the FFT choice as a finding.
   1. Decide: paper default `slot_drv` instead of `slot_class` (better almost everywhere), and
      whether the headline moves to four GPUs. The residual 4070 eager error (~34%) is a
      host-side limitation: aten microbenchmarks on an old host overstate in-situ dispatch.

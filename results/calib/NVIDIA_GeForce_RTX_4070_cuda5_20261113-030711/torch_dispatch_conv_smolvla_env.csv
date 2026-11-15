@@ -1,0 +1,16 @@
+gpu,bench,kernel,config,mode,timer,n_runs,mean_us,std_us,min_us,median_us,module_loading
+NVIDIA GeForce RTX 4070,torch_dispatch,conv,conv1d;c=512x512;l=16;k=5;shape=diffusion_unet_512;kernels_per_op=2;torch=2.10.0+cu128;cuda=12.8;n_ops=400,eager,host,20,109.9405,57.3137,85.7472,86.0840,EAGER
+NVIDIA GeForce RTX 4070,torch_dispatch,conv,conv1d;c=512x512;l=16;k=5;shape=diffusion_unet_512;kernels_per_op=2;torch=2.10.0+cu128;cuda=12.8;n_ops=400,issue,host,20,109.8157,57.2642,85.6433,85.9960,EAGER
+NVIDIA GeForce RTX 4070,torch_dispatch,conv,conv1d;c=512x512;l=16;k=5;shape=diffusion_unet_512;kernels_per_op=2;torch=2.10.0+cu128;cuda=12.8;n_ops=400,graph,host,20,69.7948,0.0091,69.7855,69.7929,EAGER
+NVIDIA GeForce RTX 4070,torch_dispatch,conv,conv1d;c=2048x2048;l=4;k=5;shape=diffusion_unet_2048;kernels_per_op=5;torch=2.10.0+cu128;cuda=12.8;n_ops=400,eager,host,20,3609.4794,0.6942,3607.9554,3609.7841,EAGER
+NVIDIA GeForce RTX 4070,torch_dispatch,conv,conv1d;c=2048x2048;l=4;k=5;shape=diffusion_unet_2048;kernels_per_op=5;torch=2.10.0+cu128;cuda=12.8;n_ops=400,issue,host,20,538.6177,0.1094,538.3535,538.6632,EAGER
+NVIDIA GeForce RTX 4070,torch_dispatch,conv,conv1d;c=2048x2048;l=4;k=5;shape=diffusion_unet_2048;kernels_per_op=5;torch=2.10.0+cu128;cuda=12.8;n_ops=400,graph,host,20,3605.5065,0.0826,3605.3666,3605.4823,EAGER
+NVIDIA GeForce RTX 4070,torch_dispatch,conv,conv2d;c=64;hw=120x160;k=3;shape=act_layer1;kernels_per_op=2;torch=2.10.0+cu128;cuda=12.8;n_ops=400,eager,host,20,66.3803,0.2165,66.2692,66.2897,EAGER
+NVIDIA GeForce RTX 4070,torch_dispatch,conv,conv2d;c=64;hw=120x160;k=3;shape=act_layer1;kernels_per_op=2;torch=2.10.0+cu128;cuda=12.8;n_ops=400,issue,host,20,64.0913,0.1659,63.7924,64.1153,EAGER
+NVIDIA GeForce RTX 4070,torch_dispatch,conv,conv2d;c=64;hw=120x160;k=3;shape=act_layer1;kernels_per_op=2;torch=2.10.0+cu128;cuda=12.8;n_ops=400,graph,host,20,66.3640,0.6619,64.2335,66.4524,EAGER
+NVIDIA GeForce RTX 4070,torch_dispatch,conv,conv2d;c=64;hw=24x24;k=3;shape=diffusion_layer1;kernels_per_op=2;torch=2.10.0+cu128;cuda=12.8;n_ops=400,eager,host,20,63.5859,0.3733,63.0957,63.4401,EAGER
+NVIDIA GeForce RTX 4070,torch_dispatch,conv,conv2d;c=64;hw=24x24;k=3;shape=diffusion_layer1;kernels_per_op=2;torch=2.10.0+cu128;cuda=12.8;n_ops=400,issue,host,20,63.4953,0.3714,63.0092,63.3451,EAGER
+NVIDIA GeForce RTX 4070,torch_dispatch,conv,conv2d;c=64;hw=24x24;k=3;shape=diffusion_layer1;kernels_per_op=2;torch=2.10.0+cu128;cuda=12.8;n_ops=400,graph,host,20,11.0128,0.0133,11.0050,11.0075,EAGER
+NVIDIA GeForce RTX 4070,torch_dispatch,conv,conv2d;c=512;hw=15x20;k=3;shape=act_layer4;kernels_per_op=1;torch=2.10.0+cu128;cuda=12.8;n_ops=400,eager,host,20,215.0623,0.7717,213.4960,214.8840,EAGER
+NVIDIA GeForce RTX 4070,torch_dispatch,conv,conv2d;c=512;hw=15x20;k=3;shape=act_layer4;kernels_per_op=1;torch=2.10.0+cu128;cuda=12.8;n_ops=400,issue,host,20,54.2787,0.1982,53.9604,54.2496,EAGER
+NVIDIA GeForce RTX 4070,torch_dispatch,conv,conv2d;c=512;hw=15x20;k=3;shape=act_layer4;kernels_per_op=1;torch=2.10.0+cu128;cuda=12.8;n_ops=400,graph,host,20,215.0521,0.8879,214.1595,214.5002,EAGER

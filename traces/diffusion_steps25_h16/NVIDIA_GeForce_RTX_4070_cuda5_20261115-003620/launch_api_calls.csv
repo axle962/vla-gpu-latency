@@ -1,0 +1,16 @@
+step,api,count
+0,cudaEventRecord,2000
+0,cudaLaunchKernel,7227
+0,cudaMemcpyAsync,350
+0,cudaPeekAtLastError,26
+0,cudaStreamWaitEvent,3400
+1,cudaEventRecord,2000
+1,cudaLaunchKernel,7227
+1,cudaMemcpyAsync,350
+1,cudaPeekAtLastError,26
+1,cudaStreamWaitEvent,3400
+2,cudaEventRecord,2000
+2,cudaLaunchKernel,7227
+2,cudaMemcpyAsync,350
+2,cudaPeekAtLastError,26
+2,cudaStreamWaitEvent,3400

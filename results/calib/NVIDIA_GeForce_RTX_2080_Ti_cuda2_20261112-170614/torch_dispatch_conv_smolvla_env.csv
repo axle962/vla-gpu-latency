@@ -1,0 +1,16 @@
+gpu,bench,kernel,config,mode,timer,n_runs,mean_us,std_us,min_us,median_us,module_loading
+NVIDIA GeForce RTX 2080 Ti,torch_dispatch,conv,conv1d;c=512x512;l=16;k=5;shape=diffusion_unet_512;kernels_per_op=3;torch=2.10.0+cu128;cuda=12.8;n_ops=400,eager,host,20,207.0679,0.6857,205.6758,207.1135,EAGER
+NVIDIA GeForce RTX 2080 Ti,torch_dispatch,conv,conv1d;c=512x512;l=16;k=5;shape=diffusion_unet_512;kernels_per_op=3;torch=2.10.0+cu128;cuda=12.8;n_ops=400,issue,host,20,77.4404,0.6381,76.8471,77.2815,EAGER
+NVIDIA GeForce RTX 2080 Ti,torch_dispatch,conv,conv1d;c=512x512;l=16;k=5;shape=diffusion_unet_512;kernels_per_op=3;torch=2.10.0+cu128;cuda=12.8;n_ops=400,graph,host,20,207.5907,0.3674,207.3729,207.4560,EAGER
+NVIDIA GeForce RTX 2080 Ti,torch_dispatch,conv,conv1d;c=2048x2048;l=4;k=5;shape=diffusion_unet_2048;kernels_per_op=3;torch=2.10.0+cu128;cuda=12.8;n_ops=400,eager,host,20,871.3508,0.0338,871.2988,871.3460,EAGER
+NVIDIA GeForce RTX 2080 Ti,torch_dispatch,conv,conv1d;c=2048x2048;l=4;k=5;shape=diffusion_unet_2048;kernels_per_op=3;torch=2.10.0+cu128;cuda=12.8;n_ops=400,issue,host,20,128.9735,0.0348,128.8647,128.9831,EAGER
+NVIDIA GeForce RTX 2080 Ti,torch_dispatch,conv,conv1d;c=2048x2048;l=4;k=5;shape=diffusion_unet_2048;kernels_per_op=3;torch=2.10.0+cu128;cuda=12.8;n_ops=400,graph,host,20,875.4485,0.1084,875.2469,875.4670,EAGER
+NVIDIA GeForce RTX 2080 Ti,torch_dispatch,conv,conv2d;c=64;hw=120x160;k=3;shape=act_layer1;kernels_per_op=2;torch=2.10.0+cu128;cuda=12.8;n_ops=400,eager,host,20,94.3338,0.5985,93.3373,94.5437,EAGER
+NVIDIA GeForce RTX 2080 Ti,torch_dispatch,conv,conv2d;c=64;hw=120x160;k=3;shape=act_layer1;kernels_per_op=2;torch=2.10.0+cu128;cuda=12.8;n_ops=400,issue,host,20,44.5883,0.1168,44.3173,44.5860,EAGER
+NVIDIA GeForce RTX 2080 Ti,torch_dispatch,conv,conv2d;c=64;hw=120x160;k=3;shape=act_layer1;kernels_per_op=2;torch=2.10.0+cu128;cuda=12.8;n_ops=400,graph,host,20,93.9522,0.5374,92.8744,94.2017,EAGER
+NVIDIA GeForce RTX 2080 Ti,torch_dispatch,conv,conv2d;c=64;hw=24x24;k=3;shape=diffusion_layer1;kernels_per_op=2;torch=2.10.0+cu128;cuda=12.8;n_ops=400,eager,host,20,44.1949,0.1482,43.9962,44.1724,EAGER
+NVIDIA GeForce RTX 2080 Ti,torch_dispatch,conv,conv2d;c=64;hw=24x24;k=3;shape=diffusion_layer1;kernels_per_op=2;torch=2.10.0+cu128;cuda=12.8;n_ops=400,issue,host,20,44.1028,0.1453,43.9044,44.0832,EAGER
+NVIDIA GeForce RTX 2080 Ti,torch_dispatch,conv,conv2d;c=64;hw=24x24;k=3;shape=diffusion_layer1;kernels_per_op=2;torch=2.10.0+cu128;cuda=12.8;n_ops=400,graph,host,20,16.0723,0.0027,16.0682,16.0716,EAGER
+NVIDIA GeForce RTX 2080 Ti,torch_dispatch,conv,conv2d;c=512;hw=15x20;k=3;shape=act_layer4;kernels_per_op=2;torch=2.10.0+cu128;cuda=12.8;n_ops=400,eager,host,20,166.5950,0.9337,164.2429,166.7505,EAGER
+NVIDIA GeForce RTX 2080 Ti,torch_dispatch,conv,conv2d;c=512;hw=15x20;k=3;shape=act_layer4;kernels_per_op=2;torch=2.10.0+cu128;cuda=12.8;n_ops=400,issue,host,20,44.7947,0.2100,44.4092,44.8010,EAGER
+NVIDIA GeForce RTX 2080 Ti,torch_dispatch,conv,conv2d;c=512;hw=15x20;k=3;shape=act_layer4;kernels_per_op=2;torch=2.10.0+cu128;cuda=12.8;n_ops=400,graph,host,20,166.5075,0.6241,165.8198,166.2745,EAGER
