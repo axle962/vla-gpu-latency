@@ -578,14 +578,31 @@ State:
     without the env server. nvcc 12.8 in `/scratch/am16489/.tools/cuda128`; RoboTwin source +
     assets (commit 0aeea2d) in `/scratch/am16489/ext/RoboTwin`; recipe files in
     `/scratch/am16489/ext/robotwin_recipe`.
+    Fixes needed on top of the recipe: CUDA headers (`CPATH` to conda's `targets/x86_64-linux`),
+    lerobot's `dataset` extra, and pins in `envs/robotwin/overrides.txt`: **numpy 1.26.4**
+    (mplib 0.2.1 is built for numpy<2 and segfaults in `Pose()` on numpy 2 arrays, which is why
+    lerobot's Docker keeps RoboTwin in a separate env; lerobot 0.7.0 asks for numpy>=2 but its
+    eval path runs on 1.26), torchcodec 0.4.0 (matches torch 2.7; unusable anyway, no system
+    FFmpeg, and not needed for eval), pyarrow 25.0.0 (26 refuses numpy 1.x). SAPIEN's Vulkan
+    rendering works on the A100 nodes, also after torch has initialized CUDA (job 34149).
+  - **RoboTwin step 3, smoke test done** (job 34207, b-19-25, `scripts/cluster/robotwin_eval.sbatch`,
+    `results/robotwin/smoke_34207/`): `lerobot/smolvla_robotwin` on `beat_block_hammer`,
+    5 episodes, **2 / 5 success (40%, CI 12 to 77%)**. The checkpoint needs `--rename_map`
+    (head/left/right_camera -> camera1/2/3, from its `train_config.json`) and 480x640 frames
+    (it was trained at 480x640; the simulator default is 240x320). **Cost: 430 s per episode
+    on one A100** (36 min for 5; episodes run up to 1200 steps), so 100 episodes ~12 GPU-h per
+    (task, delay) point: the plan's 5 to 15 GPU-h covers about one point, not a delay sweep.
+    Not started: delay model port (lerobot 0.7 rollout), parallel envs (`eval.batch_size` > 1;
+    the A100 node has 12 CPUs), the RoboTwin-shape latency trace. Waiting for the user to pick
+    the scope.
 - **Next:**
   1. Paper and slides (deferred by the user until the teammates' work is merged): move the
      headline to `slot_drv` on four GPUs, add ACT/Diffusion (three regimes: dispatch bound,
      mixed, GPU bound) and the cuDNN algorithm-selection finding; verify bibliography; compile
      on Overleaf.
-  2. RoboTwin steps 2 and 3 (cluster).
+  2. RoboTwin: scope decision (see the smoke-test bullet), then delay sweep and latency trace.
   3. Optional: spec-only what-if predictions for H100/H200/L40S remain a stated limitation.
-- GPU-hours used on `csci_ga_3033_025-2026fa`: 4.07 of 300 (2026-11-16).
+- GPU-hours used on `csci_ga_3033_025-2026fa`: 4.81 of 300 (2026-11-16).
 - Pending for the user (CIMS): see "Needs the user" in section 1 and the cuda2 commands in
   section 6. The user asked for a full "what to run on cuda machines and elsewhere" list once
   the cluster runs are finished.

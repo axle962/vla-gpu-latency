@@ -3,7 +3,7 @@
 # robotwin_native stage of lerobot's docker/Dockerfile.sim (lerobot main, 2026-11-16):
 # CUDA 12.8 nvcc, torch 2.7.1, pinned RoboTwin commit + assets, CuRobo v0.7.8 (sm_80 only),
 # pytorch3d, RoboTwin's mplib/SAPIEN patches. Unlike the Dockerfile, the policy side
-# (lerobot[smolvla]==0.7.0, which accepts torch>=2.7) goes into the same venv, so lerobot-eval
+# (lerobot[smolvla,dataset]==0.7.0, which accepts torch>=2.7) goes into the same venv, so lerobot-eval
 # runs the simulator in-process and no env server is needed.
 #   source scripts/cluster/site.sh
 #   sbatch -p n2c48m24 scripts/cluster/robotwin_build.sbatch     # CPU partition: no GPU-hours
@@ -42,9 +42,15 @@ if [ ! -x "$ENV/bin/python" ]; then
   uv venv -p 3.12 "$ENV"
 fi
 export VIRTUAL_ENV=$ENV PATH="$ENV/bin:$PATH"
+# Conda's CUDA packages keep headers/libs under targets/x86_64-linux, not $CUDA_HOME/include, and
+# torch's extension builder only adds $CUDA_HOME/include; torch's own nvidia/* wheels carry the
+# cuBLAS/cuSPARSE/... headers that ATen's CUDA headers include.
+NV_INC=$(ls -d "$ENV"/lib/python3.12/site-packages/nvidia/*/include 2> /dev/null | tr '\n' ':')
+export CPATH="$CUDA/targets/x86_64-linux/include:${NV_INC}${CPATH:-}"
+export LIBRARY_PATH="$CUDA/targets/x86_64-linux/lib:$CUDA/lib:${LIBRARY_PATH:-}"
 
 if ! done_ base; then
-  uv pip install "numpy==2.2.6" "gymnasium==1.4.0" pyyaml termcolor
+  uv pip install "numpy==1.26.4" "gymnasium==1.4.0" pyyaml termcolor
   uv pip install "torch==2.7.1" "torchvision==0.22.1" "setuptools<82" av scipy ninja
   uv pip install "sapien==3.0.0b1" "mplib==0.2.1" "transforms3d==0.4.2" "trimesh==4.4.3" \
     "opencv-python-headless==4.10.0.84" "open3d==0.19.0" "imageio==2.34.2" termcolor zarr \
@@ -109,9 +115,11 @@ EOF
 fi
 
 if ! done_ lerobot; then
-  # Policy side in the same venv; keep RoboTwin's torch 2.7.1 (lerobot 0.7.0 allows >=2.7).
-  printf 'torch==2.7.1\ntorchvision==0.22.1\nnumpy==2.2.6\n' > "$ENV/overrides.txt"
-  uv pip install --override "$ENV/overrides.txt" "lerobot[smolvla]==0.7.0" "eclipse-zenoh==1.10.1" msgpack
+  # Policy side in the same venv; keep RoboTwin's torch 2.7.1 (lerobot 0.7.0 allows >=2.7) and
+  # numpy 1.26.4: mplib 0.2.1 is built for numpy<2 and segfaults on numpy 2 arrays, although
+  # lerobot asks for numpy>=2. torchcodec 0.4 matches torch 2.7; pyarrow 26 refuses numpy 1.x.
+  printf 'torch==2.7.1\ntorchvision==0.22.1\nnumpy==1.26.4\ntorchcodec==0.4.0\npyarrow==25.0.0\n' > "$ENV/overrides.txt"
+  uv pip install --override "$ENV/overrides.txt" "lerobot[smolvla,dataset]==0.7.0" "eclipse-zenoh==1.10.1" msgpack
   mark lerobot
 fi
 
