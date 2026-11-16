@@ -1,0 +1,104 @@
+policy,precision,suite,task_id,episode,delay_steps,exec_horizon,success,steps,inferences,infer_ms_median,episode_s,gpu,host,task
+smolvla,fp16,libero_10,0,0,10,50,0,520,13,300.2,21.7,NVIDIA TITAN V,cuda3,put both the alphabet soup and the tomato sauce in the basket
+smolvla,fp16,libero_10,0,1,10,50,0,520,13,301.2,20.6,NVIDIA TITAN V,cuda3,put both the alphabet soup and the tomato sauce in the basket
+smolvla,fp16,libero_10,0,2,10,50,0,520,13,301.1,19.9,NVIDIA TITAN V,cuda3,put both the alphabet soup and the tomato sauce in the basket
+smolvla,fp16,libero_10,0,3,10,50,0,520,13,301.6,19.9,NVIDIA TITAN V,cuda3,put both the alphabet soup and the tomato sauce in the basket
+smolvla,fp16,libero_10,0,4,10,50,0,520,13,301.8,21.1,NVIDIA TITAN V,cuda3,put both the alphabet soup and the tomato sauce in the basket
+smolvla,fp16,libero_10,0,5,10,50,0,520,13,300.8,20.5,NVIDIA TITAN V,cuda3,put both the alphabet soup and the tomato sauce in the basket
+smolvla,fp16,libero_10,0,6,10,50,0,520,13,303.9,20.2,NVIDIA TITAN V,cuda3,put both the alphabet soup and the tomato sauce in the basket
+smolvla,fp16,libero_10,0,7,10,50,0,520,13,395.2,22.0,NVIDIA TITAN V,cuda3,put both the alphabet soup and the tomato sauce in the basket
+smolvla,fp16,libero_10,0,8,10,50,0,520,13,300.9,20.0,NVIDIA TITAN V,cuda3,put both the alphabet soup and the tomato sauce in the basket
+smolvla,fp16,libero_10,0,9,10,50,0,520,13,304.8,20.1,NVIDIA TITAN V,cuda3,put both the alphabet soup and the tomato sauce in the basket
+smolvla,fp16,libero_10,0,0,15,50,0,520,15,300.8,21.9,NVIDIA TITAN V,cuda3,put both the alphabet soup and the tomato sauce in the basket
+smolvla,fp16,libero_10,0,1,15,50,0,520,15,394.9,23.8,NVIDIA TITAN V,cuda3,put both the alphabet soup and the tomato sauce in the basket
+smolvla,fp16,libero_10,0,2,15,50,0,520,15,301.2,20.8,NVIDIA TITAN V,cuda3,put both the alphabet soup and the tomato sauce in the basket
+smolvla,fp16,libero_10,0,3,15,50,1,255,8,303.2,12.9,NVIDIA TITAN V,cuda3,put both the alphabet soup and the tomato sauce in the basket
+smolvla,fp16,libero_10,0,4,15,50,0,520,15,304.3,20.8,NVIDIA TITAN V,cuda3,put both the alphabet soup and the tomato sauce in the basket
+smolvla,fp16,libero_10,0,5,15,50,0,520,15,301.9,21.0,NVIDIA TITAN V,cuda3,put both the alphabet soup and the tomato sauce in the basket
+smolvla,fp16,libero_10,0,6,15,50,0,520,15,301.5,20.7,NVIDIA TITAN V,cuda3,put both the alphabet soup and the tomato sauce in the basket
+smolvla,fp16,libero_10,0,7,15,50,0,520,15,300.6,21.3,NVIDIA TITAN V,cuda3,put both the alphabet soup and the tomato sauce in the basket
+smolvla,fp16,libero_10,0,8,15,50,0,520,15,302.4,20.7,NVIDIA TITAN V,cuda3,put both the alphabet soup and the tomato sauce in the basket
+smolvla,fp16,libero_10,0,9,15,50,0,520,15,302.4,22.2,NVIDIA TITAN V,cuda3,put both the alphabet soup and the tomato sauce in the basket
+smolvla,fp16,libero_10,0,0,20,50,1,269,9,300.2,13.5,NVIDIA TITAN V,cuda3,put both the alphabet soup and the tomato sauce in the basket
+smolvla,fp16,libero_10,0,1,20,50,0,520,18,301.6,21.6,NVIDIA TITAN V,cuda3,put both the alphabet soup and the tomato sauce in the basket
+smolvla,fp16,libero_10,0,2,20,50,0,520,18,304.3,21.8,NVIDIA TITAN V,cuda3,put both the alphabet soup and the tomato sauce in the basket
+smolvla,fp16,libero_10,0,3,20,50,0,520,18,304.7,23.3,NVIDIA TITAN V,cuda3,put both the alphabet soup and the tomato sauce in the basket
+smolvla,fp16,libero_10,0,4,20,50,0,520,18,300.5,22.1,NVIDIA TITAN V,cuda3,put both the alphabet soup and the tomato sauce in the basket
+smolvla,fp16,libero_10,0,5,20,50,0,520,18,305.4,22.0,NVIDIA TITAN V,cuda3,put both the alphabet soup and the tomato sauce in the basket
+smolvla,fp16,libero_10,0,6,20,50,0,520,18,304.8,21.8,NVIDIA TITAN V,cuda3,put both the alphabet soup and the tomato sauce in the basket
+smolvla,fp16,libero_10,0,7,20,50,0,520,18,301.9,22.1,NVIDIA TITAN V,cuda3,put both the alphabet soup and the tomato sauce in the basket
+smolvla,fp16,libero_10,0,8,20,50,0,520,18,301.5,21.6,NVIDIA TITAN V,cuda3,put both the alphabet soup and the tomato sauce in the basket
+smolvla,fp16,libero_10,0,9,20,50,1,265,9,394.9,14.8,NVIDIA TITAN V,cuda3,put both the alphabet soup and the tomato sauce in the basket
+smolvla,fp16,libero_10,1,0,10,50,1,233,6,307.7,11.2,NVIDIA TITAN V,cuda3,put both the cream cheese box and the butter in the basket
+smolvla,fp16,libero_10,1,1,10,50,0,520,13,302.2,20.7,NVIDIA TITAN V,cuda3,put both the cream cheese box and the butter in the basket
+smolvla,fp16,libero_10,1,2,10,50,1,238,6,305.0,11.3,NVIDIA TITAN V,cuda3,put both the cream cheese box and the butter in the basket
+smolvla,fp16,libero_10,1,3,10,50,0,520,13,301.7,19.9,NVIDIA TITAN V,cuda3,put both the cream cheese box and the butter in the basket
+smolvla,fp16,libero_10,1,4,10,50,1,241,7,301.9,11.7,NVIDIA TITAN V,cuda3,put both the cream cheese box and the butter in the basket
+smolvla,fp16,libero_10,1,5,10,50,0,520,13,304.3,20.1,NVIDIA TITAN V,cuda3,put both the cream cheese box and the butter in the basket
+smolvla,fp16,libero_10,1,6,10,50,1,228,6,304.8,11.0,NVIDIA TITAN V,cuda3,put both the cream cheese box and the butter in the basket
+smolvla,fp16,libero_10,1,7,10,50,1,232,6,302.2,11.1,NVIDIA TITAN V,cuda3,put both the cream cheese box and the butter in the basket
+smolvla,fp16,libero_10,1,8,10,50,0,520,13,301.2,20.1,NVIDIA TITAN V,cuda3,put both the cream cheese box and the butter in the basket
+smolvla,fp16,libero_10,1,9,10,50,1,224,6,300.8,10.8,NVIDIA TITAN V,cuda3,put both the cream cheese box and the butter in the basket
+smolvla,fp16,libero_10,1,0,15,50,1,232,7,300.2,11.4,NVIDIA TITAN V,cuda3,put both the cream cheese box and the butter in the basket
+smolvla,fp16,libero_10,1,1,15,50,0,520,15,304.2,21.5,NVIDIA TITAN V,cuda3,put both the cream cheese box and the butter in the basket
+smolvla,fp16,libero_10,1,2,15,50,0,520,15,304.2,21.9,NVIDIA TITAN V,cuda3,put both the cream cheese box and the butter in the basket
+smolvla,fp16,libero_10,1,3,15,50,0,520,15,301.8,21.8,NVIDIA TITAN V,cuda3,put both the cream cheese box and the butter in the basket
+smolvla,fp16,libero_10,1,4,15,50,0,520,15,300.9,20.7,NVIDIA TITAN V,cuda3,put both the cream cheese box and the butter in the basket
+smolvla,fp16,libero_10,1,5,15,50,1,406,12,301.7,18.8,NVIDIA TITAN V,cuda3,put both the cream cheese box and the butter in the basket
+smolvla,fp16,libero_10,1,6,15,50,0,520,15,300.9,20.9,NVIDIA TITAN V,cuda3,put both the cream cheese box and the butter in the basket
+smolvla,fp16,libero_10,1,7,15,50,0,520,15,300.6,21.9,NVIDIA TITAN V,cuda3,put both the cream cheese box and the butter in the basket
+smolvla,fp16,libero_10,1,8,15,50,0,520,15,303.6,20.8,NVIDIA TITAN V,cuda3,put both the cream cheese box and the butter in the basket
+smolvla,fp16,libero_10,1,9,15,50,1,243,7,302.8,11.8,NVIDIA TITAN V,cuda3,put both the cream cheese box and the butter in the basket
+smolvla,fp16,libero_10,1,0,20,50,1,238,8,301.4,11.9,NVIDIA TITAN V,cuda3,put both the cream cheese box and the butter in the basket
+smolvla,fp16,libero_10,1,1,20,50,0,520,18,300.8,22.1,NVIDIA TITAN V,cuda3,put both the cream cheese box and the butter in the basket
+smolvla,fp16,libero_10,1,2,20,50,1,238,8,300.6,11.8,NVIDIA TITAN V,cuda3,put both the cream cheese box and the butter in the basket
+smolvla,fp16,libero_10,1,3,20,50,0,520,18,302.5,22.1,NVIDIA TITAN V,cuda3,put both the cream cheese box and the butter in the basket
+smolvla,fp16,libero_10,1,4,20,50,1,232,8,302.0,11.7,NVIDIA TITAN V,cuda3,put both the cream cheese box and the butter in the basket
+smolvla,fp16,libero_10,1,5,20,50,0,520,18,305.5,22.3,NVIDIA TITAN V,cuda3,put both the cream cheese box and the butter in the basket
+smolvla,fp16,libero_10,1,6,20,50,1,236,8,302.2,11.8,NVIDIA TITAN V,cuda3,put both the cream cheese box and the butter in the basket
+smolvla,fp16,libero_10,1,7,20,50,1,240,8,300.2,11.9,NVIDIA TITAN V,cuda3,put both the cream cheese box and the butter in the basket
+smolvla,fp16,libero_10,1,8,20,50,0,520,18,304.9,22.9,NVIDIA TITAN V,cuda3,put both the cream cheese box and the butter in the basket
+smolvla,fp16,libero_10,1,9,20,50,0,520,18,301.1,22.1,NVIDIA TITAN V,cuda3,put both the cream cheese box and the butter in the basket
+smolvla,fp16,libero_10,2,0,10,50,1,230,6,300.5,9.2,NVIDIA TITAN V,cuda3,turn on the stove and put the moka pot on it
+smolvla,fp16,libero_10,2,1,10,50,1,233,6,302.0,9.3,NVIDIA TITAN V,cuda3,turn on the stove and put the moka pot on it
+smolvla,fp16,libero_10,2,2,10,50,1,236,6,300.6,9.4,NVIDIA TITAN V,cuda3,turn on the stove and put the moka pot on it
+smolvla,fp16,libero_10,2,3,10,50,0,520,13,300.5,18.5,NVIDIA TITAN V,cuda3,turn on the stove and put the moka pot on it
+smolvla,fp16,libero_10,2,4,10,50,1,234,6,302.1,9.4,NVIDIA TITAN V,cuda3,turn on the stove and put the moka pot on it
+smolvla,fp16,libero_10,2,5,10,50,0,520,13,395.1,20.9,NVIDIA TITAN V,cuda3,turn on the stove and put the moka pot on it
+smolvla,fp16,libero_10,2,6,10,50,1,246,7,304.4,10.1,NVIDIA TITAN V,cuda3,turn on the stove and put the moka pot on it
+smolvla,fp16,libero_10,2,7,10,50,0,520,13,300.8,17.6,NVIDIA TITAN V,cuda3,turn on the stove and put the moka pot on it
+smolvla,fp16,libero_10,2,8,10,50,1,221,6,301.4,9.0,NVIDIA TITAN V,cuda3,turn on the stove and put the moka pot on it
+smolvla,fp16,libero_10,2,9,10,50,1,231,6,303.9,9.3,NVIDIA TITAN V,cuda3,turn on the stove and put the moka pot on it
+smolvla,fp16,libero_10,2,0,15,50,1,247,8,304.9,10.4,NVIDIA TITAN V,cuda3,turn on the stove and put the moka pot on it
+smolvla,fp16,libero_10,2,1,15,50,1,234,7,302.2,9.7,NVIDIA TITAN V,cuda3,turn on the stove and put the moka pot on it
+smolvla,fp16,libero_10,2,2,15,50,1,241,7,301.1,9.9,NVIDIA TITAN V,cuda3,turn on the stove and put the moka pot on it
+smolvla,fp16,libero_10,2,3,15,50,1,235,7,301.2,9.7,NVIDIA TITAN V,cuda3,turn on the stove and put the moka pot on it
+smolvla,fp16,libero_10,2,4,15,50,0,520,15,302.6,19.2,NVIDIA TITAN V,cuda3,turn on the stove and put the moka pot on it
+smolvla,fp16,libero_10,2,5,15,50,1,249,8,300.8,10.4,NVIDIA TITAN V,cuda3,turn on the stove and put the moka pot on it
+smolvla,fp16,libero_10,2,6,15,50,1,254,8,301.2,10.5,NVIDIA TITAN V,cuda3,turn on the stove and put the moka pot on it
+smolvla,fp16,libero_10,2,7,15,50,1,223,7,301.3,9.3,NVIDIA TITAN V,cuda3,turn on the stove and put the moka pot on it
+smolvla,fp16,libero_10,2,8,15,50,1,224,7,301.1,9.4,NVIDIA TITAN V,cuda3,turn on the stove and put the moka pot on it
+smolvla,fp16,libero_10,2,9,15,50,1,229,7,302.3,9.5,NVIDIA TITAN V,cuda3,turn on the stove and put the moka pot on it
+smolvla,fp16,libero_10,2,0,20,50,1,245,9,300.4,10.5,NVIDIA TITAN V,cuda3,turn on the stove and put the moka pot on it
+smolvla,fp16,libero_10,2,1,20,50,1,227,8,304.2,9.8,NVIDIA TITAN V,cuda3,turn on the stove and put the moka pot on it
+smolvla,fp16,libero_10,2,2,20,50,1,227,8,301.7,9.8,NVIDIA TITAN V,cuda3,turn on the stove and put the moka pot on it
+smolvla,fp16,libero_10,2,3,20,50,0,520,18,300.3,20.0,NVIDIA TITAN V,cuda3,turn on the stove and put the moka pot on it
+smolvla,fp16,libero_10,2,4,20,50,1,245,9,301.4,10.6,NVIDIA TITAN V,cuda3,turn on the stove and put the moka pot on it
+smolvla,fp16,libero_10,2,5,20,50,0,520,18,394.9,22.6,NVIDIA TITAN V,cuda3,turn on the stove and put the moka pot on it
+smolvla,fp16,libero_10,2,6,20,50,1,253,9,300.2,10.8,NVIDIA TITAN V,cuda3,turn on the stove and put the moka pot on it
+smolvla,fp16,libero_10,2,7,20,50,1,249,9,301.9,10.7,NVIDIA TITAN V,cuda3,turn on the stove and put the moka pot on it
+smolvla,fp16,libero_10,2,8,20,50,1,213,8,394.4,10.6,NVIDIA TITAN V,cuda3,turn on the stove and put the moka pot on it
+smolvla,fp16,libero_10,2,9,20,50,1,245,9,304.3,10.6,NVIDIA TITAN V,cuda3,turn on the stove and put the moka pot on it
+smolvla,fp16,libero_10,3,0,10,50,1,270,7,301.9,11.9,NVIDIA TITAN V,cuda3,put the black bowl in the bottom drawer of the cabinet and close it
+smolvla,fp16,libero_10,3,1,10,50,0,520,13,300.0,21.7,NVIDIA TITAN V,cuda3,put the black bowl in the bottom drawer of the cabinet and close it
+smolvla,fp16,libero_10,3,2,10,50,1,220,6,301.4,9.9,NVIDIA TITAN V,cuda3,put the black bowl in the bottom drawer of the cabinet and close it
+smolvla,fp16,libero_10,3,3,10,50,1,210,6,305.4,9.6,NVIDIA TITAN V,cuda3,put the black bowl in the bottom drawer of the cabinet and close it
+smolvla,fp16,libero_10,3,4,10,50,1,219,6,303.6,9.8,NVIDIA TITAN V,cuda3,put the black bowl in the bottom drawer of the cabinet and close it
+smolvla,fp16,libero_10,3,5,10,50,1,213,6,301.8,9.8,NVIDIA TITAN V,cuda3,put the black bowl in the bottom drawer of the cabinet and close it
+smolvla,fp16,libero_10,3,6,10,50,1,248,7,302.3,11.0,NVIDIA TITAN V,cuda3,put the black bowl in the bottom drawer of the cabinet and close it
+smolvla,fp16,libero_10,3,7,10,50,0,520,13,303.4,20.6,NVIDIA TITAN V,cuda3,put the black bowl in the bottom drawer of the cabinet and close it
+smolvla,fp16,libero_10,3,8,10,50,1,217,6,301.4,9.8,NVIDIA TITAN V,cuda3,put the black bowl in the bottom drawer of the cabinet and close it
+smolvla,fp16,libero_10,3,9,10,50,1,230,6,302.4,10.0,NVIDIA TITAN V,cuda3,put the black bowl in the bottom drawer of the cabinet and close it
+smolvla,fp16,libero_10,3,0,15,50,0,520,15,304.4,21.0,NVIDIA TITAN V,cuda3,put the black bowl in the bottom drawer of the cabinet and close it
+smolvla,fp16,libero_10,3,1,15,50,1,224,7,301.3,10.2,NVIDIA TITAN V,cuda3,put the black bowl in the bottom drawer of the cabinet and close it
+smolvla,fp16,libero_10,3,2,15,50,1,218,7,304.1,10.0,NVIDIA TITAN V,cuda3,put the black bowl in the bottom drawer of the cabinet and close it

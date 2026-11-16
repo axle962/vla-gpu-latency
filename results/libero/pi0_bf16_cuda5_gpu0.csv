@@ -1,0 +1,101 @@
+policy,precision,suite,task_id,episode,delay_steps,exec_horizon,success,steps,inferences,infer_ms_median,episode_s,gpu,host,task
+pi0,bf16,libero_10,0,0,0,50,1,422,9,549.7,21.5,NVIDIA GeForce RTX 4070,cuda5,put both the alphabet soup and the tomato sauce in the basket
+pi0,bf16,libero_10,0,1,0,50,0,520,11,558.5,20.6,NVIDIA GeForce RTX 4070,cuda5,put both the alphabet soup and the tomato sauce in the basket
+pi0,bf16,libero_10,0,2,0,50,0,520,11,559.3,21.2,NVIDIA GeForce RTX 4070,cuda5,put both the alphabet soup and the tomato sauce in the basket
+pi0,bf16,libero_10,0,3,0,50,0,520,11,559.5,21.1,NVIDIA GeForce RTX 4070,cuda5,put both the alphabet soup and the tomato sauce in the basket
+pi0,bf16,libero_10,0,4,0,50,0,520,11,552.2,21.1,NVIDIA GeForce RTX 4070,cuda5,put both the alphabet soup and the tomato sauce in the basket
+pi0,bf16,libero_10,0,5,0,50,1,487,10,548.3,21.9,NVIDIA GeForce RTX 4070,cuda5,put both the alphabet soup and the tomato sauce in the basket
+pi0,bf16,libero_10,0,6,0,50,1,256,6,560.5,13.2,NVIDIA GeForce RTX 4070,cuda5,put both the alphabet soup and the tomato sauce in the basket
+pi0,bf16,libero_10,0,7,0,50,1,272,6,559.3,13.7,NVIDIA GeForce RTX 4070,cuda5,put both the alphabet soup and the tomato sauce in the basket
+pi0,bf16,libero_10,0,8,0,50,0,520,11,571.0,21.8,NVIDIA GeForce RTX 4070,cuda5,put both the alphabet soup and the tomato sauce in the basket
+pi0,bf16,libero_10,0,9,0,50,0,520,11,565.0,21.1,NVIDIA GeForce RTX 4070,cuda5,put both the alphabet soup and the tomato sauce in the basket
+pi0,bf16,libero_10,1,0,0,50,0,520,11,564.0,21.3,NVIDIA GeForce RTX 4070,cuda5,put both the cream cheese box and the butter in the basket
+pi0,bf16,libero_10,1,1,0,50,0,520,11,564.3,21.5,NVIDIA GeForce RTX 4070,cuda5,put both the cream cheese box and the butter in the basket
+pi0,bf16,libero_10,1,2,0,50,0,520,11,566.4,21.2,NVIDIA GeForce RTX 4070,cuda5,put both the cream cheese box and the butter in the basket
+pi0,bf16,libero_10,1,3,0,50,1,242,5,571.5,11.9,NVIDIA GeForce RTX 4070,cuda5,put both the cream cheese box and the butter in the basket
+pi0,bf16,libero_10,1,4,0,50,1,239,5,577.0,11.9,NVIDIA GeForce RTX 4070,cuda5,put both the cream cheese box and the butter in the basket
+pi0,bf16,libero_10,1,5,0,50,1,250,5,571.1,12.0,NVIDIA GeForce RTX 4070,cuda5,put both the cream cheese box and the butter in the basket
+pi0,bf16,libero_10,1,6,0,50,0,520,11,570.9,21.6,NVIDIA GeForce RTX 4070,cuda5,put both the cream cheese box and the butter in the basket
+pi0,bf16,libero_10,1,7,0,50,1,254,6,565.1,12.9,NVIDIA GeForce RTX 4070,cuda5,put both the cream cheese box and the butter in the basket
+pi0,bf16,libero_10,1,8,0,50,1,425,9,564.5,19.5,NVIDIA GeForce RTX 4070,cuda5,put both the cream cheese box and the butter in the basket
+pi0,bf16,libero_10,1,9,0,50,1,287,6,558.8,13.8,NVIDIA GeForce RTX 4070,cuda5,put both the cream cheese box and the butter in the basket
+pi0,bf16,libero_10,2,0,0,50,0,520,11,555.5,19.1,NVIDIA GeForce RTX 4070,cuda5,turn on the stove and put the moka pot on it
+pi0,bf16,libero_10,2,1,0,50,0,520,11,542.1,18.8,NVIDIA GeForce RTX 4070,cuda5,turn on the stove and put the moka pot on it
+pi0,bf16,libero_10,2,2,0,50,0,520,11,566.5,18.7,NVIDIA GeForce RTX 4070,cuda5,turn on the stove and put the moka pot on it
+pi0,bf16,libero_10,2,3,0,50,1,221,5,547.4,9.5,NVIDIA GeForce RTX 4070,cuda5,turn on the stove and put the moka pot on it
+pi0,bf16,libero_10,2,4,0,50,1,248,5,563.0,10.1,NVIDIA GeForce RTX 4070,cuda5,turn on the stove and put the moka pot on it
+pi0,bf16,libero_10,2,5,0,50,0,520,11,556.6,19.2,NVIDIA GeForce RTX 4070,cuda5,turn on the stove and put the moka pot on it
+pi0,bf16,libero_10,2,6,0,50,0,520,11,564.3,19.5,NVIDIA GeForce RTX 4070,cuda5,turn on the stove and put the moka pot on it
+pi0,bf16,libero_10,2,7,0,50,0,520,11,564.1,19.3,NVIDIA GeForce RTX 4070,cuda5,turn on the stove and put the moka pot on it
+pi0,bf16,libero_10,2,8,0,50,0,520,11,552.4,19.1,NVIDIA GeForce RTX 4070,cuda5,turn on the stove and put the moka pot on it
+pi0,bf16,libero_10,2,9,0,50,0,520,11,548.3,18.8,NVIDIA GeForce RTX 4070,cuda5,turn on the stove and put the moka pot on it
+pi0,bf16,libero_10,3,0,0,50,0,520,11,548.1,19.8,NVIDIA GeForce RTX 4070,cuda5,put the black bowl in the bottom drawer of the cabinet and close it
+pi0,bf16,libero_10,3,1,0,50,1,239,5,570.1,11.2,NVIDIA GeForce RTX 4070,cuda5,put the black bowl in the bottom drawer of the cabinet and close it
+pi0,bf16,libero_10,3,2,0,50,1,255,6,569.2,11.9,NVIDIA GeForce RTX 4070,cuda5,put the black bowl in the bottom drawer of the cabinet and close it
+pi0,bf16,libero_10,3,3,0,50,1,210,5,556.7,10.1,NVIDIA GeForce RTX 4070,cuda5,put the black bowl in the bottom drawer of the cabinet and close it
+pi0,bf16,libero_10,3,4,0,50,1,215,5,558.3,10.6,NVIDIA GeForce RTX 4070,cuda5,put the black bowl in the bottom drawer of the cabinet and close it
+pi0,bf16,libero_10,3,5,0,50,1,234,5,548.9,11.0,NVIDIA GeForce RTX 4070,cuda5,put the black bowl in the bottom drawer of the cabinet and close it
+pi0,bf16,libero_10,3,6,0,50,0,520,11,556.6,20.1,NVIDIA GeForce RTX 4070,cuda5,put the black bowl in the bottom drawer of the cabinet and close it
+pi0,bf16,libero_10,3,7,0,50,0,520,11,569.7,20.4,NVIDIA GeForce RTX 4070,cuda5,put the black bowl in the bottom drawer of the cabinet and close it
+pi0,bf16,libero_10,3,8,0,50,1,509,11,562.5,22.0,NVIDIA GeForce RTX 4070,cuda5,put the black bowl in the bottom drawer of the cabinet and close it
+pi0,bf16,libero_10,3,9,0,50,1,220,5,562.2,10.7,NVIDIA GeForce RTX 4070,cuda5,put the black bowl in the bottom drawer of the cabinet and close it
+pi0,bf16,libero_10,4,0,0,50,0,520,11,670.3,24.0,NVIDIA GeForce RTX 4070,cuda5,put the white mug on the left plate and put the yellow and white mug on the right plate
+pi0,bf16,libero_10,4,1,0,50,0,520,11,667.9,23.8,NVIDIA GeForce RTX 4070,cuda5,put the white mug on the left plate and put the yellow and white mug on the right plate
+pi0,bf16,libero_10,4,2,0,50,0,520,11,643.9,23.4,NVIDIA GeForce RTX 4070,cuda5,put the white mug on the left plate and put the yellow and white mug on the right plate
+pi0,bf16,libero_10,4,3,0,50,0,520,11,645.3,22.7,NVIDIA GeForce RTX 4070,cuda5,put the white mug on the left plate and put the yellow and white mug on the right plate
+pi0,bf16,libero_10,4,4,0,50,0,520,11,669.9,23.1,NVIDIA GeForce RTX 4070,cuda5,put the white mug on the left plate and put the yellow and white mug on the right plate
+pi0,bf16,libero_10,4,5,0,50,0,520,11,569.6,20.8,NVIDIA GeForce RTX 4070,cuda5,put the white mug on the left plate and put the yellow and white mug on the right plate
+pi0,bf16,libero_10,4,6,0,50,0,520,11,557.7,21.3,NVIDIA GeForce RTX 4070,cuda5,put the white mug on the left plate and put the yellow and white mug on the right plate
+pi0,bf16,libero_10,4,7,0,50,0,520,11,660.0,22.1,NVIDIA GeForce RTX 4070,cuda5,put the white mug on the left plate and put the yellow and white mug on the right plate
+pi0,bf16,libero_10,4,8,0,50,0,520,11,645.6,23.9,NVIDIA GeForce RTX 4070,cuda5,put the white mug on the left plate and put the yellow and white mug on the right plate
+pi0,bf16,libero_10,4,9,0,50,0,520,11,646.5,22.9,NVIDIA GeForce RTX 4070,cuda5,put the white mug on the left plate and put the yellow and white mug on the right plate
+pi0,bf16,libero_10,5,0,0,50,1,190,4,559.6,8.6,NVIDIA GeForce RTX 4070,cuda5,pick up the book and place it in the back compartment of the caddy
+pi0,bf16,libero_10,5,1,0,50,0,520,11,550.3,18.2,NVIDIA GeForce RTX 4070,cuda5,pick up the book and place it in the back compartment of the caddy
+pi0,bf16,libero_10,5,2,0,50,0,520,11,544.8,18.5,NVIDIA GeForce RTX 4070,cuda5,pick up the book and place it in the back compartment of the caddy
+pi0,bf16,libero_10,5,3,0,50,1,174,4,656.7,9.0,NVIDIA GeForce RTX 4070,cuda5,pick up the book and place it in the back compartment of the caddy
+pi0,bf16,libero_10,5,4,0,50,1,158,4,632.0,8.1,NVIDIA GeForce RTX 4070,cuda5,pick up the book and place it in the back compartment of the caddy
+pi0,bf16,libero_10,5,5,0,50,1,201,5,607.6,10.0,NVIDIA GeForce RTX 4070,cuda5,pick up the book and place it in the back compartment of the caddy
+pi0,bf16,libero_10,5,6,0,50,1,180,4,559.5,8.2,NVIDIA GeForce RTX 4070,cuda5,pick up the book and place it in the back compartment of the caddy
+pi0,bf16,libero_10,5,7,0,50,1,168,4,550.0,7.5,NVIDIA GeForce RTX 4070,cuda5,pick up the book and place it in the back compartment of the caddy
+pi0,bf16,libero_10,5,8,0,50,0,520,11,551.5,17.7,NVIDIA GeForce RTX 4070,cuda5,pick up the book and place it in the back compartment of the caddy
+pi0,bf16,libero_10,5,9,0,50,1,236,5,538.5,9.4,NVIDIA GeForce RTX 4070,cuda5,pick up the book and place it in the back compartment of the caddy
+pi0,bf16,libero_10,6,0,0,50,0,520,11,562.1,20.3,NVIDIA GeForce RTX 4070,cuda5,put the white mug on the plate and put the chocolate pudding to the right of the plate
+pi0,bf16,libero_10,6,1,0,50,1,231,5,555.1,11.1,NVIDIA GeForce RTX 4070,cuda5,put the white mug on the plate and put the chocolate pudding to the right of the plate
+pi0,bf16,libero_10,6,2,0,50,1,203,5,666.0,11.5,NVIDIA GeForce RTX 4070,cuda5,put the white mug on the plate and put the chocolate pudding to the right of the plate
+pi0,bf16,libero_10,6,3,0,50,0,520,11,646.9,23.0,NVIDIA GeForce RTX 4070,cuda5,put the white mug on the plate and put the chocolate pudding to the right of the plate
+pi0,bf16,libero_10,6,4,0,50,0,520,11,679.3,24.8,NVIDIA GeForce RTX 4070,cuda5,put the white mug on the plate and put the chocolate pudding to the right of the plate
+pi0,bf16,libero_10,6,5,0,50,1,476,10,678.5,24.0,NVIDIA GeForce RTX 4070,cuda5,put the white mug on the plate and put the chocolate pudding to the right of the plate
+pi0,bf16,libero_10,6,6,0,50,0,520,11,671.8,23.2,NVIDIA GeForce RTX 4070,cuda5,put the white mug on the plate and put the chocolate pudding to the right of the plate
+pi0,bf16,libero_10,6,7,0,50,0,520,11,664.2,23.8,NVIDIA GeForce RTX 4070,cuda5,put the white mug on the plate and put the chocolate pudding to the right of the plate
+pi0,bf16,libero_10,6,8,0,50,1,261,6,676.8,14.3,NVIDIA GeForce RTX 4070,cuda5,put the white mug on the plate and put the chocolate pudding to the right of the plate
+pi0,bf16,libero_10,6,9,0,50,0,520,11,680.4,25.0,NVIDIA GeForce RTX 4070,cuda5,put the white mug on the plate and put the chocolate pudding to the right of the plate
+pi0,bf16,libero_10,7,0,0,50,1,269,6,668.2,14.0,NVIDIA GeForce RTX 4070,cuda5,put both the alphabet soup and the cream cheese box in the basket
+pi0,bf16,libero_10,7,1,0,50,0,520,11,680.9,23.0,NVIDIA GeForce RTX 4070,cuda5,put both the alphabet soup and the cream cheese box in the basket
+pi0,bf16,libero_10,7,2,0,50,0,520,11,671.5,22.5,NVIDIA GeForce RTX 4070,cuda5,put both the alphabet soup and the cream cheese box in the basket
+pi0,bf16,libero_10,7,3,0,50,0,520,11,675.8,22.7,NVIDIA GeForce RTX 4070,cuda5,put both the alphabet soup and the cream cheese box in the basket
+pi0,bf16,libero_10,7,4,0,50,0,520,11,683.9,23.1,NVIDIA GeForce RTX 4070,cuda5,put both the alphabet soup and the cream cheese box in the basket
+pi0,bf16,libero_10,7,5,0,50,0,520,11,667.7,22.2,NVIDIA GeForce RTX 4070,cuda5,put both the alphabet soup and the cream cheese box in the basket
+pi0,bf16,libero_10,7,6,0,50,0,520,11,665.3,21.9,NVIDIA GeForce RTX 4070,cuda5,put both the alphabet soup and the cream cheese box in the basket
+pi0,bf16,libero_10,7,7,0,50,0,520,11,679.4,22.8,NVIDIA GeForce RTX 4070,cuda5,put both the alphabet soup and the cream cheese box in the basket
+pi0,bf16,libero_10,7,8,0,50,1,276,6,682.8,14.2,NVIDIA GeForce RTX 4070,cuda5,put both the alphabet soup and the cream cheese box in the basket
+pi0,bf16,libero_10,7,9,0,50,0,520,11,680.2,22.7,NVIDIA GeForce RTX 4070,cuda5,put both the alphabet soup and the cream cheese box in the basket
+pi0,bf16,libero_10,8,0,0,50,1,388,8,686.8,19.1,NVIDIA GeForce RTX 4070,cuda5,put both moka pots on the stove
+pi0,bf16,libero_10,8,1,0,50,0,520,11,671.7,23.8,NVIDIA GeForce RTX 4070,cuda5,put both moka pots on the stove
+pi0,bf16,libero_10,8,2,0,50,0,520,11,682.4,24.4,NVIDIA GeForce RTX 4070,cuda5,put both moka pots on the stove
+pi0,bf16,libero_10,8,3,0,50,0,520,11,693.8,24.8,NVIDIA GeForce RTX 4070,cuda5,put both moka pots on the stove
+pi0,bf16,libero_10,8,4,0,50,0,520,11,678.8,24.2,NVIDIA GeForce RTX 4070,cuda5,put both moka pots on the stove
+pi0,bf16,libero_10,8,5,0,50,0,520,11,696.9,24.0,NVIDIA GeForce RTX 4070,cuda5,put both moka pots on the stove
+pi0,bf16,libero_10,8,6,0,50,0,520,11,679.8,23.5,NVIDIA GeForce RTX 4070,cuda5,put both moka pots on the stove
+pi0,bf16,libero_10,8,7,0,50,1,382,8,673.6,18.3,NVIDIA GeForce RTX 4070,cuda5,put both moka pots on the stove
+pi0,bf16,libero_10,8,8,0,50,0,520,11,674.8,23.1,NVIDIA GeForce RTX 4070,cuda5,put both moka pots on the stove
+pi0,bf16,libero_10,8,9,0,50,0,520,11,675.3,23.1,NVIDIA GeForce RTX 4070,cuda5,put both moka pots on the stove
+pi0,bf16,libero_10,9,0,0,50,0,520,11,586.8,20.9,NVIDIA GeForce RTX 4070,cuda5,put the yellow and white mug in the microwave and close it
+pi0,bf16,libero_10,9,1,0,50,1,239,5,562.3,11.1,NVIDIA GeForce RTX 4070,cuda5,put the yellow and white mug in the microwave and close it
+pi0,bf16,libero_10,9,2,0,50,1,246,5,562.0,11.5,NVIDIA GeForce RTX 4070,cuda5,put the yellow and white mug in the microwave and close it
+pi0,bf16,libero_10,9,3,0,50,0,520,11,554.4,20.2,NVIDIA GeForce RTX 4070,cuda5,put the yellow and white mug in the microwave and close it
+pi0,bf16,libero_10,9,4,0,50,0,520,11,562.1,19.9,NVIDIA GeForce RTX 4070,cuda5,put the yellow and white mug in the microwave and close it
+pi0,bf16,libero_10,9,5,0,50,0,520,11,537.0,19.2,NVIDIA GeForce RTX 4070,cuda5,put the yellow and white mug in the microwave and close it
+pi0,bf16,libero_10,9,6,0,50,0,520,11,538.3,19.3,NVIDIA GeForce RTX 4070,cuda5,put the yellow and white mug in the microwave and close it
+pi0,bf16,libero_10,9,7,0,50,1,234,5,550.5,10.5,NVIDIA GeForce RTX 4070,cuda5,put the yellow and white mug in the microwave and close it
+pi0,bf16,libero_10,9,8,0,50,1,300,6,559.5,13.0,NVIDIA GeForce RTX 4070,cuda5,put the yellow and white mug in the microwave and close it
+pi0,bf16,libero_10,9,9,0,50,1,244,5,556.4,11.2,NVIDIA GeForce RTX 4070,cuda5,put the yellow and white mug in the microwave and close it

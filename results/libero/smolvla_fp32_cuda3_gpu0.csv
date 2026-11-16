@@ -1,0 +1,101 @@
+policy,precision,suite,task_id,episode,delay_steps,exec_horizon,success,steps,inferences,infer_ms_median,episode_s,gpu,host,task
+smolvla,fp32,libero_10,0,0,0,50,0,520,11,371.4,21.1,NVIDIA TITAN V,cuda3,put both the alphabet soup and the tomato sauce in the basket
+smolvla,fp32,libero_10,0,1,0,50,1,270,6,371.8,12.7,NVIDIA TITAN V,cuda3,put both the alphabet soup and the tomato sauce in the basket
+smolvla,fp32,libero_10,0,2,0,50,1,262,6,373.3,13.1,NVIDIA TITAN V,cuda3,put both the alphabet soup and the tomato sauce in the basket
+smolvla,fp32,libero_10,0,3,0,50,1,268,6,372.8,13.1,NVIDIA TITAN V,cuda3,put both the alphabet soup and the tomato sauce in the basket
+smolvla,fp32,libero_10,0,4,0,50,0,520,11,373.3,21.1,NVIDIA TITAN V,cuda3,put both the alphabet soup and the tomato sauce in the basket
+smolvla,fp32,libero_10,0,5,0,50,0,520,11,372.0,20.5,NVIDIA TITAN V,cuda3,put both the alphabet soup and the tomato sauce in the basket
+smolvla,fp32,libero_10,0,6,0,50,0,520,11,373.2,20.3,NVIDIA TITAN V,cuda3,put both the alphabet soup and the tomato sauce in the basket
+smolvla,fp32,libero_10,0,7,0,50,1,261,6,374.4,12.8,NVIDIA TITAN V,cuda3,put both the alphabet soup and the tomato sauce in the basket
+smolvla,fp32,libero_10,0,8,0,50,1,438,9,372.8,19.4,NVIDIA TITAN V,cuda3,put both the alphabet soup and the tomato sauce in the basket
+smolvla,fp32,libero_10,0,9,0,50,0,520,11,369.9,20.0,NVIDIA TITAN V,cuda3,put both the alphabet soup and the tomato sauce in the basket
+smolvla,fp32,libero_10,1,0,0,50,1,227,5,370.3,10.9,NVIDIA TITAN V,cuda3,put both the cream cheese box and the butter in the basket
+smolvla,fp32,libero_10,1,1,0,50,1,231,5,373.4,11.0,NVIDIA TITAN V,cuda3,put both the cream cheese box and the butter in the basket
+smolvla,fp32,libero_10,1,2,0,50,1,242,5,372.3,11.4,NVIDIA TITAN V,cuda3,put both the cream cheese box and the butter in the basket
+smolvla,fp32,libero_10,1,3,0,50,1,238,5,370.6,11.4,NVIDIA TITAN V,cuda3,put both the cream cheese box and the butter in the basket
+smolvla,fp32,libero_10,1,4,0,50,0,520,11,371.5,21.1,NVIDIA TITAN V,cuda3,put both the cream cheese box and the butter in the basket
+smolvla,fp32,libero_10,1,5,0,50,1,230,5,370.0,10.9,NVIDIA TITAN V,cuda3,put both the cream cheese box and the butter in the basket
+smolvla,fp32,libero_10,1,6,0,50,0,520,11,370.2,20.6,NVIDIA TITAN V,cuda3,put both the cream cheese box and the butter in the basket
+smolvla,fp32,libero_10,1,7,0,50,1,237,5,370.3,11.1,NVIDIA TITAN V,cuda3,put both the cream cheese box and the butter in the basket
+smolvla,fp32,libero_10,1,8,0,50,1,236,5,372.8,11.1,NVIDIA TITAN V,cuda3,put both the cream cheese box and the butter in the basket
+smolvla,fp32,libero_10,1,9,0,50,0,520,11,371.9,20.7,NVIDIA TITAN V,cuda3,put both the cream cheese box and the butter in the basket
+smolvla,fp32,libero_10,2,0,0,50,1,234,5,371.4,9.5,NVIDIA TITAN V,cuda3,turn on the stove and put the moka pot on it
+smolvla,fp32,libero_10,2,1,0,50,1,236,5,371.8,9.4,NVIDIA TITAN V,cuda3,turn on the stove and put the moka pot on it
+smolvla,fp32,libero_10,2,2,0,50,1,243,5,373.1,9.7,NVIDIA TITAN V,cuda3,turn on the stove and put the moka pot on it
+smolvla,fp32,libero_10,2,3,0,50,0,520,11,371.2,18.7,NVIDIA TITAN V,cuda3,turn on the stove and put the moka pot on it
+smolvla,fp32,libero_10,2,4,0,50,1,242,5,396.4,10.1,NVIDIA TITAN V,cuda3,turn on the stove and put the moka pot on it
+smolvla,fp32,libero_10,2,5,0,50,1,248,5,372.2,10.1,NVIDIA TITAN V,cuda3,turn on the stove and put the moka pot on it
+smolvla,fp32,libero_10,2,6,0,50,1,247,5,372.8,9.7,NVIDIA TITAN V,cuda3,turn on the stove and put the moka pot on it
+smolvla,fp32,libero_10,2,7,0,50,1,221,5,372.2,9.1,NVIDIA TITAN V,cuda3,turn on the stove and put the moka pot on it
+smolvla,fp32,libero_10,2,8,0,50,1,219,5,370.9,9.1,NVIDIA TITAN V,cuda3,turn on the stove and put the moka pot on it
+smolvla,fp32,libero_10,2,9,0,50,1,225,5,371.4,9.2,NVIDIA TITAN V,cuda3,turn on the stove and put the moka pot on it
+smolvla,fp32,libero_10,3,0,0,50,0,520,11,370.5,20.9,NVIDIA TITAN V,cuda3,put the black bowl in the bottom drawer of the cabinet and close it
+smolvla,fp32,libero_10,3,1,0,50,1,223,5,371.6,10.2,NVIDIA TITAN V,cuda3,put the black bowl in the bottom drawer of the cabinet and close it
+smolvla,fp32,libero_10,3,2,0,50,1,216,5,373.1,9.7,NVIDIA TITAN V,cuda3,put the black bowl in the bottom drawer of the cabinet and close it
+smolvla,fp32,libero_10,3,3,0,50,1,214,5,370.3,9.7,NVIDIA TITAN V,cuda3,put the black bowl in the bottom drawer of the cabinet and close it
+smolvla,fp32,libero_10,3,4,0,50,1,219,5,372.2,9.9,NVIDIA TITAN V,cuda3,put the black bowl in the bottom drawer of the cabinet and close it
+smolvla,fp32,libero_10,3,5,0,50,1,217,5,374.4,10.2,NVIDIA TITAN V,cuda3,put the black bowl in the bottom drawer of the cabinet and close it
+smolvla,fp32,libero_10,3,6,0,50,0,520,11,370.9,21.0,NVIDIA TITAN V,cuda3,put the black bowl in the bottom drawer of the cabinet and close it
+smolvla,fp32,libero_10,3,7,0,50,1,222,5,370.6,10.3,NVIDIA TITAN V,cuda3,put the black bowl in the bottom drawer of the cabinet and close it
+smolvla,fp32,libero_10,3,8,0,50,1,230,5,371.5,10.3,NVIDIA TITAN V,cuda3,put the black bowl in the bottom drawer of the cabinet and close it
+smolvla,fp32,libero_10,3,9,0,50,1,227,5,371.7,10.1,NVIDIA TITAN V,cuda3,put the black bowl in the bottom drawer of the cabinet and close it
+smolvla,fp32,libero_10,4,0,0,50,1,228,5,374.1,11.6,NVIDIA TITAN V,cuda3,put the white mug on the left plate and put the yellow and white mug on the right plate
+smolvla,fp32,libero_10,4,1,0,50,0,520,11,372.6,20.3,NVIDIA TITAN V,cuda3,put the white mug on the left plate and put the yellow and white mug on the right plate
+smolvla,fp32,libero_10,4,2,0,50,0,520,11,373.9,20.7,NVIDIA TITAN V,cuda3,put the white mug on the left plate and put the yellow and white mug on the right plate
+smolvla,fp32,libero_10,4,3,0,50,1,229,5,371.3,11.7,NVIDIA TITAN V,cuda3,put the white mug on the left plate and put the yellow and white mug on the right plate
+smolvla,fp32,libero_10,4,4,0,50,0,520,11,370.5,21.4,NVIDIA TITAN V,cuda3,put the white mug on the left plate and put the yellow and white mug on the right plate
+smolvla,fp32,libero_10,4,5,0,50,0,520,11,373.1,21.1,NVIDIA TITAN V,cuda3,put the white mug on the left plate and put the yellow and white mug on the right plate
+smolvla,fp32,libero_10,4,6,0,50,0,520,11,373.4,20.8,NVIDIA TITAN V,cuda3,put the white mug on the left plate and put the yellow and white mug on the right plate
+smolvla,fp32,libero_10,4,7,0,50,0,520,11,372.7,20.9,NVIDIA TITAN V,cuda3,put the white mug on the left plate and put the yellow and white mug on the right plate
+smolvla,fp32,libero_10,4,8,0,50,0,520,11,375.0,21.8,NVIDIA TITAN V,cuda3,put the white mug on the left plate and put the yellow and white mug on the right plate
+smolvla,fp32,libero_10,4,9,0,50,0,520,11,371.5,21.6,NVIDIA TITAN V,cuda3,put the white mug on the left plate and put the yellow and white mug on the right plate
+smolvla,fp32,libero_10,5,0,0,50,0,520,11,373.3,17.2,NVIDIA TITAN V,cuda3,pick up the book and place it in the back compartment of the caddy
+smolvla,fp32,libero_10,5,1,0,50,1,402,9,373.0,15.5,NVIDIA TITAN V,cuda3,pick up the book and place it in the back compartment of the caddy
+smolvla,fp32,libero_10,5,2,0,50,1,192,4,371.0,7.8,NVIDIA TITAN V,cuda3,pick up the book and place it in the back compartment of the caddy
+smolvla,fp32,libero_10,5,3,0,50,0,520,11,367.9,17.8,NVIDIA TITAN V,cuda3,pick up the book and place it in the back compartment of the caddy
+smolvla,fp32,libero_10,5,4,0,50,1,360,8,370.8,13.9,NVIDIA TITAN V,cuda3,pick up the book and place it in the back compartment of the caddy
+smolvla,fp32,libero_10,5,5,0,50,1,167,4,369.2,7.1,NVIDIA TITAN V,cuda3,pick up the book and place it in the back compartment of the caddy
+smolvla,fp32,libero_10,5,6,0,50,1,186,4,369.9,7.7,NVIDIA TITAN V,cuda3,pick up the book and place it in the back compartment of the caddy
+smolvla,fp32,libero_10,5,7,0,50,1,171,4,367.7,7.3,NVIDIA TITAN V,cuda3,pick up the book and place it in the back compartment of the caddy
+smolvla,fp32,libero_10,5,8,0,50,1,164,4,370.3,7.1,NVIDIA TITAN V,cuda3,pick up the book and place it in the back compartment of the caddy
+smolvla,fp32,libero_10,5,9,0,50,1,163,4,370.4,6.9,NVIDIA TITAN V,cuda3,pick up the book and place it in the back compartment of the caddy
+smolvla,fp32,libero_10,6,0,0,50,0,520,11,370.5,21.7,NVIDIA TITAN V,cuda3,put the white mug on the plate and put the chocolate pudding to the right of the plate
+smolvla,fp32,libero_10,6,1,0,50,0,520,11,371.6,21.1,NVIDIA TITAN V,cuda3,put the white mug on the plate and put the chocolate pudding to the right of the plate
+smolvla,fp32,libero_10,6,2,0,50,1,223,5,369.9,10.3,NVIDIA TITAN V,cuda3,put the white mug on the plate and put the chocolate pudding to the right of the plate
+smolvla,fp32,libero_10,6,3,0,50,0,520,11,368.9,18.8,NVIDIA TITAN V,cuda3,put the white mug on the plate and put the chocolate pudding to the right of the plate
+smolvla,fp32,libero_10,6,4,0,50,1,219,5,368.4,10.1,NVIDIA TITAN V,cuda3,put the white mug on the plate and put the chocolate pudding to the right of the plate
+smolvla,fp32,libero_10,6,5,0,50,1,214,5,369.2,10.1,NVIDIA TITAN V,cuda3,put the white mug on the plate and put the chocolate pudding to the right of the plate
+smolvla,fp32,libero_10,6,6,0,50,0,520,11,368.2,18.6,NVIDIA TITAN V,cuda3,put the white mug on the plate and put the chocolate pudding to the right of the plate
+smolvla,fp32,libero_10,6,7,0,50,0,520,11,368.0,18.6,NVIDIA TITAN V,cuda3,put the white mug on the plate and put the chocolate pudding to the right of the plate
+smolvla,fp32,libero_10,6,8,0,50,0,520,11,368.7,21.4,NVIDIA TITAN V,cuda3,put the white mug on the plate and put the chocolate pudding to the right of the plate
+smolvla,fp32,libero_10,6,9,0,50,0,520,11,369.4,19.8,NVIDIA TITAN V,cuda3,put the white mug on the plate and put the chocolate pudding to the right of the plate
+smolvla,fp32,libero_10,7,0,0,50,0,520,11,370.5,18.8,NVIDIA TITAN V,cuda3,put both the alphabet soup and the cream cheese box in the basket
+smolvla,fp32,libero_10,7,1,0,50,1,247,5,368.9,10.4,NVIDIA TITAN V,cuda3,put both the alphabet soup and the cream cheese box in the basket
+smolvla,fp32,libero_10,7,2,0,50,0,520,11,370.4,18.8,NVIDIA TITAN V,cuda3,put both the alphabet soup and the cream cheese box in the basket
+smolvla,fp32,libero_10,7,3,0,50,0,520,11,370.6,18.6,NVIDIA TITAN V,cuda3,put both the alphabet soup and the cream cheese box in the basket
+smolvla,fp32,libero_10,7,4,0,50,0,520,11,369.7,18.7,NVIDIA TITAN V,cuda3,put both the alphabet soup and the cream cheese box in the basket
+smolvla,fp32,libero_10,7,5,0,50,1,245,5,367.4,10.2,NVIDIA TITAN V,cuda3,put both the alphabet soup and the cream cheese box in the basket
+smolvla,fp32,libero_10,7,6,0,50,0,520,11,368.7,18.4,NVIDIA TITAN V,cuda3,put both the alphabet soup and the cream cheese box in the basket
+smolvla,fp32,libero_10,7,7,0,50,0,520,11,369.8,18.7,NVIDIA TITAN V,cuda3,put both the alphabet soup and the cream cheese box in the basket
+smolvla,fp32,libero_10,7,8,0,50,1,263,6,369.8,11.3,NVIDIA TITAN V,cuda3,put both the alphabet soup and the cream cheese box in the basket
+smolvla,fp32,libero_10,7,9,0,50,0,520,11,369.0,18.6,NVIDIA TITAN V,cuda3,put both the alphabet soup and the cream cheese box in the basket
+smolvla,fp32,libero_10,8,0,0,50,1,379,8,369.6,15.5,NVIDIA TITAN V,cuda3,put both moka pots on the stove
+smolvla,fp32,libero_10,8,1,0,50,0,520,11,368.4,19.4,NVIDIA TITAN V,cuda3,put both moka pots on the stove
+smolvla,fp32,libero_10,8,2,0,50,0,520,11,367.1,19.8,NVIDIA TITAN V,cuda3,put both moka pots on the stove
+smolvla,fp32,libero_10,8,3,0,50,1,463,10,369.6,18.8,NVIDIA TITAN V,cuda3,put both moka pots on the stove
+smolvla,fp32,libero_10,8,4,0,50,1,385,8,370.1,15.5,NVIDIA TITAN V,cuda3,put both moka pots on the stove
+smolvla,fp32,libero_10,8,5,0,50,1,401,9,368.7,16.4,NVIDIA TITAN V,cuda3,put both moka pots on the stove
+smolvla,fp32,libero_10,8,6,0,50,0,520,11,369.7,19.6,NVIDIA TITAN V,cuda3,put both moka pots on the stove
+smolvla,fp32,libero_10,8,7,0,50,1,378,8,369.4,15.5,NVIDIA TITAN V,cuda3,put both moka pots on the stove
+smolvla,fp32,libero_10,8,8,0,50,0,520,11,367.9,19.4,NVIDIA TITAN V,cuda3,put both moka pots on the stove
+smolvla,fp32,libero_10,8,9,0,50,1,387,8,371.5,15.8,NVIDIA TITAN V,cuda3,put both moka pots on the stove
+smolvla,fp32,libero_10,9,0,0,50,1,258,6,372.1,11.6,NVIDIA TITAN V,cuda3,put the yellow and white mug in the microwave and close it
+smolvla,fp32,libero_10,9,1,0,50,1,268,6,369.3,11.9,NVIDIA TITAN V,cuda3,put the yellow and white mug in the microwave and close it
+smolvla,fp32,libero_10,9,2,0,50,1,275,6,369.8,12.2,NVIDIA TITAN V,cuda3,put the yellow and white mug in the microwave and close it
+smolvla,fp32,libero_10,9,3,0,50,1,254,6,369.5,11.3,NVIDIA TITAN V,cuda3,put the yellow and white mug in the microwave and close it
+smolvla,fp32,libero_10,9,4,0,50,0,520,11,370.6,19.6,NVIDIA TITAN V,cuda3,put the yellow and white mug in the microwave and close it
+smolvla,fp32,libero_10,9,5,0,50,0,520,11,370.0,19.2,NVIDIA TITAN V,cuda3,put the yellow and white mug in the microwave and close it
+smolvla,fp32,libero_10,9,6,0,50,1,248,5,369.0,11.0,NVIDIA TITAN V,cuda3,put the yellow and white mug in the microwave and close it
+smolvla,fp32,libero_10,9,7,0,50,0,520,11,368.5,18.8,NVIDIA TITAN V,cuda3,put the yellow and white mug in the microwave and close it
+smolvla,fp32,libero_10,9,8,0,50,1,255,6,368.6,11.2,NVIDIA TITAN V,cuda3,put the yellow and white mug in the microwave and close it
+smolvla,fp32,libero_10,9,9,0,50,1,244,5,370.7,10.6,NVIDIA TITAN V,cuda3,put the yellow and white mug in the microwave and close it

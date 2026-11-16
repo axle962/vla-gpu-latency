@@ -1,0 +1,79 @@
+policy,precision,suite,task_id,episode,delay_steps,exec_horizon,success,steps,inferences,infer_ms_median,episode_s,gpu,host,task
+pi0,fp16,libero_10,0,0,10,50,0,520,13,490.3,23.9,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the tomato sauce in the basket
+pi0,fp16,libero_10,0,1,10,50,0,520,13,484.3,21.4,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the tomato sauce in the basket
+pi0,fp16,libero_10,0,2,10,50,0,520,13,491.6,20.8,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the tomato sauce in the basket
+pi0,fp16,libero_10,0,3,10,50,0,520,13,493.6,22.1,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the tomato sauce in the basket
+pi0,fp16,libero_10,0,4,10,50,0,520,13,492.5,22.2,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the tomato sauce in the basket
+pi0,fp16,libero_10,0,5,10,50,0,520,13,600.2,22.6,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the tomato sauce in the basket
+pi0,fp16,libero_10,0,6,10,50,0,520,13,498.1,22.2,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the tomato sauce in the basket
+pi0,fp16,libero_10,0,7,10,50,0,520,13,491.7,21.0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the tomato sauce in the basket
+pi0,fp16,libero_10,0,8,10,50,0,520,13,491.5,20.9,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the tomato sauce in the basket
+pi0,fp16,libero_10,0,9,10,50,0,520,13,498.2,22.5,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the tomato sauce in the basket
+pi0,fp16,libero_10,0,0,15,50,0,520,15,489.6,22.8,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the tomato sauce in the basket
+pi0,fp16,libero_10,0,1,15,50,0,520,15,493.9,23.0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the tomato sauce in the basket
+pi0,fp16,libero_10,0,2,15,50,0,520,15,493.0,22.3,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the tomato sauce in the basket
+pi0,fp16,libero_10,0,3,15,50,0,520,15,478.2,21.6,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the tomato sauce in the basket
+pi0,fp16,libero_10,0,4,15,50,0,520,15,481.0,21.4,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the tomato sauce in the basket
+pi0,fp16,libero_10,0,5,15,50,0,520,15,487.3,22.2,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the tomato sauce in the basket
+pi0,fp16,libero_10,0,6,15,50,0,520,15,484.5,21.9,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the tomato sauce in the basket
+pi0,fp16,libero_10,0,7,15,50,0,520,15,488.2,22.7,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the tomato sauce in the basket
+pi0,fp16,libero_10,0,8,15,50,0,520,15,475.0,21.6,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the tomato sauce in the basket
+pi0,fp16,libero_10,0,9,15,50,0,520,15,485.5,22.3,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the tomato sauce in the basket
+pi0,fp16,libero_10,0,0,20,50,0,520,18,484.1,23.7,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the tomato sauce in the basket
+pi0,fp16,libero_10,0,1,20,50,0,520,18,481.5,23.1,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the tomato sauce in the basket
+pi0,fp16,libero_10,0,2,20,50,0,520,18,484.0,23.4,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the tomato sauce in the basket
+pi0,fp16,libero_10,0,3,20,50,0,520,18,481.3,23.1,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the tomato sauce in the basket
+pi0,fp16,libero_10,0,4,20,50,0,520,18,485.0,23.5,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the tomato sauce in the basket
+pi0,fp16,libero_10,0,5,20,50,0,520,18,478.5,23.1,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the tomato sauce in the basket
+pi0,fp16,libero_10,0,6,20,50,0,520,18,477.0,23.0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the tomato sauce in the basket
+pi0,fp16,libero_10,0,7,20,50,0,520,18,485.4,23.5,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the tomato sauce in the basket
+pi0,fp16,libero_10,0,8,20,50,0,520,18,479.0,23.1,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the tomato sauce in the basket
+pi0,fp16,libero_10,0,9,20,50,0,520,18,484.1,23.8,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the tomato sauce in the basket
+pi0,fp16,libero_10,1,0,10,50,0,520,13,484.3,21.0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the cream cheese box and the butter in the basket
+pi0,fp16,libero_10,1,1,10,50,0,520,13,479.7,20.6,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the cream cheese box and the butter in the basket
+pi0,fp16,libero_10,1,2,10,50,1,395,10,484.3,17.8,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the cream cheese box and the butter in the basket
+pi0,fp16,libero_10,1,3,10,50,0,520,13,485.0,21.5,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the cream cheese box and the butter in the basket
+pi0,fp16,libero_10,1,4,10,50,0,520,13,489.9,21.3,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the cream cheese box and the butter in the basket
+pi0,fp16,libero_10,1,5,10,50,0,520,13,489.7,21.6,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the cream cheese box and the butter in the basket
+pi0,fp16,libero_10,1,6,10,50,1,262,7,486.2,12.5,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the cream cheese box and the butter in the basket
+pi0,fp16,libero_10,1,7,10,50,0,520,13,483.3,20.5,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the cream cheese box and the butter in the basket
+pi0,fp16,libero_10,1,8,10,50,0,520,13,487.2,20.9,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the cream cheese box and the butter in the basket
+pi0,fp16,libero_10,1,9,10,50,0,520,13,481.7,21.4,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the cream cheese box and the butter in the basket
+pi0,fp16,libero_10,1,0,15,50,0,520,15,495.4,22.3,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the cream cheese box and the butter in the basket
+pi0,fp16,libero_10,1,1,15,50,0,520,15,498.1,21.9,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the cream cheese box and the butter in the basket
+pi0,fp16,libero_10,1,2,15,50,0,520,15,476.0,21.6,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the cream cheese box and the butter in the basket
+pi0,fp16,libero_10,1,3,15,50,0,520,15,484.5,21.5,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the cream cheese box and the butter in the basket
+pi0,fp16,libero_10,1,4,15,50,0,520,15,479.4,21.2,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the cream cheese box and the butter in the basket
+pi0,fp16,libero_10,1,5,15,50,0,520,15,486.6,22.7,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the cream cheese box and the butter in the basket
+pi0,fp16,libero_10,1,6,15,50,0,520,15,489.7,22.5,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the cream cheese box and the butter in the basket
+pi0,fp16,libero_10,1,7,15,50,0,520,15,491.2,22.0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the cream cheese box and the butter in the basket
+pi0,fp16,libero_10,1,8,15,50,0,520,15,477.6,22.7,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the cream cheese box and the butter in the basket
+pi0,fp16,libero_10,1,9,15,50,0,520,15,479.2,22.1,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the cream cheese box and the butter in the basket
+pi0,fp16,libero_10,1,0,20,50,0,520,18,472.5,23.3,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the cream cheese box and the butter in the basket
+pi0,fp16,libero_10,1,1,20,50,0,520,18,476.3,23.1,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the cream cheese box and the butter in the basket
+pi0,fp16,libero_10,1,2,20,50,0,520,18,481.5,23.0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the cream cheese box and the butter in the basket
+pi0,fp16,libero_10,1,3,20,50,0,520,18,477.0,23.8,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the cream cheese box and the butter in the basket
+pi0,fp16,libero_10,1,4,20,50,0,520,18,479.6,23.5,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the cream cheese box and the butter in the basket
+pi0,fp16,libero_10,1,5,20,50,0,520,18,474.6,24.8,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the cream cheese box and the butter in the basket
+pi0,fp16,libero_10,1,6,20,50,0,520,18,482.5,23.9,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the cream cheese box and the butter in the basket
+pi0,fp16,libero_10,1,7,20,50,0,520,18,475.0,23.1,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the cream cheese box and the butter in the basket
+pi0,fp16,libero_10,1,8,20,50,0,520,18,475.8,22.8,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the cream cheese box and the butter in the basket
+pi0,fp16,libero_10,1,9,20,50,0,520,18,474.8,23.1,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the cream cheese box and the butter in the basket
+pi0,fp16,libero_10,2,0,10,50,1,217,6,474.7,9.0,NVIDIA GeForce RTX 2080 Ti,cuda2,turn on the stove and put the moka pot on it
+pi0,fp16,libero_10,2,1,10,50,0,520,13,471.0,19.3,NVIDIA GeForce RTX 2080 Ti,cuda2,turn on the stove and put the moka pot on it
+pi0,fp16,libero_10,2,2,10,50,1,270,7,492.0,11.2,NVIDIA GeForce RTX 2080 Ti,cuda2,turn on the stove and put the moka pot on it
+pi0,fp16,libero_10,2,3,10,50,0,520,13,480.8,18.9,NVIDIA GeForce RTX 2080 Ti,cuda2,turn on the stove and put the moka pot on it
+pi0,fp16,libero_10,2,4,10,50,0,520,13,495.0,19.0,NVIDIA GeForce RTX 2080 Ti,cuda2,turn on the stove and put the moka pot on it
+pi0,fp16,libero_10,2,5,10,50,1,233,6,470.3,9.7,NVIDIA GeForce RTX 2080 Ti,cuda2,turn on the stove and put the moka pot on it
+pi0,fp16,libero_10,2,6,10,50,1,237,6,482.0,9.7,NVIDIA GeForce RTX 2080 Ti,cuda2,turn on the stove and put the moka pot on it
+pi0,fp16,libero_10,2,7,10,50,0,520,13,478.4,19.5,NVIDIA GeForce RTX 2080 Ti,cuda2,turn on the stove and put the moka pot on it
+pi0,fp16,libero_10,2,8,10,50,1,229,6,485.8,9.5,NVIDIA GeForce RTX 2080 Ti,cuda2,turn on the stove and put the moka pot on it
+pi0,fp16,libero_10,2,9,10,50,0,520,13,482.5,19.1,NVIDIA GeForce RTX 2080 Ti,cuda2,turn on the stove and put the moka pot on it
+pi0,fp16,libero_10,2,0,15,50,0,520,15,470.8,20.3,NVIDIA GeForce RTX 2080 Ti,cuda2,turn on the stove and put the moka pot on it
+pi0,fp16,libero_10,2,1,15,50,0,520,15,474.9,19.8,NVIDIA GeForce RTX 2080 Ti,cuda2,turn on the stove and put the moka pot on it
+pi0,fp16,libero_10,2,2,15,50,1,258,8,498.7,11.5,NVIDIA GeForce RTX 2080 Ti,cuda2,turn on the stove and put the moka pot on it
+pi0,fp16,libero_10,2,3,15,50,1,227,7,482.2,9.9,NVIDIA GeForce RTX 2080 Ti,cuda2,turn on the stove and put the moka pot on it
+pi0,fp16,libero_10,2,4,15,50,1,233,7,477.6,10.3,NVIDIA GeForce RTX 2080 Ti,cuda2,turn on the stove and put the moka pot on it
+pi0,fp16,libero_10,2,5,15,50,1,234,7,483.8,10.2,NVIDIA GeForce RTX 2080 Ti,cuda2,turn on the stove and put the moka pot on it
+pi0,fp16,libero_10,2,6,15,50,1,255,8,482.2,11.4,NVIDIA GeForce RTX 2080 Ti,cuda2,turn on the stove and put the moka pot on it
+pi0,fp16,libero_10,2,7,15,50,0,520,15,486.6,19.9,NVIDIA GeForce RTX 2080 Ti,cuda2,turn on the stove and put the moka pot on it

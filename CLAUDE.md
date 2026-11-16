@@ -499,7 +499,7 @@ State:
     is model independent (2080 Ti host 20.5 to 23.1 us, TITAN V host 12.7 to 13.8 us across
     SmolVLA, pi0, pi0.5, pi0-FAST): p is a host property.
   - One cuda2 pi0 run overlapped my LIBERO render test: in `traces/_excluded/` (README).
-- **LIBERO (running 2026-11-15 from ~18:00):** `workloads/libero_eval.py` (lerobot rollout
+- **LIBERO (done 2026-11-15 22:07; `model/libero_analysis.py` -> `results/libero_analysis.md`):** `workloads/libero_eval.py` (lerobot rollout
   pipeline with whole chunks and a simulated inference delay d in 50 ms control steps: naive
   async execution, the new chunk is planned d steps early and starts at index d; seeds torch per
   (task, episode) so every delay sees the same scenes and noise), `scripts/run_libero.sh`
@@ -511,6 +511,15 @@ State:
   FP16 d = 0..20; cuda5 pi0 and pi0.5 BF16 d = 0 (precision gate), then pi0.5 FP16 d = 0..20.
   10 tasks x 10 episodes per point. Earlier unseeded runs: `results/libero/unseeded/` (not used).
   Stop runs with `logs/stop_libero.sh` (pgrep/pkill patterns match their own command line here).
+  - Results, LIBERO-Long, 100 episodes per point, success at d = 0 / 2 / 5 / 10 / 15 / 20 control
+    steps (0 to 1 s): SmolVLA FP16 50 / 49 / 51 / 44 / 44 / 34%, pi0 FP16 38 / 37 / 34 / 27 /
+    22 / 15%, pi0.5 FP16 87 / 79 / 76 / 63 / 65 / 48%. Paired McNemar vs d = 0 significant from
+    d = 15 (pi0), d = 5 (pi0.5), d = 20 (SmolVLA). Precision gates at d = 0: pi0 FP16 38 vs BF16
+    39%, pi0.5 FP16 87 vs BF16 83% (FP16 is fine); SmolVLA FP16 50 vs stock 58% (not tested
+    for significance). Mapping measured latencies to d: CUDA graphs (prefix + graph loop) put
+    every policy at d = 2 to 5 on every GPU, eager at d = 7 to 15: e.g. pi0.5 on the RTX 4070
+    65% eager vs 76% with graphs, pi0 25% vs 35%; for SmolVLA the difference is small (44 to 48%
+    vs ~50%). Graphs matter for task success where the policy is delay sensitive.
 - **Not done:** RoboTwin 2.0 success evaluation (needs Docker or GPU Podman/CDI, neither on CIMS;
   native build = CuRobo + pytorch3d against torch 2.7.1); a latency trace of
   `lerobot/smolvla_robotwin` at RoboTwin shapes is possible without the simulator. MolmoSpaces
