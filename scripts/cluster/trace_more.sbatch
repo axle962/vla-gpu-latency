@@ -29,8 +29,18 @@ if [ "$mode" = smoke ]; then
   exit 0
 fi
 if [ "$mode" = diffbench ]; then
-  for s in 100 10 25 50 100; do
-    $PY workloads/trace_diffusion.py --cudnn-benchmark --num-steps $s || echo "FAILED: diffusionbench $s"
+  # Optional extra args: step counts to run (default the full sweep). On the A100 (cuDNN
+  # 9.10.2) cuDNN's autotuner segfaults or faults in ~80% of processes while it tries
+  # candidate algorithms (jobs 33175 and 33182, two nodes), so each config is retried up to
+  # DIFFBENCH_TRIES times; a surviving process is a normal, bit-exact run.
+  shift; steps=${*:-"100 10 25 50 100"}
+  for s in $steps; do
+    ok=0
+    for t in $(seq 1 ${DIFFBENCH_TRIES:-1}); do
+      if $PY workloads/trace_diffusion.py --cudnn-benchmark --num-steps $s; then ok=1; break; fi
+      echo "attempt $t failed: diffusionbench $s"
+    done
+    [ $ok = 1 ] || echo "FAILED: diffusionbench $s"
   done
   exit 0
 fi

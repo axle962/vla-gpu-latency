@@ -34,7 +34,8 @@ def main() -> None:
         if m.get("graph_denoise_ms_median"):
             row["graph_denoise_speedup"] = round(
                 m["eager_denoise_ms_median"] / m["graph_denoise_ms_median"], 3)
-            row["hybrid_speedup"] = round(m["eager_ms_median"] / m["hybrid_ms_median"], 3)
+            if m.get("hybrid_ms_median"):  # absent in the torch.compile traces
+                row["hybrid_speedup"] = round(m["eager_ms_median"] / m["hybrid_ms_median"], 3)
         elif m.get("graph_ms_median"):  # whole step captured (ACT)
             row["hybrid_speedup"] = round(m["eager_ms_median"] / m["graph_ms_median"], 3)
         w.writerow(row)

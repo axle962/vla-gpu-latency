@@ -408,7 +408,8 @@ State:
     because its conv algorithm differs (FFT).
   - `trace_diffusion.py --cudnn-benchmark` writes `traces/diffusionbench_*` (separate workload
     `diffusionbench` in `cross_gpu.py`); CIMS stage `diffbench` (`run_cims_host.sh
-    diffbench-only`), cluster `trace_more.sbatch diffbench` (**A100 not run yet**). All 16 runs
+    diffbench-only`), cluster `trace_more.sbatch diffbench` (A100: see the cluster bullet of
+    2026-11-16 below). All 16 CIMS runs
     bit-exact. 100 steps, hybrid: 2080 Ti 1027 to 1099, TITAN V 1220, RTX 4070 1084 ms (default:
     1490 / 1450 / 3390): autotuning removes the 4070 penalty. But (a) the algorithm choice is
     not reproducible across processes: three 2080 Ti runs have 27.6k to 32.4k kernels per step
@@ -548,15 +549,43 @@ State:
      model) on a few tasks x 100 episodes, plus a latency trace of the policy on the A100
      (`trace_smolvla.py`-style, RoboTwin shapes). Estimate 5 to 15 GPU-h; state it before
      submitting. Keep RoboTwin outputs under `results/robotwin/`.
+- **Cluster session 2026-11-15/16:**
+  - **A100 `diffbench`: cuDNN 9.10.2's autotuner crashes on the A100.** Jobs 33175 (b-19-16),
+    33182 (b-19-12) and 33195 (b-19-42, 8 retries per config via `DIFFBENCH_TRIES`, extra args
+    pick the step counts): 20 of 24 processes segfaulted (or hit `unspecified launch failure`
+    in a conv during capture) while `cudnn.benchmark` tried candidate algorithms, before any
+    timing; three nodes, so not hardware. Never on Turing/Volta/Ada. Survivors are normal
+    bit-exact runs: 10 steps (b-19-12) and 25 steps (b-19-16); **50 and 100 steps failed all
+    attempts** (0 of 18), so the A100 has no `diffbench` baseline (100 steps) and appears only
+    as a target. With autotuned FP32 convs the A100 is the slowest of the four: 10-step graph
+    loop 132 ms (2080 Ti ~105, 4070 ~99 ms predicted from it). `slot_drv` into the A100: from
+    TITAN V +8 to +11%, 2080 Ti -21%, RTX 4070 -26%. `diffbench` cross MAPE now (4 GPUs as
+    targets): graph loop 25.5%, eager 36.8%, loop speedup 13.9%. All other workloads'
+    predictions are byte-identical to before.
+  - `model/summarize_traces.py`: skips `hybrid_speedup` when a run has no hybrid timing (the
+    torch.compile traces); it crashed on them, so the earlier summary lacked later rows.
+  - **Submitting from an OOD Jupyter session:** its shell inherits `SLURM_EXPORT_ENV=NONE` and
+    `SLURM_GET_USER_ENV=1`, and jobs then hang as `user env retrieval failed requeued held`.
+    `unset SLURM_EXPORT_ENV SLURM_GET_USER_ENV` and submit with `--export=ALL`.
+  - **RoboTwin step 1 passed** (job 33642, b-19-75): `/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json`,
+    `libvulkan.so.1`, `libEGL_nvidia`/`libGLX_nvidia` 610.43.02, Singularity (no Apptainer,
+    Docker or Podman); 82 GB RAM on the A100 node. `/scratch` is 97% full (1.2 TB free).
+  - **RoboTwin step 2 (env build):** `scripts/cluster/robotwin_build.sbatch` (CPU partition,
+    resumable stages in `envs/.robotwin_stages`). Deviation from lerobot's recipe: one venv
+    (`envs/robotwin`, Python 3.12) holds RoboTwin's stack (torch 2.7.1, CuRobo v0.7.8 for sm_80
+    only, pytorch3d, SAPIEN 3.0.0b1 + patches) and `lerobot[smolvla]==0.7.0` (which allows
+    torch >= 2.7 and has `env.type=robotwin`), so `lerobot-eval` runs RoboTwin in-process
+    without the env server. nvcc 12.8 in `/scratch/am16489/.tools/cuda128`; RoboTwin source +
+    assets (commit 0aeea2d) in `/scratch/am16489/ext/RoboTwin`; recipe files in
+    `/scratch/am16489/ext/robotwin_recipe`.
 - **Next:**
   1. Paper and slides (deferred by the user until the teammates' work is merged): move the
      headline to `slot_drv` on four GPUs, add ACT/Diffusion (three regimes: dispatch bound,
      mixed, GPU bound) and the cuDNN algorithm-selection finding; verify bibliography; compile
      on Overleaf.
-  2. Optional: A100 `diffbench` on the cluster (~15 min, `trace_more.sbatch diffbench`), then
-     rerun `model/cross_gpu.py`, the reports and figures.
+  2. RoboTwin steps 2 and 3 (cluster).
   3. Optional: spec-only what-if predictions for H100/H200/L40S remain a stated limitation.
-- GPU-hours used on `csci_ga_3033_025-2026fa`: 3.65 of 300 (2026-11-15).
+- GPU-hours used on `csci_ga_3033_025-2026fa`: 4.07 of 300 (2026-11-16).
 - Pending for the user (CIMS): see "Needs the user" in section 1 and the cuda2 commands in
   section 6. The user asked for a full "what to run on cuda machines and elsewhere" list once
   the cluster runs are finished.
