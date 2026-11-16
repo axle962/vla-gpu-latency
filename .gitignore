@@ -26,3 +26,5 @@ envs/
 # raw profiler traces stay on /scratch (tens of MB each); summaries and kernels.csv.gz are kept
 traces/**/trace.json.gz
 traces/**/trace_graph.json.gz
+# placement profiler traces (workloads/placement.py --profile)
+results/placement/**/trace_*.json.gz
