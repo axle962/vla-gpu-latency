@@ -516,6 +516,29 @@ State:
   `lerobot/smolvla_robotwin` at RoboTwin shapes is possible without the simulator. MolmoSpaces
   skipped. Praxis-1 (Reactor blog, 2026-11-11): independent evidence, 249 of ~800 ms Python on a
   B200, 21,740 -> 4,944 kernels.
+- **RoboTwin 2.0 on the cluster (planned 2026-11-15; for a cluster session to pick up):**
+  CIMS cannot run it (no Docker, Podman has no NVIDIA CDI / subuid). lerobot's guide
+  (huggingface.co/docs/lerobot/robotwin): RoboTwin runs in its own environment behind
+  `lerobot-env-server` because its planners (CuRobo v0.7.8, pytorch3d) compile against torch
+  2.7.1 + CUDA 12.8 `nvcc`, with a pinned RoboTwin commit, assets, and RoboTwin's mplib/SAPIEN
+  patches (recipe: stage `robotwin_native` of lerobot's `docker/Dockerfile.sim`; then lerobot with
+  `--no-deps` + `docker/sim/requirements.txt`). Needs a newer lerobot than 0.4.4 (env-server,
+  `env.type=robotwin`). Eval: `lerobot-eval --policy.path=... --env.type=robotwin
+  --env.task=beat_block_hammer --eval.batch_size=1 --eval.n_episodes=100`; 3 cameras
+  (head/left/right, 240x320), 14-dim joint actions, episode 1200 steps, 25 FPS. Checkpoints:
+  `lerobot/smolvla_robotwin` (official), community pi0.5 fine-tunes (e.g. SidneyXie/pi05_robotwin).
+  Steps:
+  1. `sbatch -p c12m85-a100-1 scripts/cluster/robotwin_check.sbatch` (~2 min): SAPIEN needs an
+     NVIDIA Vulkan ICD on the GPU node (cloud VMs may lack it: then stop, or use an Apptainer
+     image with --nv if Apptainer exists). Also lists CUDA modules and container runtimes.
+  2. If Vulkan works: build a separate env (`envs/robotwin`: torch 2.7.1, conda `cuda-nvcc` 12.8,
+     CuRobo, pytorch3d, RoboTwin + assets, newer lerobot) inside a CPU-partition job
+     (`n2c48m24`; the login node has ~1.8 GB RAM, too little for pytorch3d).
+  3. Smoke test `lerobot/smolvla_robotwin` on one task, 5 episodes, then the same experiment as
+     LIBERO: success vs simulated inference delay (port `workloads/libero_eval.py`'s delay
+     model) on a few tasks x 100 episodes, plus a latency trace of the policy on the A100
+     (`trace_smolvla.py`-style, RoboTwin shapes). Estimate 5 to 15 GPU-h; state it before
+     submitting. Keep RoboTwin outputs under `results/robotwin/`.
 - **Next:**
   1. Paper and slides (deferred by the user until the teammates' work is merged): move the
      headline to `slot_drv` on four GPUs, add ACT/Diffusion (three regimes: dispatch bound,
