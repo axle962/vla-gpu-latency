@@ -1,0 +1,207 @@
+<title>VLA Latency Project Status</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@600;700&display=swap">
+<style>
+/* Layout: one reading column of numbered-free sections; eager (amber) vs graph (teal) is the only color story. */
+:root {
+  --bg: #f6f7f8; --surface: #ffffff; --fg: #1b2127; --muted: #5b6670; --rule: #dde2e6;
+  --eager: #b8691b; --graph: #0f7a72; --accent: #0f7a72; --bar-bg: #e8ecef;
+  --display: "IBM Plex Sans Condensed", "Arial Narrow", system-ui, sans-serif;
+  --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #12161a; --surface: #1a2026; --fg: #e3e8ec; --muted: #9aa6b0; --rule: #2c353d;
+  --eager: #e39a4f; --graph: #4fc2b6; --accent: #4fc2b6; --bar-bg: #26303a; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #12161a; --surface: #1a2026; --fg: #e3e8ec; --muted: #9aa6b0; --rule: #2c353d;
+  --eager: #e39a4f; --graph: #4fc2b6; --accent: #4fc2b6; --bar-bg: #26303a; color-scheme: dark }
+
+body { background: var(--bg); color: var(--fg); font: 15px/1.6 var(--body); }
+.wrap { max-width: 860px; margin: 0 auto; padding-block: 40px 64px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: flex; flex-direction: column; gap: 40px; }
+header { display: flex; flex-direction: column; gap: 8px; border-bottom: 2px solid var(--fg); padding-bottom: 20px; }
+.eyebrow { font: 500 12px/1.4 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+h1 { font: 700 clamp(30px, 6vw, 44px)/1.05 var(--display); margin: 0; text-wrap: balance; }
+h2 { font: 600 22px/1.2 var(--display); margin: 0; text-wrap: balance; }
+h3 { font: 600 16px/1.3 var(--body); margin: 0; }
+p { margin: 0; max-width: 68ch; }
+.lede { font-size: 17px; color: var(--muted); max-width: 64ch; }
+section { display: flex; flex-direction: column; gap: 14px; }
+.k { color: var(--eager); font-weight: 600; } .g { color: var(--graph); font-weight: 600; }
+ul { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px; max-width: 70ch; }
+code, .num { font-family: var(--mono); font-size: .92em; }
+.num, td { font-variant-numeric: tabular-nums; }
+
+.keypoints { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+.kp { background: var(--surface); border: 1px solid var(--rule); border-radius: 6px; padding: 14px 16px; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.kp b { font: 600 15px/1.35 var(--body); }
+.kp span { color: var(--muted); font-size: 14px; }
+
+.tablebox { overflow-x: auto; border: 1px solid var(--rule); border-radius: 6px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+th { font: 500 12px/1.4 var(--mono); letter-spacing: .04em; text-transform: uppercase; color: var(--muted); background: var(--bg); }
+tr:last-child td { border-bottom: 0; }
+td.r, th.r { text-align: right; white-space: nowrap; }
+.pill { display: inline-block; font: 500 11px/1.6 var(--mono); padding: 0 7px; border-radius: 10px; border: 1px solid currentColor; white-space: nowrap; }
+.pill.disp { color: var(--graph); } .pill.mix { color: var(--muted); } .pill.gpu { color: var(--eager); }
+
+.chart { background: var(--surface); border: 1px solid var(--rule); border-radius: 6px; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+.chart svg { width: 100%; height: auto; max-width: 100%; }
+.chart svg text { fill: var(--fg); font-family: var(--mono); font-size: 12px; }
+.chart svg .lab { fill: var(--muted); }
+.legend { display: flex; gap: 16px; flex-wrap: wrap; font: 12px var(--mono); color: var(--muted); }
+.sw { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; }
+.note { font-size: 13px; color: var(--muted); }
+footer { border-top: 1px solid var(--rule); padding-top: 14px; font-size: 13px; color: var(--muted); }
+</style>
+
+<div class="wrap">
+<header>
+  <div class="eyebrow">GPU Architecture course project · status as of 17 Nov 2026</div>
+  <h1>VLA Latency Project Status</h1>
+  <p class="lede">What we did since 11 Nov: new robot policies, benchmark and side studies, the final cross-GPU model, and task-success tests in simulation. Four GPUs: A100 (cluster), RTX 2080 Ti, TITAN V and RTX 4070 (CIMS).</p>
+</header>
+
+<section>
+  <h2>Main points</h2>
+  <div class="keypoints">
+    <div class="kp"><b>Three latency regimes</b><span>Dispatch bound (SmolVLA, pi0, pi0.5), mixed (ACT) and GPU bound (Diffusion Policy). CUDA graphs help a lot only in the first.</span></div>
+    <div class="kp"><b>GPU order flips between modes</b><span>The 4070 is slowest in <span class="k">eager</span> mode and fastest with <span class="g">graphs</span>. The host CPU sets eager speed.</span></div>
+    <div class="kp"><b>The model predicts the flip</b><span><code>slot_drv</code> ranks the four GPUs correctly in 65% of SmolVLA cases, against 27% for memory-bandwidth scaling.</span></div>
+    <div class="kp"><b>Faster inference can raise task success</b><span>On LIBERO-Long, graphs move pi0.5 on the 4070 from 65% to 76% success. On RoboTwin's hammer task, delay did not matter.</span></div>
+  </div>
+</section>
+
+<section>
+  <h2>SmolVLA on four GPUs</h2>
+  <p>The 10-step denoising loop as a CUDA graph, against the full eager step (batch 1, FP16, 3 cameras). The graph speedup of the loop ranges from 4.6x to 22.5x.</p>
+  <div class="chart">
+    <div class="legend"><span><i class="sw" style="background:var(--graph)"></i>Loop speedup with graphs (eager loop / graph loop)</span></div>
+    <svg viewBox="0 0 640 180" role="img" aria-label="Loop graph speedup: RTX 4070 22.5x, RTX 2080 Ti 10.2x, A100 9.0x, TITAN V 4.6x">
+      <!-- scale: 0..25x over x = 120..600 (19.2 px per x) -->
+      <g stroke="var(--rule)" stroke-width="1">
+        <line x1="120" y1="8" x2="120" y2="156"/><line x1="216" y1="8" x2="216" y2="156"/>
+        <line x1="312" y1="8" x2="312" y2="156"/><line x1="408" y1="8" x2="408" y2="156"/>
+        <line x1="504" y1="8" x2="504" y2="156"/><line x1="600" y1="8" x2="600" y2="156"/>
+      </g>
+      <g class="lab" text-anchor="middle">
+        <text x="120" y="174">0</text><text x="216" y="174">5x</text><text x="312" y="174">10x</text>
+        <text x="408" y="174">15x</text><text x="504" y="174">20x</text><text x="600" y="174">25x</text>
+      </g>
+      <g fill="var(--graph)">
+        <rect x="120" y="14" width="432" height="24" rx="2"/>
+        <rect x="120" y="50" width="195.8" height="24" rx="2"/>
+        <rect x="120" y="86" width="172.8" height="24" rx="2"/>
+        <rect x="120" y="122" width="88.3" height="24" rx="2"/>
+      </g>
+      <g text-anchor="end">
+        <text x="110" y="30">RTX 4070</text><text x="110" y="66">RTX 2080 Ti</text>
+        <text x="110" y="102">A100</text><text x="110" y="138">TITAN V</text>
+      </g>
+      <g>
+        <text x="560" y="30">22.5x</text><text x="323" y="66">10.2x</text>
+        <text x="300" y="102">9.0x</text><text x="216" y="138">4.6x</text>
+      </g>
+    </svg>
+  </div>
+  <div class="tablebox"><table>
+    <thead><tr><th>GPU (host)</th><th class="r">Eager step</th><th class="r">Graph loop</th><th class="r">Loop speedup</th></tr></thead>
+    <tbody>
+      <tr><td>A100 (2.2 GHz cloud Xeon)</td><td class="r k">383 ms</td><td class="r g">35.6 ms</td><td class="r">9.0x</td></tr>
+      <tr><td>RTX 2080 Ti (Xeon E5-2660 v3)</td><td class="r k">491 ms</td><td class="r g">40.1 ms</td><td class="r">10.2x</td></tr>
+      <tr><td>TITAN V (Xeon Gold 5118)</td><td class="r k">343 ms</td><td class="r g">61.5 ms</td><td class="r">4.6x</td></tr>
+      <tr><td>RTX 4070 (Xeon E5-2650 v2, 2013)</td><td class="r k">607 ms</td><td class="r g">22.8 ms</td><td class="r">22.5x</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section>
+  <h2>Reactor (Praxis-1)</h2>
+  <p>Logged on 11 Nov as outside evidence only; we ran no experiments on it. Their B200 inference spent 249 of about 800 ms in Python, and they cut kernels from 21,740 to 4,944. This supports our finding that framework dispatch, not the GPU, sets eager latency.</p>
+</section>
+
+<section>
+  <h2>New policies</h2>
+  <p>Chosen for their different mixes of GPU calls. On every GPU, the graph runs gave the same outputs as eager mode.</p>
+  <div class="tablebox"><table>
+    <thead><tr><th>Policy</th><th>Size, precision</th><th>Regime</th><th class="r">Graph speedup</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>ACT</td><td>52M, FP32</td><td><span class="pill mix">mixed</span></td><td class="r">1.6 to 3.5x</td><td>Whole forward pass captured (480x640). Same GPU order flip as SmolVLA.</td></tr>
+      <tr><td>Diffusion Policy</td><td>263M, FP32</td><td><span class="pill gpu">GPU bound</span></td><td class="r">1.00 to 1.03x</td><td>With default settings cuDNN picks a different conv algorithm per architecture; FFT on the 4070 makes it 2.3x slower than the 2080 Ti. Autotuning removes that, but its choice varies between runs and it crashes on the A100.</td></tr>
+      <tr><td>pi0</td><td>FP16 and BF16</td><td><span class="pill disp">dispatch bound</span></td><td class="r">loop 2.9 to 11.7x*</td><td>Eager 355 to 600 ms, graph loop 37.5 to 83.3 ms (TITAN V, 2080 Ti, 4070).</td></tr>
+      <tr><td>pi0.5</td><td>FP16 and BF16</td><td><span class="pill disp">dispatch bound</span></td><td class="r">loop 2.9 to 11.7x*</td><td>Eager 425 to 713 ms, graph loop 48.4 to 94.6 ms.</td></tr>
+      <tr><td>pi0-FAST</td><td>BF16 (FP16 timing only)</td><td><span class="pill gpu">weight streaming</span></td><td class="r">n/a</td><td>Eager 5.6 to 10.6 s; 256-token graph decode about 3 s on all three GPUs (similar DRAM bandwidth). FP16 overflows. lerobot always decodes 256 tokens; stopping at the end token (~136) would save ~47%.</td></tr>
+    </tbody>
+  </table></div>
+  <p class="note">* Range over pi0 and pi0.5 together, from the TITAN V (lowest) to the RTX 4070 (highest). The pi models ran on the three CIMS GPUs only.</p>
+</section>
+
+<section>
+  <h2>Benchmarks and side studies</h2>
+  <div class="tablebox"><table>
+    <thead><tr><th>Study</th><th>Result</th></tr></thead>
+    <tbody>
+      <tr><td>Batch size</td><td><span class="k">Eager</span> stays flat (host bound); the <span class="g">graph</span> loop grows. Graph speedup falls below 2x at batch ~10 (TITAN V), ~16 (2080 Ti), above 16 (4070). Cross-GPU error 6 to 18% up to batch 8, 27% at batch 16.</td></tr>
+      <tr><td>torch.compile</td><td>Fuses ~11.5k kernels into ~3.2k. Compiled plus graphs is ~2x faster than our hand-built graph (2080 Ti 20.8 vs 40.1 ms). Cross-GPU error 12% at batch 1.</td></tr>
+      <tr><td>Energy</td><td>Graphs cut GPU energy per inference 1.6 to 2.7x at batch 1 (4070: 31 J to 11.5 J), 1.1 to 1.5x at batch 8.</td></tr>
+      <tr><td>Calibration ablation</td><td>Spec sheets only: eager error 34%, graph loop 38%, correct ranking 20%. The PyTorch dispatch table and the graph-slot table carry most of the gain.</td></tr>
+      <tr><td>Host CPU experiment</td><td>CPU contention on one 2080 Ti slows <span class="k">eager</span> 1.65 to 1.93x; the <span class="g">graph</span> loop stays within 8%.</td></tr>
+      <tr><td>Rodinia</td><td>Our rules fail on throughput kernels (~100% error); bandwidth-bound streamcluster within 2.5%.</td></tr>
+      <tr><td>What-if (spec only)</td><td>H100, H200, L40S, RTX 4090, PRO 6000 from A100 traces. Eager OpenVLA barely moves (dispatch bound). The H200 being slower than the H100 in public benchmarks points to host or software, not the GPU.</td></tr>
+      <tr><td>Timeline figure</td><td>Nsight Systems trace of the loop in both modes (both ~1.4x slower under the tracer).</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section>
+  <h2>Prediction model</h2>
+  <p>Final model <code>slot_drv</code>: per-kernel slot times from source-GPU traces, transferred with calibration tables measured on the target (no target traces). Mean absolute percentage error across GPU pairs:</p>
+  <div class="tablebox"><table>
+    <thead><tr><th>Workload</th><th>GPUs</th><th class="r">Eager</th><th class="r">Graph loop</th><th class="r">Eager prefix + graph loop</th></tr></thead>
+    <tbody>
+      <tr><td>SmolVLA</td><td>4</td><td class="r">20.2%</td><td class="r">15.3%</td><td class="r">13.0%</td></tr>
+      <tr><td>SmolVLA</td><td>3 (without the 4070)</td><td class="r">6.6%</td><td class="r">16.2%</td><td class="r">5.5%</td></tr>
+      <tr><td>pi0</td><td>3</td><td class="r">18%</td><td class="r">13%</td><td class="r">11%</td></tr>
+      <tr><td>pi0.5</td><td>3</td><td class="r">12%</td><td class="r">10%</td><td class="r">18%</td></tr>
+      <tr><td>ACT</td><td>4</td><td class="r">28.0%</td><td class="r">12.2%</td><td class="r">n/a</td></tr>
+      <tr><td>Diffusion (default cuDNN)</td><td>4</td><td class="r">39.8%</td><td class="r">41.9%</td><td class="r">n/a</td></tr>
+    </tbody>
+  </table></div>
+  <p class="note">Weak spots: eager mode on the 4070's old host (microbenchmarks overstate its slowdown), and Diffusion pairs with the 4070, where cuDNN runs a different conv algorithm.</p>
+</section>
+
+<section>
+  <h2>Task success in simulation</h2>
+  <h3>LIBERO-Long (100 paired episodes per point)</h3>
+  <div class="tablebox"><table>
+    <thead><tr><th>Policy</th><th class="r">0 ms</th><th class="r">100 ms</th><th class="r">250 ms</th><th class="r">500 ms</th><th class="r">750 ms</th><th class="r">1 s</th></tr></thead>
+    <tbody>
+      <tr><td>SmolVLA FP16</td><td class="r">50%</td><td class="r">49%</td><td class="r">51%</td><td class="r">44%</td><td class="r">44%</td><td class="r">34%</td></tr>
+      <tr><td>pi0 FP16</td><td class="r">38%</td><td class="r">37%</td><td class="r">34%</td><td class="r">27%</td><td class="r">22%</td><td class="r">15%</td></tr>
+      <tr><td>pi0.5 FP16</td><td class="r">87%</td><td class="r">79%</td><td class="r">76%</td><td class="r">63%</td><td class="r">65%</td><td class="r">48%</td></tr>
+    </tbody>
+  </table></div>
+  <p>Delay starts to hurt significantly at 250 ms for pi0.5, 750 ms for pi0 and 1 s for SmolVLA. With <span class="g">graphs</span> every policy runs at 100 to 250 ms of delay on every GPU; in <span class="k">eager</span> mode at 350 to 750 ms.</p>
+  <h3>RoboTwin 2.0 (A100 cluster, SmolVLA)</h3>
+  <ul>
+    <li><b>beat_block_hammer:</b> 63 / 63 / 70 / 73% success at 0 / 120 / 400 / 800 ms delay. A control that replans at the same points with no delay gives the same result, so staleness costs nothing here; the small gain comes from replanning more often.</li>
+    <li><b>lift_pot:</b> delay study in progress (0 ms, 800 ms and the replanning control, 100 episodes each). Done so far: 0 ms at 37 of 76 episodes (49%), control 12 of 28. Five blocks lost to failed node boots were resubmitted.</li>
+    <li>SmolVLA's RoboTwin checkpoint has the same latency as the base model (eager 378 ms, graph loop 35.4 ms).</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Open items</h2>
+  <ul>
+    <li>Finish and analyze the lift_pot study (8 jobs running or queued).</li>
+    <li>Final reproducibility check from a fresh clone on cuda2.</li>
+    <li>Access to more GPUs (T4, V100, PRO 6000, H200, L40S) would turn the spec-only what-if into measured targets.</li>
+  </ul>
+  <p>Cluster budget: 86.9 of 300 GPU-hours used; the lift_pot jobs still in the queue add about 25.</p>
+</section>
+
+<footer>Sources: CLAUDE.md project log, <code>results/report_cross_gpu*.md</code>, <code>results/libero_analysis.md</code>, <code>results/robotwin_analysis.md</code>.</footer>
+</div>
