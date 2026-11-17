@@ -606,6 +606,14 @@ State:
     starts at index d, so only 50 - d of its actions run and planning happens every 50 - d
     steps (same in the LIBERO harness). Not yet run on the GPU. RoboTwin runs at 25 Hz, so
     d control steps = 40 ms each (LIBERO: 50 ms).
+  - **RoboTwin delay sweep submitted 2026-11-17 00:05 (user chose 100 episodes per delay,
+    ~28 GPU-h):** SmolVLA, `beat_block_hammer`, d = 0 / 3 / 10 / 20 (0 / 120 / 400 / 800 ms;
+    ~3 is the graph-mode latency, ~10 eager on the A100), 4 parallel envs. Per delay two jobs:
+    52 episodes (`EVAL_SEED=1000`, `ROBOTWIN_NOISE_SEED=10000`) and 48 episodes (1052, 20000),
+    identical across delays (paired). Jobs 34666/34667 (d=0), 34668/34669 (3), 34670/34671 (10),
+    34672/34673 (20); outputs `results/robotwin/sweep_d<d>_s<seed>_<job>/`, logs
+    `logs/rtw-d<d>-s<seed>-<job>.out`. Analysis to do: merge halves, paired McNemar vs d = 0
+    (as `model/libero_analysis.py`).
 - **Next:**
   1. Paper and slides (deferred by the user until the teammates' work is merged): move the
      headline to `slot_drv` on four GPUs, add ACT/Diffusion (three regimes: dispatch bound,

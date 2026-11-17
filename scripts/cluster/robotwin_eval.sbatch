@@ -5,7 +5,8 @@
 #   source scripts/cluster/site.sh
 #   sbatch -p c12m85-a100-1 scripts/cluster/robotwin_eval.sbatch [policy] [tasks] [episodes] [tag]
 # Defaults: lerobot/smolvla_robotwin, beat_block_hammer, 5 episodes, tag "smoke".
-# EVAL_BATCH=N runs N simulator copies in parallel (async envs, one GPU).
+# EVAL_BATCH=N runs N simulator copies in parallel (async envs, one GPU). EVAL_SEED sets the
+# first episode seed (lerobot --seed; episode i uses EVAL_SEED + i).
 # Outputs in results/robotwin/<tag>_<job>/ (eval_info.json, a few episode videos).
 #SBATCH --job-name=robotwin-eval
 #SBATCH --gres=gpu:1
@@ -50,6 +51,7 @@ if [ -n "${ROBOTWIN_DELAY:-}" ]; then EVAL=(python "$REPO/workloads/robotwin_del
   --eval.n_episodes="$EPISODES" \
   --env.observation_height="$H" --env.observation_width="$W" \
   --rename_map="$RENAME" \
+  --seed="${EVAL_SEED:-1000}" \
   --output_dir="$OUT"
 echo "wall time $(( $(date +%s) - start )) s"
 ls -la "$OUT"

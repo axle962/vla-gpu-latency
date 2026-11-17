@@ -16,7 +16,8 @@ every delay as well (paired comparison).
 
 Usage (envs/robotwin, from the RoboTwin root, RoboTwin on PYTHONPATH):
   ROBOTWIN_DELAY=5 python workloads/robotwin_delay_eval.py <lerobot-eval arguments>
-Optional: ROBOTWIN_EXEC_H (execution horizon, default the policy's n_action_steps).
+Optional: ROBOTWIN_EXEC_H (execution horizon, default the policy's n_action_steps),
+ROBOTWIN_NOISE_SEED (base noise seed, default 10000).
 Writes <output_dir>/delay_info.json (delay, horizon, inference count and times).
 """
 
@@ -34,7 +35,9 @@ import lerobot.scripts.lerobot_eval as le
 
 DELAY = int(os.environ.get("ROBOTWIN_DELAY", "0"))
 EXEC_H = int(os.environ.get("ROBOTWIN_EXEC_H", "0"))
-STATS = {"delay_steps": DELAY, "exec_horizon": None, "rollouts": 0, "inferences": 0,
+# Noise seed of rollout r is NOISE_SEED + r; give each episode block (lerobot --seed) its own base.
+NOISE_SEED = int(os.environ.get("ROBOTWIN_NOISE_SEED", "10000"))
+STATS = {"delay_steps": DELAY, "noise_seed": NOISE_SEED, "exec_horizon": None, "rollouts": 0, "inferences": 0,
          "infer_ms": [], "select_calls": 0}
 
 
@@ -61,7 +64,7 @@ def wrap_policy(policy):
         orig_reset()
         state["queue"], state["pending"], state["start"] = deque(), None, True
         # same noise stream for every delay: seed by rollout index
-        torch.manual_seed(10_000 + STATS["rollouts"])
+        torch.manual_seed(NOISE_SEED + STATS["rollouts"])
         STATS["rollouts"] += 1
 
     def select_action(self, batch, **kwargs):
