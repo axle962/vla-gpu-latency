@@ -40,7 +40,7 @@ commit and push (or tar) the results. Never run GPU work on the `access` gateway
 
 ---
 
-## 0.1 Resume here (updated 2026-11-12 ~22:30)
+## 0.1 Resume here (updated 2026-11-17)
 
 State:
 - **Calibration done on A100** (`results/calib/NVIDIA_A100*`, two nodes; launch numbers agree
@@ -612,16 +612,27 @@ State:
     52 episodes (`EVAL_SEED=1000`, `ROBOTWIN_NOISE_SEED=10000`) and 48 episodes (1052, 20000),
     identical across delays (paired). Jobs 34666/34667 (d=0), 34668/34669 (3), 34670/34671 (10),
     34672/34673 (20); outputs `results/robotwin/sweep_d<d>_s<seed>_<job>/`, logs
-    `logs/rtw-d<d>-s<seed>-<job>.out`. Analysis to do: merge halves, paired McNemar vs d = 0
-    (as `model/libero_analysis.py`).
+    `logs/rtw-d<d>-s<seed>-<job>.out`. 34672 was requeued after a failed boot, cancelled and
+    rerun as 34689.
+  - **RoboTwin sweep done 2026-11-17** (`model/robotwin_analysis.py` ->
+    `results/robotwin_analysis.md`; ~33 GPU-h including the 4 parallel envs' wall time, 217 to
+    330 s per episode). Success at d = 0 / 3 / 10 / 20 (0 / 120 / 400 / 800 ms): **63 / 63 / 70 /
+    73%**, 100 paired episodes each, paired McNemar vs d = 0 p = 1.0 / 0.4 / 0.2. **Delay does not
+    hurt on beat_block_hammer** (unlike LIBERO-Long), so graphs buy no task success here.
+    Confound: larger d also replans every 50 - d steps (more feedback); a control (replan every
+    50 - d steps, no delay) would separate them. Outcomes are noisy: only 29 of 100 seeds have
+    the same outcome at every d. One slow quasi-static task only. In-harness eager policy call
+    on the A100: ~328 ms (d ~ 9); the graph-mode hybrid (~95 ms) is d = 3. Sweep videos (first 10
+    episodes per job, ~28 MB) are git-ignored and stay on /scratch.
 - **Next:**
   1. Paper and slides (deferred by the user until the teammates' work is merged): move the
      headline to `slot_drv` on four GPUs, add ACT/Diffusion (three regimes: dispatch bound,
      mixed, GPU bound) and the cuDNN algorithm-selection finding; verify bibliography; compile
      on Overleaf.
-  2. RoboTwin: scope decision (see the smoke-test bullet), then delay sweep and latency trace.
+  2. RoboTwin (optional, user decides): replanning-rate control and/or a faster, more dynamic
+     task; latency trace of `smolvla_robotwin` at RoboTwin shapes on the A100.
   3. Optional: spec-only what-if predictions for H100/H200/L40S remain a stated limitation.
-- GPU-hours used on `csci_ga_3033_025-2026fa`: 4.81 of 300 (2026-11-16).
+- GPU-hours used on `csci_ga_3033_025-2026fa`: 37.4 of 300 (2026-11-17, `sacct -D` tally).
 - Pending for the user (CIMS): see "Needs the user" in section 1 and the cuda2 commands in
   section 6. The user asked for a full "what to run on cuda machines and elsewhere" list once
   the cluster runs are finished.
