@@ -638,21 +638,29 @@ State:
       x 3 cameras, state 14, same latency as the base model (eager 378, prefix 58, graph loop
       35.4, hybrid 94 ms; bit-exact).
     - `model/robotwin_analysis.py` now has control and screen sections.
-  - **lift_pot delay study submitted 2026-11-17 ~15:20 (user approved, ~36 GPU-h):** d = 0, d = 20
+  - **lift_pot delay study submitted 2026-11-17 ~15:00 (user approved, ~36 GPU-h):** d = 0, d = 20
     and control H = 30 (`ROBOTWIN_EXEC_H=30`, no delay), 100 paired episodes each, split in four
     seed blocks so each job fits 6 h: seeds 1000 (28 episodes, noise 10000), 1028 (24, 20000),
     1052 (24, 30000), 1076 (24, 40000). Jobs 35039 to 35050 (per block: d0, d20, ctrlh30);
     outputs `results/robotwin/lift_pot_{d0,d20,ctrlh30}_s<seed>_<job>/`, logs
     `logs/lp-<cond>-s<seed>-<job>.out`. `model/robotwin_analysis.py` reports it per task once
     finished (resubmit any block that requeues or fails, same env vars).
+    **Status 2026-11-17 evening:** 35043/35044/35046/35047/35049 died at node boot
+    (`CANCELLED by 0`, ~11 to 15 min each) and were resubmitted as 35290 (d20 s1028), 35291
+    (ctrlh30 s1028), 35292 (d20 s1052), 35293 (ctrlh30 s1052), 35294 (d20 s1076); env
+    `EVAL_BATCH=4 EVAL_SEED=<seed> ROBOTWIN_NOISE_SEED=<noise> ROBOTWIN_DELAY=<0|20>
+    [ROBOTWIN_EXEC_H=30]`, plus `-A csci_ga_3033_025-2026fa` (sbatch from the OOD shell needs it
+    even after `source site.sh`). Done so far: d0 s1000 14/28, s1028 12/24, s1052 11/24;
+    ctrlh30 s1000 12/28. lift_pot runs ~510 s per episode with 4 envs (slower than the screen
+    suggested), so a 24-episode block takes ~3.5 to 4.5 h.
 - **Next:**
   1. Paper and slides (deferred by the user until the teammates' work is merged): move the
      headline to `slot_drv` on four GPUs, add ACT/Diffusion (three regimes: dispatch bound,
      mixed, GPU bound) and the cuDNN algorithm-selection finding; verify bibliography; compile
      on Overleaf.
-  2. RoboTwin: analyze the lift_pot study when jobs 35039 to 35050 finish.
+  2. RoboTwin: analyze the lift_pot study when jobs 35040, 35048, 35050 and 35290 to 35294 finish.
   3. Optional: spec-only what-if predictions for H100/H200/L40S remain a stated limitation.
-- GPU-hours used on `csci_ga_3033_025-2026fa`: 56.0 of 300 (2026-11-17, `sacct -D` tally).
+- GPU-hours used on `csci_ga_3033_025-2026fa`: 86.9 of 300 (2026-11-17 evening, `sacct -D` tally; ~25 more queued/running for lift_pot).
 - **Run list (2026-11-17, all planned measurements are done; everything below is optional or
   administrative):**
   - CIMS: final reproducibility check from a fresh clone on cuda2 (`git pull`, `module load
