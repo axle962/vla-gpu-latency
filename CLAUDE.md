@@ -592,9 +592,20 @@ State:
     (it was trained at 480x640; the simulator default is 240x320). **Cost: 430 s per episode
     on one A100** (36 min for 5; episodes run up to 1200 steps), so 100 episodes ~12 GPU-h per
     (task, delay) point: the plan's 5 to 15 GPU-h covers about one point, not a delay sweep.
-    Not started: delay model port (lerobot 0.7 rollout), parallel envs (`eval.batch_size` > 1;
-    the A100 node has 12 CPUs), the RoboTwin-shape latency trace. Waiting for the user to pick
-    the scope.
+  - **User chose (2026-11-16): throughput test first, then a firm estimate before any sweep.**
+    Parallel envs (job 34318, `EVAL_BATCH=4`, 12 CPUs / 80 GB requested,
+    `results/robotwin/tput4_34318/`): 8 episodes in 1975 s = **247 s per episode** (1.74x vs
+    serial; a batch runs until its slowest episode ends), 6 / 8 success. Together with the smoke
+    test: 8 / 13 at d = 0.
+  - **Delay model ported:** `workloads/robotwin_delay_eval.py` runs lerobot 0.7's own
+    `lerobot-eval` and only wraps the policy returned by `make_policy` (same model as
+    `libero_eval.py`; torch reseeded per rollout for paired noise; writes `delay_info.json`
+    with inference count/times). `ROBOTWIN_DELAY=d` in `robotwin_eval.sbatch` switches to it.
+    `workloads/test_robotwin_delay.py` (CPU) checks it step for step against the LIBERO loop
+    for d = 0, 1, 5, 20: passes. Note: with a 50-action chunk and horizon 50, a delayed chunk
+    starts at index d, so only 50 - d of its actions run and planning happens every 50 - d
+    steps (same in the LIBERO harness). Not yet run on the GPU. RoboTwin runs at 25 Hz, so
+    d control steps = 40 ms each (LIBERO: 50 ms).
 - **Next:**
   1. Paper and slides (deferred by the user until the teammates' work is merged): move the
      headline to `slot_drv` on four GPUs, add ACT/Diffusion (three regimes: dispatch bound,

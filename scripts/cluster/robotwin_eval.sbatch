@@ -5,11 +5,12 @@
 #   source scripts/cluster/site.sh
 #   sbatch -p c12m85-a100-1 scripts/cluster/robotwin_eval.sbatch [policy] [tasks] [episodes] [tag]
 # Defaults: lerobot/smolvla_robotwin, beat_block_hammer, 5 episodes, tag "smoke".
-# Outputs in results/robotwin/<tag>_<job>/ (eval_info.json, videos off).
+# EVAL_BATCH=N runs N simulator copies in parallel (async envs, one GPU).
+# Outputs in results/robotwin/<tag>_<job>/ (eval_info.json, a few episode videos).
 #SBATCH --job-name=robotwin-eval
 #SBATCH --gres=gpu:1
-#SBATCH --cpus-per-task=8
-#SBATCH --mem=48G
+#SBATCH --cpus-per-task=12
+#SBATCH --mem=80G
 #SBATCH --time=01:00:00
 #SBATCH --output=logs/%x-%j.out
 #SBATCH --no-requeue
@@ -37,12 +38,15 @@ export PYTHONPATH=$RT ROBOTWIN_ROOT=$RT SIM_WORKDIR=$RT
 mkdir -p "$(dirname "$OUT")"
 cd "$RT"
 start=$(date +%s)
-lerobot-eval \
+# ROBOTWIN_DELAY=d (control steps) runs lerobot-eval through workloads/robotwin_delay_eval.py,
+# which wraps the policy with the simulated-delay model (also for d = 0, for paired seeds).
+if [ -n "${ROBOTWIN_DELAY:-}" ]; then EVAL=(python "$REPO/workloads/robotwin_delay_eval.py"); else EVAL=(lerobot-eval); fi
+"${EVAL[@]}" \
   --policy.path="$POLICY" \
   --policy.device=cuda \
   --env.type=robotwin \
   --env.task="$TASKS" \
-  --eval.batch_size=1 \
+  --eval.batch_size="${EVAL_BATCH:-1}" \
   --eval.n_episodes="$EPISODES" \
   --env.observation_height="$H" --env.observation_width="$W" \
   --rename_map="$RENAME" \
