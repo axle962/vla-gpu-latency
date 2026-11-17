@@ -35,14 +35,29 @@ def _read(f: str) -> tuple[dict, dict, list[int]]:
     return e, info, [int(bool(x)) for x in e["per_task"][0]["metrics"]["successes"]]
 
 
-def load() -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
-    """Delay sweep (sweep_d<d>_s<seed>) and replanning controls (ctrl_h<H>_s<seed>: no delay,
-    replan every H steps, the same replanning period as delay d = 50 - H)."""
+TASKS = ("beat_block_hammer", "lift_pot")
+
+
+def run_patterns(task: str) -> tuple[tuple[str, str], ...]:
+    """(kind, directory regex) of a task's delay runs and replanning controls. beat_block_hammer
+    (the first sweep) uses sweep_d<d>_s<seed>_<job> / ctrl_h<H>_s<seed>_<job>; later tasks
+    <task>_d<d>_s<seed>_<job> / <task>_ctrlh<H>_s<seed>_<job>."""
+    if task == "beat_block_hammer":
+        return (("sweep", r"sweep_d(\d+)_s(\d+)_(\d+)$"), ("ctrl", r"ctrl_h(\d+)_s(\d+)_(\d+)$"))
+    return (("sweep", rf"{task}_d(\d+)_s(\d+)_(\d+)$"), ("ctrl", rf"{task}_ctrlh(\d+)_s(\d+)_(\d+)$"))
+
+
+def load(task: str) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    """Delay runs and replanning controls (no delay, replan every H steps, the same replanning
+    period as delay d = 50 - H) of one task; only finished runs (eval_info.json written)."""
     rows, ctrl, runs = [], [], []
-    pats = (("sweep", r"sweep_d(\d+)_s(\d+)_(\d+)"), ("ctrl", r"ctrl_h(\d+)_s(\d+)_(\d+)"))
-    for kind, pat in pats:
-        for f in sorted(glob.glob(str(ROOT / f"results/robotwin/{kind}_*_s*_*/eval_info.json"))):
-            x, seed, job = (int(v) for v in re.search(pat, f).groups())
+    files = sorted(glob.glob(str(ROOT / "results/robotwin/*/eval_info.json")))
+    for kind, pat in run_patterns(task):
+        for f in files:
+            m = re.search(pat, Path(f).parent.name)
+            if not m:
+                continue
+            x, seed, job = (int(v) for v in m.groups())
             e, info, succ = _read(f)
             if kind == "sweep":
                 assert info["delay_steps"] == x
@@ -62,6 +77,8 @@ def load() -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
                          "inferences": info["inferences"],
                          "infer_ms_median": info["infer_ms_median"],
                          "wall_s_per_episode": o["eval_ep_s"]})
+    if not runs:
+        return pd.DataFrame(), pd.DataFrame(), pd.DataFrame()
     runs = pd.DataFrame(runs).sort_values(["run", "delay_steps", "replan_period", "episode_seed"],
                                           ascending=[False, True, False, True])
     return pd.DataFrame(rows), pd.DataFrame(ctrl), runs
@@ -74,19 +91,18 @@ def paired(a: pd.Series, b: pd.Series) -> dict:
     return {"n": len(j), "lost": lost, "gained": gained, "mcnemar_p": round(mcnemar_p(lost, gained), 4)}
 
 
-def main() -> None:
-    d, ctrl, runs = load()
-    print("# RoboTwin 2.0: inference delay vs task success\n")
-    print("SmolVLA (`lerobot/smolvla_robotwin`, 480x640, 3 cameras), task `beat_block_hammer`, "
-          f"A100, 4 parallel envs. Delay d in control steps of {CONTROL_MS:.0f} ms (25 Hz), "
-          "naive async execution (the next chunk is planned d steps early and starts at index d, "
-          "so a 50-action chunk executes 50 - d actions). Paired: same episode and noise seeds "
-          "at every d.\n")
-
-    print("## Runs\n")
+def task_report(task: str) -> None:
+    d, ctrl, runs = load(task)
+    if d.empty:
+        return
+    if 0 not in set(d.delay_steps):
+        print(f"## Task `{task}`: incomplete (no finished d = 0 run yet)\n")
+        return
+    print(f"## Task `{task}`\n")
+    print("### Runs\n")
     print(runs.round(1).to_markdown(index=False), "\n")
 
-    print("## Success rate per delay\n")
+    print("### Success rate per delay\n")
     key = ["half", "episode"]
     base = d[d.delay_steps == 0].set_index(key).success
     out = []
@@ -111,18 +127,18 @@ def main() -> None:
     print(f"Scene effect: {always} of {len(w)} episodes succeed at every d, {never} fail at "
           f"every d; {len(w) - always - never} change outcome with d.\n")
 
-    print("## Success per half (seed block)\n")
+    print("### Success per half (seed block)\n")
     t = d.groupby(["delay_steps", "half"]).success.agg(lambda x: f"{int(x.sum())}/{len(x)}") \
         .unstack()
     print(t.to_markdown(), "\n")
 
-    print("## Staleness vs replanning rate (control runs)\n")
+    print("### Staleness vs replanning rate (control runs)\n")
     print("A delay d makes the policy plan every 50 - d steps from an observation d steps old. "
           "The control replans every H = 50 - d steps with no delay (synchronous, the chunk's "
           "first H actions), so it observes at the same steps; the only difference is staleness. "
           "Same episode and noise seeds, paired by episode.\n")
     out = []
-    for h, g in ctrl.groupby("horizon", sort=False):
+    for h, g in (ctrl.groupby("horizon", sort=False) if len(ctrl) else []):
         dl = 50 - h
         c = g.set_index(key).success
         k, n = int(c.sum()), len(c)
@@ -138,22 +154,11 @@ def main() -> None:
             v = paired(c, dd)
             row.update({"delay_vs_ctrl (lost/gained, p)": f"{v['lost']}/{v['gained']}, {v['mcnemar_p']}"})
         out.append(row)
-    print(pd.DataFrame(out).sort_values("replan_every", ascending=False).round(1)
-          .to_markdown(index=False), "\n")
+    if out:
+        print(pd.DataFrame(out).sort_values("replan_every", ascending=False).round(1)
+              .to_markdown(index=False), "\n")
 
-    print("## Task screen (d = 0, 8 episodes each, seeds 1000..1007)\n")
-    sc = []
-    for f in sorted(glob.glob(str(ROOT / "results/robotwin/screen_*_d0_*/eval_info.json"))):
-        task = re.search(r"screen_(.+)_d0_(\d+)", f).group(1)
-        e, info, succ = _read(f)
-        lo, hi = wilson(sum(succ), len(succ))
-        sc.append({"task": task, "success": f"{sum(succ)}/{len(succ)}",
-                   "ci95": f"{100 * lo:.0f} to {100 * hi:.0f}",
-                   "wall_s_per_episode": round(e["overall"]["eval_ep_s"])})
-    if sc:
-        print(pd.DataFrame(sc).to_markdown(index=False), "\n")
-
-    print("## What each GPU and execution mode buys\n")
+    print("### What each GPU and execution mode buys\n")
     print("Latency from the SmolVLA traces (3 cameras, 10 flow steps, chunk 50; the traced "
           "inputs are resized to 512, as RoboTwin's 480x640 frames are), converted to "
           f"d = ceil(latency / {CONTROL_MS:.0f} ms); success interpolated linearly between "
@@ -182,7 +187,30 @@ def main() -> None:
     print("The in-eval policy call (`infer_ms_median` above, eager, includes lerobot "
           "pre/post-processing) is the A100's eager latency in the actual harness.\n")
 
-    print("## Reading\n")
+
+def main() -> None:
+    print("# RoboTwin 2.0: inference delay vs task success\n")
+    print("SmolVLA (`lerobot/smolvla_robotwin`, 480x640, 3 cameras) on the A100, 4 parallel envs. "
+          f"Delay d in control steps of {CONTROL_MS:.0f} ms (25 Hz), naive async execution (the "
+          "next chunk is planned d steps early and starts at index d, so a 50-action chunk "
+          "executes 50 - d actions). Paired: same episode and noise seeds at every d; seed "
+          "blocks (`half`) are the jobs a condition is split into.\n")
+    for task in TASKS:
+        task_report(task)
+
+    print("## Task screen (d = 0, 8 episodes each, seeds 1000..1007)\n")
+    sc = []
+    for f in sorted(glob.glob(str(ROOT / "results/robotwin/screen_*_d0_*/eval_info.json"))):
+        task = re.search(r"screen_(.+)_d0_(\d+)", f).group(1)
+        e, info, succ = _read(f)
+        lo, hi = wilson(sum(succ), len(succ))
+        sc.append({"task": task, "success": f"{sum(succ)}/{len(succ)}",
+                   "ci95": f"{100 * lo:.0f} to {100 * hi:.0f}",
+                   "wall_s_per_episode": round(e["overall"]["eval_ep_s"])})
+    if sc:
+        print(pd.DataFrame(sc).to_markdown(index=False), "\n")
+
+    print("## Reading (beat_block_hammer)\n")
     print("- No delay up to 20 steps (800 ms) lowers success on beat_block_hammer (paired "
           "McNemar p >= 0.2 vs d = 0).\n"
           "- The control settles the confound: at the same replanning period, a stale plan "

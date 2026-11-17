@@ -638,13 +638,19 @@ State:
       x 3 cameras, state 14, same latency as the base model (eager 378, prefix 58, graph loop
       35.4, hybrid 94 ms; bit-exact).
     - `model/robotwin_analysis.py` now has control and screen sections.
+  - **lift_pot delay study submitted 2026-11-17 ~15:20 (user approved, ~36 GPU-h):** d = 0, d = 20
+    and control H = 30 (`ROBOTWIN_EXEC_H=30`, no delay), 100 paired episodes each, split in four
+    seed blocks so each job fits 6 h: seeds 1000 (28 episodes, noise 10000), 1028 (24, 20000),
+    1052 (24, 30000), 1076 (24, 40000). Jobs 35039 to 35050 (per block: d0, d20, ctrlh30);
+    outputs `results/robotwin/lift_pot_{d0,d20,ctrlh30}_s<seed>_<job>/`, logs
+    `logs/lp-<cond>-s<seed>-<job>.out`. `model/robotwin_analysis.py` reports it per task once
+    finished (resubmit any block that requeues or fails, same env vars).
 - **Next:**
   1. Paper and slides (deferred by the user until the teammates' work is merged): move the
      headline to `slot_drv` on four GPUs, add ACT/Diffusion (three regimes: dispatch bound,
      mixed, GPU bound) and the cuDNN algorithm-selection finding; verify bibliography; compile
      on Overleaf.
-  2. RoboTwin (optional, user decides): lift_pot delay study, d = 0 vs 20 (+ control H = 30),
-     100 paired episodes each, ~12 GPU-h per point (24 to 36 GPU-h).
+  2. RoboTwin: analyze the lift_pot study when jobs 35039 to 35050 finish.
   3. Optional: spec-only what-if predictions for H100/H200/L40S remain a stated limitation.
 - GPU-hours used on `csci_ga_3033_025-2026fa`: 56.0 of 300 (2026-11-17, `sacct -D` tally).
 - **Run list (2026-11-17, all planned measurements are done; everything below is optional or
@@ -653,7 +659,7 @@ State:
     cuda-12.4`, `make -C bench`, `scripts/run_calib.sh`, `scripts/run_bench.sh`), as the course
     requires the code to run there. Optional: `trace_smolvla.py --model lerobot/smolvla_robotwin`
     on cuda2/3/5 (expected equal to the base traces).
-  - Cluster: lift_pot delay study (Next, item 2). Nothing else pending; L4 still unusable.
+  - Cluster: lift_pot delay study running (Next, item 2). Nothing else pending; L4 still unusable.
   - Elsewhere (needs access the user must request): T4 / V100 / RTX PRO 6000 partitions for this
     account (NYU HPC), H200 / L40S on Torch; with access, rerun calib + dispatch table + SmolVLA
     trace sweep there as real targets (would replace the spec-only what-if, whose spec values in

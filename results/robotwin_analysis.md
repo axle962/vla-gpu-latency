@@ -1,8 +1,10 @@
 # RoboTwin 2.0: inference delay vs task success
 
-SmolVLA (`lerobot/smolvla_robotwin`, 480x640, 3 cameras), task `beat_block_hammer`, A100, 4 parallel envs. Delay d in control steps of 40 ms (25 Hz), naive async execution (the next chunk is planned d steps early and starts at index d, so a 50-action chunk executes 50 - d actions). Paired: same episode and noise seeds at every d.
+SmolVLA (`lerobot/smolvla_robotwin`, 480x640, 3 cameras) on the A100, 4 parallel envs. Delay d in control steps of 40 ms (25 Hz), naive async execution (the next chunk is planned d steps early and starts at index d, so a 50-action chunk executes 50 - d actions). Paired: same episode and noise seeds at every d; seed blocks (`half`) are the jobs a condition is split into.
 
-## Runs
+## Task `beat_block_hammer`
+
+### Runs
 
 | run   |   delay_steps |   replan_period |   episode_seed |   noise_seed |   job |   episodes |   successes |   inferences |   infer_ms_median |   wall_s_per_episode |
 |:------|--------------:|----------------:|---------------:|-------------:|------:|-----------:|------------:|-------------:|------------------:|---------------------:|
@@ -19,7 +21,7 @@ SmolVLA (`lerobot/smolvla_robotwin`, 480x640, 3 cameras), task `beat_block_hamme
 | ctrl  |             0 |              30 |           1000 |        10000 | 34878 |         52 |          37 |          383 |             319.8 |                246.8 |
 | ctrl  |             0 |              30 |           1052 |        20000 | 34879 |         48 |          35 |          382 |             326   |                247.8 | 
 
-## Success rate per delay
+### Success rate per delay
 
 |   delay_steps |   delay_ms |   episodes |   success_pct | ci95     |   lost_vs_d0 |   gained_vs_d0 |   mcnemar_p |
 |--------------:|-----------:|-----------:|--------------:|:---------|-------------:|---------------:|------------:|
@@ -30,7 +32,7 @@ SmolVLA (`lerobot/smolvla_robotwin`, 480x640, 3 cameras), task `beat_block_hamme
 
 Scene effect: 28 of 100 episodes succeed at every d, 1 fail at every d; 71 change outcome with d.
 
-## Success per half (seed block)
+### Success per half (seed block)
 
 |   delay_steps | 1000   | 1052   |
 |--------------:|:-------|:-------|
@@ -39,7 +41,7 @@ Scene effect: 28 of 100 episodes succeed at every d, 1 fail at every d; 71 chang
 |            10 | 41/52  | 29/48  |
 |            20 | 38/52  | 35/48  | 
 
-## Staleness vs replanning rate (control runs)
+### Staleness vs replanning rate (control runs)
 
 A delay d makes the policy plan every 50 - d steps from an observation d steps old. The control replans every H = 50 - d steps with no delay (synchronous, the chunk's first H actions), so it observes at the same steps; the only difference is staleness. Same episode and noise seeds, paired by episode.
 
@@ -48,15 +50,7 @@ A delay d makes the policy plan every 50 - d steps from an observation d steps o
 |             40 |                    70 | 60 to 78       |                    70 |        10 | 17/24, 0.3489                 | 15/15, 1.0                       |
 |             30 |                    72 | 63 to 80       |                    73 |        20 | 17/26, 0.2221                 | 13/14, 1.0                       | 
 
-## Task screen (d = 0, 8 episodes each, seeds 1000..1007)
-
-| task             | success   | ci95     |   wall_s_per_episode |
-|:-----------------|:----------|:---------|---------------------:|
-| handover_block   | 1/8       | 2 to 47  |                  605 |
-| lift_pot         | 5/8       | 31 to 86 |                  427 |
-| stack_blocks_two | 0/8       | 0 to 32  |                  661 | 
-
-## What each GPU and execution mode buys
+### What each GPU and execution mode buys
 
 Latency from the SmolVLA traces (3 cameras, 10 flow steps, chunk 50; the traced inputs are resized to 512, as RoboTwin's 480x640 frames are), converted to d = ceil(latency / 40 ms); success interpolated linearly between the measured delays.
 
@@ -75,7 +69,15 @@ Latency from the SmolVLA traces (3 cameras, 10 flow steps, chunk 50; the traced 
 
 The in-eval policy call (`infer_ms_median` above, eager, includes lerobot pre/post-processing) is the A100's eager latency in the actual harness.
 
-## Reading
+## Task screen (d = 0, 8 episodes each, seeds 1000..1007)
+
+| task             | success   | ci95     |   wall_s_per_episode |
+|:-----------------|:----------|:---------|---------------------:|
+| handover_block   | 1/8       | 2 to 47  |                  605 |
+| lift_pot         | 5/8       | 31 to 86 |                  427 |
+| stack_blocks_two | 0/8       | 0 to 32  |                  661 | 
+
+## Reading (beat_block_hammer)
 
 - No delay up to 20 steps (800 ms) lowers success on beat_block_hammer (paired McNemar p >= 0.2 vs d = 0).
 - The control settles the confound: at the same replanning period, a stale plan (delay d) and a fresh plan (no delay) succeed equally often, episode for episode (discordant pairs 15/15 at d = 10, 13/14 at d = 20). Staleness costs nothing here; the small rise with d comes from replanning more often (also not significant).
