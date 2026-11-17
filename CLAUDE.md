@@ -624,18 +624,41 @@ State:
     the same outcome at every d. One slow quasi-static task only. In-harness eager policy call
     on the A100: ~328 ms (d ~ 9); the graph-mode hybrid (~95 ms) is d = 3. Sweep videos (first 10
     episodes per job, ~28 MB) are git-ignored and stay on /scratch.
+  - **RoboTwin round 2 done 2026-11-17** (jobs 34876 to 34883, ~18.5 GPU-h, no requeues):
+    - **Replanning control** (`ROBOTWIN_DELAY=0 ROBOTWIN_EXEC_H=H`, `results/robotwin/ctrl_h{40,30}_*`):
+      replanning every 40 / 30 steps with no delay gives 70 / 72%, vs 70 / 73% for d = 10 / 20,
+      which plan at the same steps. Paired discordant pairs delay vs control 15/15 and 13/14
+      (p = 1.0). **Staleness up to 800 ms costs nothing on beat_block_hammer**; the small rise
+      with d is the replanning rate (vs d = 0: p = 0.35 / 0.22, not significant).
+    - **Task screen** (d = 0, 8 episodes, `results/robotwin/screen_*`): handover_block 1/8,
+      stack_blocks_two 0/8, lift_pot 5/8 (427 s per episode, so ~12 GPU-h per 100-episode
+      point). lift_pot is the only candidate for a second delay study (not run; user decides).
+    - **Latency trace** of `lerobot/smolvla_robotwin` (job 34883, `traces/smolvlarobotwin_cam3_steps10_chunk50/`;
+      `trace_smolvla.py --model`, which drops config keys lerobot 0.4.4 does not know): 480x640
+      x 3 cameras, state 14, same latency as the base model (eager 378, prefix 58, graph loop
+      35.4, hybrid 94 ms; bit-exact).
+    - `model/robotwin_analysis.py` now has control and screen sections.
 - **Next:**
   1. Paper and slides (deferred by the user until the teammates' work is merged): move the
      headline to `slot_drv` on four GPUs, add ACT/Diffusion (three regimes: dispatch bound,
      mixed, GPU bound) and the cuDNN algorithm-selection finding; verify bibliography; compile
      on Overleaf.
-  2. RoboTwin (optional, user decides): replanning-rate control and/or a faster, more dynamic
-     task; latency trace of `smolvla_robotwin` at RoboTwin shapes on the A100.
+  2. RoboTwin (optional, user decides): lift_pot delay study, d = 0 vs 20 (+ control H = 30),
+     100 paired episodes each, ~12 GPU-h per point (24 to 36 GPU-h).
   3. Optional: spec-only what-if predictions for H100/H200/L40S remain a stated limitation.
-- GPU-hours used on `csci_ga_3033_025-2026fa`: 37.4 of 300 (2026-11-17, `sacct -D` tally).
-- Pending for the user (CIMS): see "Needs the user" in section 1 and the cuda2 commands in
-  section 6. The user asked for a full "what to run on cuda machines and elsewhere" list once
-  the cluster runs are finished.
+- GPU-hours used on `csci_ga_3033_025-2026fa`: 56.0 of 300 (2026-11-17, `sacct -D` tally).
+- **Run list (2026-11-17, all planned measurements are done; everything below is optional or
+  administrative):**
+  - CIMS: final reproducibility check from a fresh clone on cuda2 (`git pull`, `module load
+    cuda-12.4`, `make -C bench`, `scripts/run_calib.sh`, `scripts/run_bench.sh`), as the course
+    requires the code to run there. Optional: `trace_smolvla.py --model lerobot/smolvla_robotwin`
+    on cuda2/3/5 (expected equal to the base traces).
+  - Cluster: lift_pot delay study (Next, item 2). Nothing else pending; L4 still unusable.
+  - Elsewhere (needs access the user must request): T4 / V100 / RTX PRO 6000 partitions for this
+    account (NYU HPC), H200 / L40S on Torch; with access, rerun calib + dispatch table + SmolVLA
+    trace sweep there as real targets (would replace the spec-only what-if, whose spec values in
+    `model/whatif.py` are still marked TODO verify).
+  - User only: professor approval status, team size, deadlines (section 1 table).
 
 ### 0.2 Memory note to carry over
 

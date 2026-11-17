@@ -27,3 +27,4 @@ envs/
 traces/**/trace.json.gz
 traces/**/trace_graph.json.gz
 results/robotwin/sweep_*/videos/
+results/robotwin/*/videos/

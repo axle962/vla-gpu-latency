@@ -1,0 +1,106 @@
+{
+  "per_task": [
+    {
+      "task_group": "handover_block",
+      "task_id": 0,
+      "metrics": {
+        "sum_rewards": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        "max_rewards": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        "successes": [
+          false,
+          false,
+          false,
+          false,
+          false,
+          true,
+          false,
+          false
+        ],
+        "video_paths": [
+          "/scratch/am16489/vla-gpu-latency/results/robotwin/screen_handover_block_d0_34880/videos/handover_block_0/eval_episode_0.mp4",
+          "/scratch/am16489/vla-gpu-latency/results/robotwin/screen_handover_block_d0_34880/videos/handover_block_0/eval_episode_1.mp4",
+          "/scratch/am16489/vla-gpu-latency/results/robotwin/screen_handover_block_d0_34880/videos/handover_block_0/eval_episode_2.mp4",
+          "/scratch/am16489/vla-gpu-latency/results/robotwin/screen_handover_block_d0_34880/videos/handover_block_0/eval_episode_3.mp4",
+          "/scratch/am16489/vla-gpu-latency/results/robotwin/screen_handover_block_d0_34880/videos/handover_block_0/eval_episode_4.mp4",
+          "/scratch/am16489/vla-gpu-latency/results/robotwin/screen_handover_block_d0_34880/videos/handover_block_0/eval_episode_5.mp4",
+          "/scratch/am16489/vla-gpu-latency/results/robotwin/screen_handover_block_d0_34880/videos/handover_block_0/eval_episode_6.mp4",
+          "/scratch/am16489/vla-gpu-latency/results/robotwin/screen_handover_block_d0_34880/videos/handover_block_0/eval_episode_7.mp4"
+        ],
+        "predicted_video_paths": []
+      },
+      "n_episodes": 8,
+      "n_success": 1,
+      "pc_success": 12.5,
+      "pc_success_ci95": [
+        2.241749145005667,
+        47.088818221285344
+      ]
+    }
+  ],
+  "per_group": {
+    "handover_block": {
+      "avg_sum_reward": 0.125,
+      "avg_max_reward": 0.125,
+      "pc_success": 12.5,
+      "n_episodes": 8,
+      "n_success": 1,
+      "pc_success_ci95": [
+        2.241749145005667,
+        47.088818221285344
+      ],
+      "video_paths": [
+        "/scratch/am16489/vla-gpu-latency/results/robotwin/screen_handover_block_d0_34880/videos/handover_block_0/eval_episode_0.mp4",
+        "/scratch/am16489/vla-gpu-latency/results/robotwin/screen_handover_block_d0_34880/videos/handover_block_0/eval_episode_1.mp4",
+        "/scratch/am16489/vla-gpu-latency/results/robotwin/screen_handover_block_d0_34880/videos/handover_block_0/eval_episode_2.mp4",
+        "/scratch/am16489/vla-gpu-latency/results/robotwin/screen_handover_block_d0_34880/videos/handover_block_0/eval_episode_3.mp4",
+        "/scratch/am16489/vla-gpu-latency/results/robotwin/screen_handover_block_d0_34880/videos/handover_block_0/eval_episode_4.mp4",
+        "/scratch/am16489/vla-gpu-latency/results/robotwin/screen_handover_block_d0_34880/videos/handover_block_0/eval_episode_5.mp4",
+        "/scratch/am16489/vla-gpu-latency/results/robotwin/screen_handover_block_d0_34880/videos/handover_block_0/eval_episode_6.mp4",
+        "/scratch/am16489/vla-gpu-latency/results/robotwin/screen_handover_block_d0_34880/videos/handover_block_0/eval_episode_7.mp4"
+      ],
+      "predicted_video_paths": []
+    }
+  },
+  "overall": {
+    "avg_sum_reward": 0.125,
+    "avg_max_reward": 0.125,
+    "pc_success": 12.5,
+    "n_episodes": 8,
+    "n_success": 1,
+    "pc_success_ci95": [
+      2.241749145005667,
+      47.088818221285344
+    ],
+    "eval_s": 4838.15509724617,
+    "eval_ep_s": 604.7693873047829,
+    "video_paths": [
+      "/scratch/am16489/vla-gpu-latency/results/robotwin/screen_handover_block_d0_34880/videos/handover_block_0/eval_episode_0.mp4",
+      "/scratch/am16489/vla-gpu-latency/results/robotwin/screen_handover_block_d0_34880/videos/handover_block_0/eval_episode_1.mp4",
+      "/scratch/am16489/vla-gpu-latency/results/robotwin/screen_handover_block_d0_34880/videos/handover_block_0/eval_episode_2.mp4",
+      "/scratch/am16489/vla-gpu-latency/results/robotwin/screen_handover_block_d0_34880/videos/handover_block_0/eval_episode_3.mp4",
+      "/scratch/am16489/vla-gpu-latency/results/robotwin/screen_handover_block_d0_34880/videos/handover_block_0/eval_episode_4.mp4",
+      "/scratch/am16489/vla-gpu-latency/results/robotwin/screen_handover_block_d0_34880/videos/handover_block_0/eval_episode_5.mp4",
+      "/scratch/am16489/vla-gpu-latency/results/robotwin/screen_handover_block_d0_34880/videos/handover_block_0/eval_episode_6.mp4",
+      "/scratch/am16489/vla-gpu-latency/results/robotwin/screen_handover_block_d0_34880/videos/handover_block_0/eval_episode_7.mp4"
+    ],
+    "predicted_video_paths": []
+  }
+}

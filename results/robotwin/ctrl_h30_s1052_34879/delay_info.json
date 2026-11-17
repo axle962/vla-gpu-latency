@@ -1,0 +1,14 @@
+{
+ "delay_steps": 0,
+ "noise_seed": 20000,
+ "exec_horizon": 30,
+ "rollouts": 12,
+ "inferences": 382,
+ "select_calls": 11386,
+ "infer_ms_median": 326.0121809998964,
+ "infer_ms_first": [
+  1786.3480780000032,
+  340.0383809999994,
+  341.78204699998105
+ ]
+}

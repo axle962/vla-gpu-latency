@@ -55,6 +55,33 @@ MODEL_ID = "lerobot/smolvla_base"
 INSTRUCTION = "Pick up the red cube and place it in the bowl."
 
 
+def load_policy(model_id: str) -> SmolVLAPolicy:
+    """Load a SmolVLA checkpoint. Checkpoints saved by newer lerobot versions (e.g.
+    lerobot/smolvla_robotwin, lerobot 0.7) carry config keys this lerobot does not know
+    (compile_mode, rtc_config, use_peft, ...); load those from a local copy whose config.json
+    keeps only the known fields (none of the dropped keys changes inference)."""
+    import dataclasses
+    import json
+    import tempfile
+
+    from huggingface_hub import snapshot_download
+    from lerobot.policies.smolvla.configuration_smolvla import SmolVLAConfig
+
+    src = Path(snapshot_download(model_id))
+    cfg = json.loads((src / "config.json").read_text())
+    known = {f.name for f in dataclasses.fields(SmolVLAConfig)} | {"type"}
+    dropped = sorted(set(cfg) - known)
+    if not dropped:
+        return SmolVLAPolicy.from_pretrained(model_id)
+    print(f"{model_id}: dropping unknown config keys {dropped}")
+    tmp = Path(tempfile.mkdtemp(prefix="smolvla_ckpt_"))
+    for f in src.iterdir():
+        if f.name != "config.json":
+            (tmp / f.name).symlink_to(f.resolve())
+    (tmp / "config.json").write_text(json.dumps({k: v for k, v in cfg.items() if k in known}))
+    return SmolVLAPolicy.from_pretrained(str(tmp))
+
+
 class CudaConstMemo:
     """While active, torch.tensor(python scalar/list, device=cuda) returns a cached GPU tensor
     instead of uploading from pageable host memory (illegal during stream capture). Only
@@ -90,7 +117,7 @@ class CudaConstMemo:
 
 
 def build(args):
-    policy = SmolVLAPolicy.from_pretrained(MODEL_ID)
+    policy = load_policy(args.model)
     cfg = policy.config
     cfg.num_steps = args.num_steps
     cfg.chunk_size = args.chunk_size
@@ -132,6 +159,7 @@ def build(args):
 
 def main() -> None:
     ap = argparse.ArgumentParser()
+    ap.add_argument("--model", default=MODEL_ID, help="SmolVLA checkpoint (HF id)")
     ap.add_argument("--cameras", type=int, default=3, help="1 to 3 camera views")
     ap.add_argument("--num-steps", type=int, default=10, help="flow-matching steps")
     ap.add_argument("--chunk-size", type=int, default=50, help="action chunk length")
@@ -243,7 +271,8 @@ def main() -> None:
 
     n_kv = sum(v.numel() * v.element_size() for layer in kv0.values() for v in layer.values())
     meta = {
-        "hf_model": MODEL_ID,
+        "hf_model": args.model,
+        "state_dim": int(cfg.robot_state_feature.shape[0]),
         "dtype": args.dtype,
         "batch": args.batch,
         "cameras": len(img_keys),
@@ -264,6 +293,8 @@ def main() -> None:
     }
     name = f"cam{len(img_keys)}_steps{cfg.num_steps}_chunk{cfg.chunk_size}"
     name = f"smolvla_{name}" if args.batch == 1 else f"smolvlabatch_b{args.batch}_{name}"
+    if args.model != MODEL_ID:  # other checkpoints get their own trace family
+        name = name.replace("smolvla", "smolvla" + args.model.split("/")[-1].replace("smolvla_", "").replace("_", ""), 1)
     out = args.out or default_out(name)
     profile_and_save(
         out, "smolvla", full_step, meta,

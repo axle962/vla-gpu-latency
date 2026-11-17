@@ -26,30 +26,56 @@ from libero_analysis import mcnemar_p, wilson  # noqa: E402
 ROOT = Path(__file__).resolve().parent.parent
 CONTROL_MS = 40.0  # RoboTwin runs at 25 Hz
 TRACE_PREFIX = "smolvla_cam3_steps10_chunk50"
+TRACE_RTW = "smolvlarobotwin_cam3_steps10_chunk50"  # the RoboTwin checkpoint itself (A100)
 
 
-def load() -> tuple[pd.DataFrame, pd.DataFrame]:
-    rows, runs = [], []
-    for f in sorted(glob.glob(str(ROOT / "results/robotwin/sweep_d*_s*_*/eval_info.json"))):
-        m = re.search(r"sweep_d(\d+)_s(\d+)_(\d+)", f)
-        dl, seed, job = (int(x) for x in m.groups())
-        e = json.loads(Path(f).read_text())
-        info = json.loads((Path(f).parent / "delay_info.json").read_text())
-        assert info["delay_steps"] == dl
-        succ = e["per_task"][0]["metrics"]["successes"]
-        for i, s in enumerate(succ):
-            rows.append({"delay_steps": dl, "half": seed, "episode": i, "success": int(bool(s))})
-        o = e["overall"]
-        runs.append({"delay_steps": dl, "episode_seed": seed, "noise_seed": info["noise_seed"],
-                     "job": job, "episodes": o["n_episodes"], "successes": o["n_success"],
-                     "inferences": info["inferences"],
-                     "infer_ms_median": info["infer_ms_median"],
-                     "wall_s_per_episode": o["eval_ep_s"]})
-    return pd.DataFrame(rows), pd.DataFrame(runs).sort_values(["delay_steps", "episode_seed"])
+def _read(f: str) -> tuple[dict, dict, list[int]]:
+    e = json.loads(Path(f).read_text())
+    info = json.loads((Path(f).parent / "delay_info.json").read_text())
+    return e, info, [int(bool(x)) for x in e["per_task"][0]["metrics"]["successes"]]
+
+
+def load() -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    """Delay sweep (sweep_d<d>_s<seed>) and replanning controls (ctrl_h<H>_s<seed>: no delay,
+    replan every H steps, the same replanning period as delay d = 50 - H)."""
+    rows, ctrl, runs = [], [], []
+    pats = (("sweep", r"sweep_d(\d+)_s(\d+)_(\d+)"), ("ctrl", r"ctrl_h(\d+)_s(\d+)_(\d+)"))
+    for kind, pat in pats:
+        for f in sorted(glob.glob(str(ROOT / f"results/robotwin/{kind}_*_s*_*/eval_info.json"))):
+            x, seed, job = (int(v) for v in re.search(pat, f).groups())
+            e, info, succ = _read(f)
+            if kind == "sweep":
+                assert info["delay_steps"] == x
+                dl, h = x, info["exec_horizon"]
+            else:
+                assert info["delay_steps"] == 0 and info["exec_horizon"] == x
+                dl, h = 0, x
+            period = h - dl  # control steps between observations used for planning
+            for i, s in enumerate(succ):
+                r = {"delay_steps": dl, "horizon": h, "replan_period": period, "half": seed,
+                     "episode": i, "success": s}
+                (rows if kind == "sweep" else ctrl).append(r)
+            o = e["overall"]
+            runs.append({"run": kind, "delay_steps": dl, "replan_period": period,
+                         "episode_seed": seed, "noise_seed": info["noise_seed"], "job": job,
+                         "episodes": o["n_episodes"], "successes": o["n_success"],
+                         "inferences": info["inferences"],
+                         "infer_ms_median": info["infer_ms_median"],
+                         "wall_s_per_episode": o["eval_ep_s"]})
+    runs = pd.DataFrame(runs).sort_values(["run", "delay_steps", "replan_period", "episode_seed"],
+                                          ascending=[False, True, False, True])
+    return pd.DataFrame(rows), pd.DataFrame(ctrl), runs
+
+
+def paired(a: pd.Series, b: pd.Series) -> dict:
+    j = a.to_frame("a").join(b.to_frame("b"), how="inner")
+    lost = int(((j.a == 1) & (j.b == 0)).sum())
+    gained = int(((j.a == 0) & (j.b == 1)).sum())
+    return {"n": len(j), "lost": lost, "gained": gained, "mcnemar_p": round(mcnemar_p(lost, gained), 4)}
 
 
 def main() -> None:
-    d, runs = load()
+    d, ctrl, runs = load()
     print("# RoboTwin 2.0: inference delay vs task success\n")
     print("SmolVLA (`lerobot/smolvla_robotwin`, 480x640, 3 cameras), task `beat_block_hammer`, "
           f"A100, 4 parallel envs. Delay d in control steps of {CONTROL_MS:.0f} ms (25 Hz), "
@@ -90,6 +116,43 @@ def main() -> None:
         .unstack()
     print(t.to_markdown(), "\n")
 
+    print("## Staleness vs replanning rate (control runs)\n")
+    print("A delay d makes the policy plan every 50 - d steps from an observation d steps old. "
+          "The control replans every H = 50 - d steps with no delay (synchronous, the chunk's "
+          "first H actions), so it observes at the same steps; the only difference is staleness. "
+          "Same episode and noise seeds, paired by episode.\n")
+    out = []
+    for h, g in ctrl.groupby("horizon", sort=False):
+        dl = 50 - h
+        c = g.set_index(key).success
+        k, n = int(c.sum()), len(c)
+        lo, hi = wilson(k, n)
+        dd = d[d.delay_steps == dl].set_index(key).success
+        row = {"replan_every": h, "control_success_pct": 100 * k / n,
+               "control_ci95": f"{100 * lo:.0f} to {100 * hi:.0f}",
+               f"delay_d_success_pct": 100 * dd.mean() if len(dd) else float("nan"),
+               "delay_d": dl}
+        v0 = paired(base, c)
+        row.update({"ctrl_vs_d0 (lost/gained, p)": f"{v0['lost']}/{v0['gained']}, {v0['mcnemar_p']}"})
+        if len(dd):
+            v = paired(c, dd)
+            row.update({"delay_vs_ctrl (lost/gained, p)": f"{v['lost']}/{v['gained']}, {v['mcnemar_p']}"})
+        out.append(row)
+    print(pd.DataFrame(out).sort_values("replan_every", ascending=False).round(1)
+          .to_markdown(index=False), "\n")
+
+    print("## Task screen (d = 0, 8 episodes each, seeds 1000..1007)\n")
+    sc = []
+    for f in sorted(glob.glob(str(ROOT / "results/robotwin/screen_*_d0_*/eval_info.json"))):
+        task = re.search(r"screen_(.+)_d0_(\d+)", f).group(1)
+        e, info, succ = _read(f)
+        lo, hi = wilson(sum(succ), len(succ))
+        sc.append({"task": task, "success": f"{sum(succ)}/{len(succ)}",
+                   "ci95": f"{100 * lo:.0f} to {100 * hi:.0f}",
+                   "wall_s_per_episode": round(e["overall"]["eval_ep_s"])})
+    if sc:
+        print(pd.DataFrame(sc).to_markdown(index=False), "\n")
+
     print("## What each GPU and execution mode buys\n")
     print("Latency from the SmolVLA traces (3 cameras, 10 flow steps, chunk 50; the traced "
           "inputs are resized to 512, as RoboTwin's 480x640 frames are), converted to "
@@ -98,11 +161,14 @@ def main() -> None:
     curve = d.groupby("delay_steps").success.mean()
     xs, ys = np.array(curve.index, float), curve.to_numpy()
     rows = []
-    for mp in sorted(glob.glob(str(ROOT / "traces" / TRACE_PREFIX / "*" / "meta.json"))):
+    for mp in sorted(glob.glob(str(ROOT / "traces" / TRACE_PREFIX / "*" / "meta.json"))
+                     + glob.glob(str(ROOT / "traces" / TRACE_RTW / "*" / "meta.json"))):
         if "HOSTEXP" in mp:
             continue
         m = json.loads(Path(mp).read_text())
         gpu = m["gpu"].replace("NVIDIA ", "").replace("GeForce ", "")
+        if TRACE_RTW in mp:
+            gpu += " (smolvla_robotwin)"
         for mode, k in (("eager", "eager_ms_median"), ("prefix + graph loop", "hybrid_ms_median")):
             lat = m.get(k)
             if not lat:
@@ -117,20 +183,20 @@ def main() -> None:
           "pre/post-processing) is the A100's eager latency in the actual harness.\n")
 
     print("## Reading\n")
-    print("- No delay up to 20 steps (800 ms) lowers success on this task; the point estimates "
-          "rise with d, but no change is significant (paired McNemar p >= 0.2). Unlike "
-          "LIBERO-Long (results/libero_analysis.md), CUDA graphs buy no task success here: "
-          "the curve is flat, so the GPU/mode table above only restates it.\n"
-          "- Confound: with a 50-action chunk and naive async execution, a larger d also means "
-          "replanning every 50 - d steps instead of 50 (more closed-loop feedback, visible as "
-          "more inferences per run). The sweep cannot separate staleness from replanning rate; "
-          "a control would replan every 50 - d steps with no delay.\n"
-          "- Outcomes are noisy per episode: only "
-          f"{always + never} of {len(w)} seeds have the same outcome at every d, so even "
-          "paired, 100 episodes resolve only effects of roughly 15 points or more.\n"
-          "- beat_block_hammer is a slow, quasi-static task; one task does not establish that "
-          "RoboTwin as a whole is delay insensitive.\n")
-
+    print("- No delay up to 20 steps (800 ms) lowers success on beat_block_hammer (paired "
+          "McNemar p >= 0.2 vs d = 0).\n"
+          "- The control settles the confound: at the same replanning period, a stale plan "
+          "(delay d) and a fresh plan (no delay) succeed equally often, episode for episode "
+          "(discordant pairs 15/15 at d = 10, 13/14 at d = 20). Staleness costs nothing here; "
+          "the small rise with d comes from replanning more often (also not significant).\n"
+          "- So on this task CUDA graphs buy no task success, unlike LIBERO-Long "
+          "(results/libero_analysis.md); their value is latency and energy only. The "
+          "smolvla_robotwin checkpoint has the base model's latency (A100 eager 378 ms, graph "
+          "loop 35.4 ms, hybrid 94 ms; graph output bit-exact).\n"
+          "- Outcomes are noisy per episode (71 of 100 seeds change outcome across d), so 100 "
+          "paired episodes resolve only effects of about 15 points or more.\n"
+          "- One slow, quasi-static task. Of three screened alternatives only lift_pot has a "
+          "usable success rate for a delay study (handover_block 1/8, stack_blocks_two 0/8).\n")
 
 if __name__ == "__main__":
     main()
