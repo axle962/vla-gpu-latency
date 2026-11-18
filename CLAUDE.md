@@ -653,21 +653,29 @@ State:
     even after `source site.sh`). Done so far: d0 s1000 14/28, s1028 12/24, s1052 11/24;
     ctrlh30 s1000 12/28. lift_pot runs ~510 s per episode with 4 envs (slower than the screen
     suggested), so a 24-episode block takes ~3.5 to 4.5 h.
+    **lift_pot done 2026-11-18 01:15** (all 12 blocks, ~43 GPU-h incl. failed boots;
+    `results/robotwin_analysis.md`, "Reading (lift_pot)"): d = 0 45%, d = 20 (800 ms) 40%
+    (12 lost / 7 gained, p = 0.4), control H = 30 40%; delay vs control 8/8 (p = 1.0).
+    Staleness costs nothing on lift_pot either; both RoboTwin tasks say SmolVLA's success is
+    insensitive to delay up to 800 ms (LIBERO-Long is where delay hurts). Run the analysis with
+    `envs/smolvla/bin/python model/robotwin_analysis.py > results/robotwin_analysis.md`
+    (system python has no numpy). Team status page: `docs/status_2026-11-17.{html,pdf}`
+    (artifact https://claude.ai/artifact/J7Y2PKjshfJbY6D6YNVV7D).
 - **Next:**
   1. Paper and slides (deferred by the user until the teammates' work is merged): move the
      headline to `slot_drv` on four GPUs, add ACT/Diffusion (three regimes: dispatch bound,
      mixed, GPU bound) and the cuDNN algorithm-selection finding; verify bibliography; compile
      on Overleaf.
-  2. RoboTwin: analyze the lift_pot study when jobs 35040, 35048, 35050 and 35290 to 35294 finish.
+  2. RoboTwin: done (beat_block_hammer and lift_pot). Optional: a delay-sensitive task.
   3. Optional: spec-only what-if predictions for H100/H200/L40S remain a stated limitation.
-- GPU-hours used on `csci_ga_3033_025-2026fa`: 86.9 of 300 (2026-11-17 evening, `sacct -D` tally; ~25 more queued/running for lift_pot).
+- GPU-hours used on `csci_ga_3033_025-2026fa`: 109.5 of 300 (2026-11-18, `sacct -D` tally). Nothing queued.
 - **Run list (2026-11-17, all planned measurements are done; everything below is optional or
   administrative):**
   - CIMS: final reproducibility check from a fresh clone on cuda2 (`git pull`, `module load
     cuda-12.4`, `make -C bench`, `scripts/run_calib.sh`, `scripts/run_bench.sh`), as the course
     requires the code to run there. Optional: `trace_smolvla.py --model lerobot/smolvla_robotwin`
     on cuda2/3/5 (expected equal to the base traces).
-  - Cluster: lift_pot delay study running (Next, item 2). Nothing else pending; L4 still unusable.
+  - Cluster: nothing pending; L4 still unusable.
   - Elsewhere (needs access the user must request): T4 / V100 / RTX PRO 6000 partitions for this
     account (NYU HPC), H200 / L40S on Torch; with access, rerun calib + dispatch table + SmolVLA
     trace sweep there as real targets (would replace the spec-only what-if, whose spec values in

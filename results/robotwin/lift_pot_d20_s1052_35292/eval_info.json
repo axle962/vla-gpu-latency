@@ -1,0 +1,160 @@
+{
+  "per_task": [
+    {
+      "task_group": "lift_pot",
+      "task_id": 0,
+      "metrics": {
+        "sum_rewards": [
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          1.0,
+          0.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "max_rewards": [
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          1.0,
+          0.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "successes": [
+          true,
+          true,
+          false,
+          false,
+          false,
+          false,
+          true,
+          false,
+          true,
+          true,
+          true,
+          false,
+          true,
+          false,
+          true,
+          false,
+          false,
+          false,
+          true,
+          true,
+          false,
+          false,
+          false,
+          false
+        ],
+        "video_paths": [
+          "/scratch/am16489/vla-gpu-latency/results/robotwin/lift_pot_d20_s1052_35292/videos/lift_pot_0/eval_episode_0.mp4",
+          "/scratch/am16489/vla-gpu-latency/results/robotwin/lift_pot_d20_s1052_35292/videos/lift_pot_0/eval_episode_1.mp4",
+          "/scratch/am16489/vla-gpu-latency/results/robotwin/lift_pot_d20_s1052_35292/videos/lift_pot_0/eval_episode_2.mp4",
+          "/scratch/am16489/vla-gpu-latency/results/robotwin/lift_pot_d20_s1052_35292/videos/lift_pot_0/eval_episode_3.mp4",
+          "/scratch/am16489/vla-gpu-latency/results/robotwin/lift_pot_d20_s1052_35292/videos/lift_pot_0/eval_episode_4.mp4",
+          "/scratch/am16489/vla-gpu-latency/results/robotwin/lift_pot_d20_s1052_35292/videos/lift_pot_0/eval_episode_5.mp4",
+          "/scratch/am16489/vla-gpu-latency/results/robotwin/lift_pot_d20_s1052_35292/videos/lift_pot_0/eval_episode_6.mp4",
+          "/scratch/am16489/vla-gpu-latency/results/robotwin/lift_pot_d20_s1052_35292/videos/lift_pot_0/eval_episode_7.mp4",
+          "/scratch/am16489/vla-gpu-latency/results/robotwin/lift_pot_d20_s1052_35292/videos/lift_pot_0/eval_episode_8.mp4",
+          "/scratch/am16489/vla-gpu-latency/results/robotwin/lift_pot_d20_s1052_35292/videos/lift_pot_0/eval_episode_9.mp4"
+        ],
+        "predicted_video_paths": []
+      },
+      "n_episodes": 24,
+      "n_success": 10,
+      "pc_success": 41.666666666666664,
+      "pc_success_ci95": [
+        24.467602609811763,
+        61.16533413477123
+      ]
+    }
+  ],
+  "per_group": {
+    "lift_pot": {
+      "avg_sum_reward": 0.4166666666666667,
+      "avg_max_reward": 0.4166666666666667,
+      "pc_success": 41.66666666666667,
+      "n_episodes": 24,
+      "n_success": 10,
+      "pc_success_ci95": [
+        24.467602609811763,
+        61.16533413477123
+      ],
+      "video_paths": [
+        "/scratch/am16489/vla-gpu-latency/results/robotwin/lift_pot_d20_s1052_35292/videos/lift_pot_0/eval_episode_0.mp4",
+        "/scratch/am16489/vla-gpu-latency/results/robotwin/lift_pot_d20_s1052_35292/videos/lift_pot_0/eval_episode_1.mp4",
+        "/scratch/am16489/vla-gpu-latency/results/robotwin/lift_pot_d20_s1052_35292/videos/lift_pot_0/eval_episode_2.mp4",
+        "/scratch/am16489/vla-gpu-latency/results/robotwin/lift_pot_d20_s1052_35292/videos/lift_pot_0/eval_episode_3.mp4",
+        "/scratch/am16489/vla-gpu-latency/results/robotwin/lift_pot_d20_s1052_35292/videos/lift_pot_0/eval_episode_4.mp4",
+        "/scratch/am16489/vla-gpu-latency/results/robotwin/lift_pot_d20_s1052_35292/videos/lift_pot_0/eval_episode_5.mp4",
+        "/scratch/am16489/vla-gpu-latency/results/robotwin/lift_pot_d20_s1052_35292/videos/lift_pot_0/eval_episode_6.mp4",
+        "/scratch/am16489/vla-gpu-latency/results/robotwin/lift_pot_d20_s1052_35292/videos/lift_pot_0/eval_episode_7.mp4",
+        "/scratch/am16489/vla-gpu-latency/results/robotwin/lift_pot_d20_s1052_35292/videos/lift_pot_0/eval_episode_8.mp4",
+        "/scratch/am16489/vla-gpu-latency/results/robotwin/lift_pot_d20_s1052_35292/videos/lift_pot_0/eval_episode_9.mp4"
+      ],
+      "predicted_video_paths": []
+    }
+  },
+  "overall": {
+    "avg_sum_reward": 0.4166666666666667,
+    "avg_max_reward": 0.4166666666666667,
+    "pc_success": 41.66666666666667,
+    "n_episodes": 24,
+    "n_success": 10,
+    "pc_success_ci95": [
+      24.467602609811763,
+      61.16533413477123
+    ],
+    "eval_s": 15115.114523887634,
+    "eval_ep_s": 629.7964385350546,
+    "video_paths": [
+      "/scratch/am16489/vla-gpu-latency/results/robotwin/lift_pot_d20_s1052_35292/videos/lift_pot_0/eval_episode_0.mp4",
+      "/scratch/am16489/vla-gpu-latency/results/robotwin/lift_pot_d20_s1052_35292/videos/lift_pot_0/eval_episode_1.mp4",
+      "/scratch/am16489/vla-gpu-latency/results/robotwin/lift_pot_d20_s1052_35292/videos/lift_pot_0/eval_episode_2.mp4",
+      "/scratch/am16489/vla-gpu-latency/results/robotwin/lift_pot_d20_s1052_35292/videos/lift_pot_0/eval_episode_3.mp4",
+      "/scratch/am16489/vla-gpu-latency/results/robotwin/lift_pot_d20_s1052_35292/videos/lift_pot_0/eval_episode_4.mp4",
+      "/scratch/am16489/vla-gpu-latency/results/robotwin/lift_pot_d20_s1052_35292/videos/lift_pot_0/eval_episode_5.mp4",
+      "/scratch/am16489/vla-gpu-latency/results/robotwin/lift_pot_d20_s1052_35292/videos/lift_pot_0/eval_episode_6.mp4",
+      "/scratch/am16489/vla-gpu-latency/results/robotwin/lift_pot_d20_s1052_35292/videos/lift_pot_0/eval_episode_7.mp4",
+      "/scratch/am16489/vla-gpu-latency/results/robotwin/lift_pot_d20_s1052_35292/videos/lift_pot_0/eval_episode_8.mp4",
+      "/scratch/am16489/vla-gpu-latency/results/robotwin/lift_pot_d20_s1052_35292/videos/lift_pot_0/eval_episode_9.mp4"
+    ],
+    "predicted_video_paths": []
+  }
+}

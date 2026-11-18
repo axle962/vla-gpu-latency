@@ -60,7 +60,7 @@ footer { border-top: 1px solid var(--rule); padding-top: 14px; font-size: 13px; 
 
 <div class="wrap">
 <header>
-  <div class="eyebrow">GPU Architecture course project · status as of 17 Nov 2026</div>
+  <div class="eyebrow">GPU Architecture course project · status as of 18 Nov 2026</div>
   <h1>VLA Latency Project Status</h1>
   <p class="lede">What we did since 11 Nov: new robot policies, benchmark and side studies, the final cross-GPU model, and task-success tests in simulation. Four GPUs: A100 (cluster), RTX 2080 Ti, TITAN V and RTX 4070 (CIMS).</p>
 </header>
@@ -188,7 +188,8 @@ footer { border-top: 1px solid var(--rule); padding-top: 14px; font-size: 13px; 
   <h3>RoboTwin 2.0 (A100 cluster, SmolVLA)</h3>
   <ul>
     <li><b>beat_block_hammer:</b> 63 / 63 / 70 / 73% success at 0 / 120 / 400 / 800 ms delay. A control that replans at the same points with no delay gives the same result, so staleness costs nothing here; the small gain comes from replanning more often.</li>
-    <li><b>lift_pot:</b> delay study in progress (0 ms, 800 ms and the replanning control, 100 episodes each). Done so far: 0 ms at 37 of 76 episodes (49%), control 12 of 28. Five blocks lost to failed node boots were resubmitted.</li>
+    <li><b>lift_pot:</b> 45% success at 0 ms and 40% at 800 ms delay (100 paired episodes each, p = 0.4, not significant). The replanning control also gives 40%, and delay against control is 8 episodes lost, 8 gained: staleness costs nothing here either.</li>
+    <li><b>Both RoboTwin tasks agree:</b> SmolVLA's success does not depend on inference delay up to 800 ms, so on RoboTwin graphs change latency and energy, not task success. LIBERO-Long is where delay hurts.</li>
     <li>SmolVLA's RoboTwin checkpoint has the same latency as the base model (eager 378 ms, graph loop 35.4 ms).</li>
   </ul>
 </section>
@@ -196,11 +197,10 @@ footer { border-top: 1px solid var(--rule); padding-top: 14px; font-size: 13px; 
 <section>
   <h2>Open items</h2>
   <ul>
-    <li>Finish and analyze the lift_pot study (8 jobs running or queued).</li>
     <li>Final reproducibility check from a fresh clone on cuda2.</li>
     <li>Access to more GPUs (T4, V100, PRO 6000, H200, L40S) would turn the spec-only what-if into measured targets.</li>
   </ul>
-  <p>Cluster budget: 86.9 of 300 GPU-hours used; the lift_pot jobs still in the queue add about 25.</p>
+  <p>Cluster budget: 109.5 of 300 GPU-hours used; nothing queued.</p>
 </section>
 
 <footer>Sources: CLAUDE.md project log, <code>results/report_cross_gpu*.md</code>, <code>results/libero_analysis.md</code>, <code>results/robotwin_analysis.md</code>.</footer>

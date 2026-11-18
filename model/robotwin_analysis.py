@@ -225,6 +225,18 @@ def main() -> None:
           "paired episodes resolve only effects of about 15 points or more.\n"
           "- One slow, quasi-static task. Of three screened alternatives only lift_pot has a "
           "usable success rate for a delay study (handover_block 1/8, stack_blocks_two 0/8).\n")
+    print("## Reading (lift_pot)\n")
+    print("- 800 ms of delay (d = 20) gives 40% vs 45% at d = 0 (12 lost, 7 gained, McNemar "
+          "p = 0.4): not significant.\n"
+          "- The control (replan every 30 steps, no delay) also gives 40%, and delay vs control "
+          "is 8 lost / 8 gained (p = 1.0): staleness costs nothing on lift_pot either. The "
+          "(non-significant) drop comes with the shorter replanning period, the opposite sign "
+          "of beat_block_hammer, where replanning more often helped slightly.\n"
+          "- Both RoboTwin tasks agree: SmolVLA's success is insensitive to inference delays up "
+          "to 800 ms, so on RoboTwin CUDA graphs change latency and energy, not task success. "
+          "LIBERO-Long (results/libero_analysis.md) is where delay hurts (pi0.5 from 250 ms).\n"
+          "- 19 of 100 seeds change outcome between conditions; 100 paired episodes resolve "
+          "effects of about 15 points or more.\n")
 
 if __name__ == "__main__":
     main()
