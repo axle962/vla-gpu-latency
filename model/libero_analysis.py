@@ -49,19 +49,20 @@ def mcnemar_p(b: int, c: int) -> float:
 def main() -> None:
     files = sorted(glob.glob(str(ROOT / "results/libero/*.csv")))
     d = pd.concat([pd.read_csv(f) for f in files], ignore_index=True)
-    d = d.drop_duplicates(["policy", "precision", "task_id", "episode", "delay_steps"], keep="last")
+    d = d.drop_duplicates(["policy", "precision", "exec_horizon", "task_id", "episode",
+                          "delay_steps"], keep="last")
     print("# LIBERO-Long: inference delay vs task success\n")
     print(f"Suite {', '.join(sorted(d.suite.unique()))}; delay d in control steps of "
           f"{CONTROL_MS:.0f} ms (20 Hz). Paired: same scenes and noise seeds at every d.\n")
 
     print("## Success rate per delay\n")
     rows = []
-    for (pol, prec), g in d.groupby(["policy", "precision"]):
+    for (pol, prec, H), g in d.groupby(["policy", "precision", "exec_horizon"]):
         base = g[g.delay_steps == 0].set_index(["task_id", "episode"]).success
         for dl, gg in g.groupby("delay_steps"):
             k, n = int(gg.success.sum()), len(gg)
             lo, hi = wilson(k, n)
-            row = {"policy": pol, "precision": prec, "delay_steps": dl,
+            row = {"policy": pol, "precision": prec, "exec_horizon": H, "delay_steps": dl,
                    "delay_ms": dl * CONTROL_MS, "episodes": n, "success_pct": 100 * k / n,
                    "ci95": f"{100 * lo:.0f} to {100 * hi:.0f}"}
             if dl != 0 and len(base):
@@ -76,15 +77,16 @@ def main() -> None:
     print(r.round(1).to_markdown(index=False), "\n")
 
     print("## Per task at d = 0 (success / episodes)\n")
-    t = d[d.delay_steps == 0].groupby(["policy", "precision", "task_id"]).success \
+    t = d[d.delay_steps == 0].groupby(["policy", "precision", "exec_horizon", "task_id"]).success \
         .agg(lambda x: f"{int(x.sum())}/{len(x)}").unstack()
     print(t.to_markdown(), "\n")
 
     print("## What each GPU and execution mode buys (FP16 sweeps)\n")
-    curves = {p: g.groupby("delay_steps").success.mean()
-              for (p, prec), g in d.groupby(["policy", "precision"]) if prec == "fp16"}
+    curves = {(p, H): g.groupby("delay_steps").success.mean()
+              for (p, prec, H), g in d.groupby(["policy", "precision", "exec_horizon"])
+              if prec == "fp16"}
     out = []
-    for pol, curve in curves.items():
+    for (pol, H), curve in curves.items():
         for mp in sorted(glob.glob(str(ROOT / "traces" / TRACE_PREFIX[pol] / "*" / "meta.json"))):
             m = json.loads(Path(mp).read_text())
             if "HOSTEXP" in mp:
@@ -97,9 +99,10 @@ def main() -> None:
                 dl = math.ceil(lat / CONTROL_MS)
                 xs, ys = np.array(curve.index, float), curve.to_numpy()
                 succ = float(np.interp(dl, xs, ys)) if dl <= xs.max() else float("nan")
-                out.append({"policy": pol, "GPU": gpu, "mode": mode, "latency_ms": lat,
+                out.append({"policy": pol, "exec_horizon": H, "GPU": gpu, "mode": mode,
+                            "latency_ms": lat,
                             "delay_steps": dl, "expected_success_pct": 100 * succ})
-    o = pd.DataFrame(out).groupby(["policy", "GPU", "mode"]).median(numeric_only=True)
+    o = pd.DataFrame(out).groupby(["policy", "exec_horizon", "GPU", "mode"]).median(numeric_only=True)
     print(o.round(1).to_markdown(), "\n")
     print("nan: the delay exceeds the largest simulated d.\n")
 
