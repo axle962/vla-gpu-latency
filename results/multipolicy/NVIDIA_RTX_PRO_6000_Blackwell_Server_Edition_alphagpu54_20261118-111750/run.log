@@ -1,0 +1,816 @@
+=== procs_smolvla: 1 policies, procs, modes ['eager', 'graph', 'loop'], 10s per mode
+    loaded in 64s
+    eager done
+    graph done
+    loop done
+    eager w0 c0 smolvla   median   173.67 ms  p95   174.84  n 47
+    graph w0 c0 smolvla   median    59.61 ms  p95    59.84  n 134
+    loop  w0 c0 smolvla   median    32.37 ms  p95    32.50  n 247
+=== procs_smolvlax2: 2 policies, procs, modes ['eager', 'graph', 'loop'], 10s per mode
+    loaded in 51s
+    eager done
+    graph done
+    loop done
+    eager w0 c0 smolvla   median   180.79 ms  p95   182.55  n 45
+    eager w1 c0 smolvla   median   181.35 ms  p95   183.04  n 44
+    graph w0 c0 smolvla   median    98.47 ms  p95    98.94  n 82
+    graph w1 c0 smolvla   median    98.45 ms  p95    98.94  n 82
+    loop  w0 c0 smolvla   median    60.36 ms  p95    60.62  n 132
+    loop  w1 c0 smolvla   median    60.39 ms  p95    60.67  n 132
+=== procs_smolvlax4: 4 policies, procs, modes ['eager', 'graph', 'loop'], 10s per mode
+    loaded in 56s
+    eager done
+    graph done
+    loop done
+    eager w0 c0 smolvla   median   263.30 ms  p95   263.75  n 30
+    eager w1 c0 smolvla   median   263.21 ms  p95   263.84  n 30
+    eager w2 c0 smolvla   median   263.30 ms  p95   263.52  n 30
+    eager w3 c0 smolvla   median   263.32 ms  p95   264.63  n 30
+    graph w0 c0 smolvla   median   186.14 ms  p95   188.58  n 43
+    graph w1 c0 smolvla   median   186.21 ms  p95   186.80  n 43
+    graph w2 c0 smolvla   median   186.13 ms  p95   186.82  n 43
+    graph w3 c0 smolvla   median   186.05 ms  p95   192.21  n 43
+    loop  w0 c0 smolvla   median   121.11 ms  p95   121.50  n 66
+    loop  w1 c0 smolvla   median   121.14 ms  p95   121.48  n 66
+    loop  w2 c0 smolvla   median   121.14 ms  p95   121.52  n 66
+    loop  w3 c0 smolvla   median   121.12 ms  p95   121.54  n 66
+=== procs_smolvlax8: 8 policies, procs, modes ['eager', 'graph', 'loop'], 10s per mode
+    loaded in 67s
+    eager done
+    graph done
+    loop done
+    eager w0 c0 smolvla   median   513.25 ms  p95   516.52  n 16
+    eager w1 c0 smolvla   median   511.65 ms  p95   513.96  n 16
+    eager w2 c0 smolvla   median   515.94 ms  p95   550.02  n 15
+    eager w3 c0 smolvla   median   512.37 ms  p95   515.04  n 16
+    eager w4 c0 smolvla   median   511.25 ms  p95   513.94  n 16
+    eager w5 c0 smolvla   median   512.34 ms  p95   513.28  n 16
+    eager w6 c0 smolvla   median   511.89 ms  p95   514.08  n 16
+    eager w7 c0 smolvla   median   512.10 ms  p95   513.47  n 16
+    graph w0 c0 smolvla   median   377.66 ms  p95   379.82  n 21
+    graph w1 c0 smolvla   median   374.66 ms  p95   377.74  n 21
+    graph w2 c0 smolvla   median   374.79 ms  p95   378.10  n 21
+    graph w3 c0 smolvla   median   370.50 ms  p95   378.51  n 22
+    graph w4 c0 smolvla   median   374.97 ms  p95   380.76  n 21
+    graph w5 c0 smolvla   median   375.40 ms  p95   378.66  n 21
+    graph w6 c0 smolvla   median   367.51 ms  p95   380.68  n 22
+    graph w7 c0 smolvla   median   378.22 ms  p95   380.50  n 21
+    loop  w0 c0 smolvla   median      nan ms  p95      nan  n 0
+    loop  w1 c0 smolvla   median      nan ms  p95      nan  n 0
+    loop  w2 c0 smolvla   median      nan ms  p95      nan  n 0
+    loop  w3 c0 smolvla   median      nan ms  p95      nan  n 0
+    loop  w4 c0 smolvla   median      nan ms  p95      nan  n 0
+    loop  w5 c0 smolvla   median      nan ms  p95      nan  n 0
+    loop  w6 c0 smolvla   median      nan ms  p95      nan  n 0
+    loop  w7 c0 smolvla   median      nan ms  p95      nan  n 0
+=== procs-mps_smolvlax2: 2 policies, procs-mps, modes ['eager', 'graph', 'loop'], 10s per mode
+    loaded in 50s
+    eager done
+    graph done
+    loop done
+    eager w0 c0 smolvla   median   170.36 ms  p95   173.01  n 46
+    eager w1 c0 smolvla   median   170.16 ms  p95   172.91  n 47
+    graph w0 c0 smolvla   median    69.76 ms  p95    70.08  n 114
+    graph w1 c0 smolvla   median    69.71 ms  p95    70.23  n 115
+    loop  w0 c0 smolvla   median    41.34 ms  p95    41.48  n 194
+    loop  w1 c0 smolvla   median    41.34 ms  p95    41.49  n 194
+=== procs-mps_smolvlax4: 4 policies, procs-mps, modes ['eager', 'graph', 'loop'], 10s per mode
+    loaded in 56s
+    eager done
+    graph done
+    loop done
+    eager w0 c0 smolvla   median   162.94 ms  p95   164.27  n 49
+    eager w1 c0 smolvla   median   161.77 ms  p95   164.87  n 49
+    eager w2 c0 smolvla   median   161.59 ms  p95   164.34  n 50
+    eager w3 c0 smolvla   median   163.05 ms  p95   164.50  n 49
+    graph w0 c0 smolvla   median    83.20 ms  p95    83.88  n 97
+    graph w1 c0 smolvla   median    83.24 ms  p95    83.77  n 97
+    graph w2 c0 smolvla   median    83.23 ms  p95    83.79  n 96
+    graph w3 c0 smolvla   median    83.19 ms  p95    83.74  n 96
+    loop  w0 c0 smolvla   median    47.64 ms  p95    47.95  n 168
+    loop  w1 c0 smolvla   median    47.66 ms  p95    47.94  n 168
+    loop  w2 c0 smolvla   median    47.67 ms  p95    47.97  n 167
+    loop  w3 c0 smolvla   median    47.63 ms  p95    47.94  n 168
+=== procs-mps_smolvlax8: 8 policies, procs-mps, modes ['eager', 'graph', 'loop'], 10s per mode
+    loaded in 64s
+    eager done
+    graph done
+    loop done
+    eager w0 c0 smolvla   median   153.83 ms  p95   157.17  n 52
+    eager w1 c0 smolvla   median   155.62 ms  p95   157.94  n 51
+    eager w2 c0 smolvla   median   155.95 ms  p95   159.27  n 51
+    eager w3 c0 smolvla   median   155.80 ms  p95   157.72  n 52
+    eager w4 c0 smolvla   median   154.02 ms  p95   157.21  n 52
+    eager w5 c0 smolvla   median   155.20 ms  p95   158.03  n 52
+    eager w6 c0 smolvla   median   155.36 ms  p95   157.65  n 51
+    eager w7 c0 smolvla   median   154.43 ms  p95   157.54  n 52
+    graph w0 c0 smolvla   median   111.16 ms  p95   113.14  n 72
+    graph w1 c0 smolvla   median   111.15 ms  p95   112.44  n 72
+    graph w2 c0 smolvla   median   111.12 ms  p95   112.13  n 73
+    graph w3 c0 smolvla   median   111.09 ms  p95   112.27  n 72
+    graph w4 c0 smolvla   median   111.06 ms  p95   112.11  n 72
+    graph w5 c0 smolvla   median   111.11 ms  p95   112.18  n 72
+    graph w6 c0 smolvla   median   111.11 ms  p95   111.93  n 72
+    graph w7 c0 smolvla   median   111.03 ms  p95   111.97  n 72
+    loop  w0 c0 smolvla   median    57.08 ms  p95    57.51  n 140
+    loop  w1 c0 smolvla   median    56.93 ms  p95    57.35  n 140
+    loop  w2 c0 smolvla   median    56.64 ms  p95    57.07  n 142
+    loop  w3 c0 smolvla   median    56.67 ms  p95    57.16  n 141
+    loop  w4 c0 smolvla   median    56.97 ms  p95    57.47  n 140
+    loop  w5 c0 smolvla   median    56.80 ms  p95    57.15  n 141
+    loop  w6 c0 smolvla   median    56.70 ms  p95    57.18  n 141
+    loop  w7 c0 smolvla   median    56.57 ms  p95    57.02  n 141
+=== threads_smolvlax2: 2 policies, threads, modes ['eager', 'graph', 'loop'], 10s per mode
+    loaded in 56s
+    eager done
+    graph done
+    loop done
+    eager w0 c0 smolvla   median   378.15 ms  p95   467.08  n 20
+    eager w0 c1 smolvla   median   368.62 ms  p95   486.25  n 21
+    graph w0 c0 smolvla   median    78.43 ms  p95    79.97  n 103
+    graph w0 c1 smolvla   median    78.31 ms  p95    80.15  n 103
+    loop  w0 c0 smolvla   median    38.38 ms  p95    38.47  n 208
+    loop  w0 c1 smolvla   median    38.38 ms  p95    38.47  n 208
+=== threads_smolvlax4: 4 policies, threads, modes ['eager', 'graph', 'loop'], 10s per mode
+    loaded in 68s
+    eager done
+    graph done
+    loop done
+    eager w0 c0 smolvla   median  1404.79 ms  p95  1550.23  n 6
+    eager w0 c1 smolvla   median  1447.00 ms  p95  1760.85  n 5
+    eager w0 c2 smolvla   median  1452.19 ms  p95  1628.79  n 6
+    eager w0 c3 smolvla   median  1405.91 ms  p95  1505.43  n 6
+    graph w0 c0 smolvla   median   168.92 ms  p95   232.26  n 48
+    graph w0 c1 smolvla   median   169.46 ms  p95   206.52  n 50
+    graph w0 c2 smolvla   median   170.62 ms  p95   230.70  n 48
+    graph w0 c3 smolvla   median   166.31 ms  p95   219.21  n 50
+    loop  w0 c0 smolvla   median    45.95 ms  p95    46.05  n 174
+    loop  w0 c1 smolvla   median    45.95 ms  p95    46.05  n 174
+    loop  w0 c2 smolvla   median    45.96 ms  p95    46.05  n 174
+    loop  w0 c3 smolvla   median    45.95 ms  p95    46.05  n 174
+=== threads_smolvlax8: 8 policies, threads, modes ['eager', 'graph', 'loop'], 10s per mode
+    loaded in 92s
+    eager done
+    graph done
+    loop done
+    eager w0 c0 smolvla   median      nan ms  p95      nan  n 0
+    eager w0 c1 smolvla   median      nan ms  p95      nan  n 0
+    eager w0 c2 smolvla   median      nan ms  p95      nan  n 0
+    eager w0 c3 smolvla   median      nan ms  p95      nan  n 0
+    eager w0 c4 smolvla   median      nan ms  p95      nan  n 0
+    eager w0 c5 smolvla   median      nan ms  p95      nan  n 0
+    eager w0 c6 smolvla   median      nan ms  p95      nan  n 0
+    eager w0 c7 smolvla   median      nan ms  p95      nan  n 0
+    graph w0 c0 smolvla   median  5400.82 ms  p95  5650.22  n 2
+    graph w0 c1 smolvla   median  5422.54 ms  p95  5528.37  n 2
+    graph w0 c2 smolvla   median  5479.42 ms  p95  5891.37  n 2
+    graph w0 c3 smolvla   median  5445.10 ms  p95  5481.10  n 2
+    graph w0 c4 smolvla   median  5254.59 ms  p95  5508.97  n 2
+    graph w0 c5 smolvla   median  5556.88 ms  p95  5597.51  n 2
+    graph w0 c6 smolvla   median  5537.89 ms  p95  5664.88  n 2
+    graph w0 c7 smolvla   median  5245.91 ms  p95  5651.78  n 2
+    loop  w0 c0 smolvla   median    54.34 ms  p95    55.48  n 146
+    loop  w0 c1 smolvla   median    54.29 ms  p95    55.33  n 148
+    loop  w0 c2 smolvla   median    54.28 ms  p95    55.28  n 147
+    loop  w0 c3 smolvla   median    54.37 ms  p95    55.33  n 147
+    loop  w0 c4 smolvla   median    54.31 ms  p95    55.33  n 148
+    loop  w0 c5 smolvla   median    54.38 ms  p95    55.35  n 147
+    loop  w0 c6 smolvla   median    54.28 ms  p95    55.40  n 147
+    loop  w0 c7 smolvla   median    54.36 ms  p95    55.40  n 146
+=== procs_act: 1 policies, procs, modes ['eager', 'graph', 'loop'], 10s per mode
+    loaded in 44s
+    eager done
+    graph done
+    loop done
+    eager w0 c0 act       median     4.85 ms  p95     4.88  n 1646
+    graph w0 c0 act       median     4.13 ms  p95     4.14  n 1939
+    loop  w0 c0 act       median     4.07 ms  p95     4.08  n 1965
+=== procs_actx2: 2 policies, procs, modes ['eager', 'graph', 'loop'], 10s per mode
+    loaded in 43s
+    eager done
+    graph done
+    loop done
+    eager w0 c0 act       median     9.50 ms  p95     9.63  n 840
+    eager w1 c0 act       median     9.50 ms  p95     9.63  n 839
+    graph w0 c0 act       median     8.30 ms  p95     8.46  n 964
+    graph w1 c0 act       median     8.29 ms  p95     8.46  n 964
+    loop  w0 c0 act       median     8.24 ms  p95     8.36  n 970
+    loop  w1 c0 act       median     8.25 ms  p95     8.35  n 969
+=== procs_actx4: 4 policies, procs, modes ['eager', 'graph', 'loop'], 10s per mode
+    loaded in 42s
+    eager done
+    graph done
+    loop done
+    eager w0 c0 act       median    19.09 ms  p95    19.25  n 419
+    eager w1 c0 act       median    19.09 ms  p95    19.25  n 419
+    eager w2 c0 act       median    19.09 ms  p95    19.26  n 419
+    eager w3 c0 act       median    19.09 ms  p95    19.24  n 419
+    graph w0 c0 act       median    16.87 ms  p95    16.96  n 475
+    graph w1 c0 act       median    16.87 ms  p95    16.97  n 475
+    graph w2 c0 act       median    16.87 ms  p95    16.95  n 474
+    graph w3 c0 act       median    16.87 ms  p95    16.95  n 474
+    loop  w0 c0 act       median    16.49 ms  p95    16.63  n 485
+    loop  w1 c0 act       median    16.49 ms  p95    16.64  n 485
+    loop  w2 c0 act       median    16.50 ms  p95    16.65  n 485
+    loop  w3 c0 act       median    16.49 ms  p95    16.63  n 485
+=== procs_actx8: 8 policies, procs, modes ['eager', 'graph', 'loop'], 10s per mode
+    loaded in 43s
+    eager done
+    graph done
+    loop done
+    eager w0 c0 act       median    38.32 ms  p95    38.58  n 209
+    eager w1 c0 act       median    38.31 ms  p95    38.58  n 209
+    eager w2 c0 act       median    38.31 ms  p95    38.62  n 209
+    eager w3 c0 act       median    38.31 ms  p95    38.58  n 209
+    eager w4 c0 act       median    38.30 ms  p95    38.59  n 209
+    eager w5 c0 act       median    38.31 ms  p95    38.59  n 209
+    eager w6 c0 act       median    38.31 ms  p95    38.59  n 209
+    eager w7 c0 act       median    38.31 ms  p95    38.64  n 209
+    graph w0 c0 act       median    33.67 ms  p95    33.89  n 238
+    graph w1 c0 act       median    33.68 ms  p95    33.89  n 238
+    graph w2 c0 act       median    33.68 ms  p95    33.89  n 238
+    graph w3 c0 act       median    33.67 ms  p95    33.90  n 239
+    graph w4 c0 act       median    33.68 ms  p95    33.89  n 239
+    graph w5 c0 act       median    33.67 ms  p95    33.92  n 239
+    graph w6 c0 act       median    33.68 ms  p95    33.90  n 238
+    graph w7 c0 act       median    33.68 ms  p95    33.92  n 239
+    loop  w0 c0 act       median    33.08 ms  p95    33.29  n 241
+    loop  w1 c0 act       median    33.08 ms  p95    33.29  n 241
+    loop  w2 c0 act       median    33.08 ms  p95    33.28  n 241
+    loop  w3 c0 act       median    33.09 ms  p95    33.30  n 241
+    loop  w4 c0 act       median    33.09 ms  p95    33.30  n 242
+    loop  w5 c0 act       median    33.08 ms  p95    33.30  n 242
+    loop  w6 c0 act       median    33.09 ms  p95    33.28  n 242
+    loop  w7 c0 act       median    33.09 ms  p95    33.30  n 242
+=== procs-mps_actx2: 2 policies, procs-mps, modes ['eager', 'graph', 'loop'], 10s per mode
+    loaded in 43s
+    eager done
+    graph done
+    loop done
+    eager w0 c0 act       median     5.85 ms  p95     6.02  n 1362
+    eager w1 c0 act       median     5.85 ms  p95     6.02  n 1362
+    graph w0 c0 act       median     5.37 ms  p95     5.63  n 1487
+    graph w1 c0 act       median     5.36 ms  p95     5.64  n 1487
+    loop  w0 c0 act       median     5.37 ms  p95     5.65  n 1486
+    loop  w1 c0 act       median     5.37 ms  p95     5.63  n 1487
+=== procs-mps_actx4: 4 policies, procs-mps, modes ['eager', 'graph', 'loop'], 10s per mode
+    loaded in 42s
+    eager done
+    graph done
+    loop done
+    eager w0 c0 act       median     8.21 ms  p95     8.44  n 975
+    eager w1 c0 act       median     8.22 ms  p95     8.52  n 972
+    eager w2 c0 act       median     8.32 ms  p95     8.76  n 958
+    eager w3 c0 act       median     8.21 ms  p95     8.44  n 975
+    graph w0 c0 act       median     7.94 ms  p95     8.30  n 1007
+    graph w1 c0 act       median     7.94 ms  p95     8.30  n 1006
+    graph w2 c0 act       median     7.95 ms  p95     8.25  n 1006
+    graph w3 c0 act       median     7.95 ms  p95     8.33  n 1004
+    loop  w0 c0 act       median     7.96 ms  p95     8.29  n 1004
+    loop  w1 c0 act       median     7.96 ms  p95     8.31  n 1005
+    loop  w2 c0 act       median     7.96 ms  p95     8.26  n 1005
+    loop  w3 c0 act       median     7.96 ms  p95     8.31  n 1005
+=== procs-mps_actx8: 8 policies, procs-mps, modes ['eager', 'graph', 'loop'], 10s per mode
+    loaded in 43s
+    eager done
+    graph done
+    loop done
+    eager w0 c0 act       median    14.12 ms  p95    14.57  n 567
+    eager w1 c0 act       median    14.39 ms  p95    15.15  n 553
+    eager w2 c0 act       median    14.09 ms  p95    14.54  n 569
+    eager w3 c0 act       median    14.10 ms  p95    14.51  n 568
+    eager w4 c0 act       median    14.13 ms  p95    14.63  n 566
+    eager w5 c0 act       median    14.12 ms  p95    14.55  n 567
+    eager w6 c0 act       median    14.12 ms  p95    14.65  n 566
+    eager w7 c0 act       median    14.27 ms  p95    14.90  n 559
+    graph w0 c0 act       median    14.13 ms  p95    14.63  n 567
+    graph w1 c0 act       median    14.10 ms  p95    14.65  n 567
+    graph w2 c0 act       median    14.12 ms  p95    14.69  n 567
+    graph w3 c0 act       median    14.12 ms  p95    14.65  n 567
+    graph w4 c0 act       median    14.11 ms  p95    14.65  n 567
+    graph w5 c0 act       median    14.10 ms  p95    14.65  n 567
+    graph w6 c0 act       median    14.12 ms  p95    14.65  n 567
+    graph w7 c0 act       median    14.12 ms  p95    14.68  n 567
+    loop  w0 c0 act       median    14.11 ms  p95    14.66  n 566
+    loop  w1 c0 act       median    14.12 ms  p95    14.68  n 566
+    loop  w2 c0 act       median    14.11 ms  p95    14.66  n 567
+    loop  w3 c0 act       median    14.13 ms  p95    14.56  n 567
+    loop  w4 c0 act       median    14.14 ms  p95    14.65  n 566
+    loop  w5 c0 act       median    14.12 ms  p95    14.65  n 566
+    loop  w6 c0 act       median    14.12 ms  p95    14.64  n 566
+    loop  w7 c0 act       median    14.13 ms  p95    14.72  n 566
+=== threads_actx2: 2 policies, threads, modes ['eager', 'graph', 'loop'], 10s per mode
+    loaded in 44s
+    eager done
+    graph done
+    loop done
+    eager w0 c0 act       median    10.36 ms  p95    13.66  n 732
+    eager w0 c1 act       median    10.18 ms  p95    10.67  n 783
+    graph w0 c0 act       median     5.16 ms  p95     5.38  n 1550
+    graph w0 c1 act       median     5.16 ms  p95     5.37  n 1550
+    loop  w0 c0 act       median     5.17 ms  p95     5.37  n 1549
+    loop  w0 c1 act       median     5.16 ms  p95     5.40  n 1549
+=== threads_actx4: 4 policies, threads, modes ['eager', 'graph', 'loop'], 10s per mode
+    loaded in 45s
+    eager done
+    graph done
+    loop done
+    eager w0 c0 act       median    38.32 ms  p95    49.17  n 199
+    eager w0 c1 act       median    39.46 ms  p95    66.40  n 188
+    eager w0 c2 act       median    40.27 ms  p95    75.14  n 182
+    eager w0 c3 act       median    39.19 ms  p95    50.01  n 196
+    graph w0 c0 act       median     7.72 ms  p95     8.02  n 1036
+    graph w0 c1 act       median     7.72 ms  p95     7.99  n 1036
+    graph w0 c2 act       median     7.72 ms  p95     8.02  n 1036
+    graph w0 c3 act       median     7.72 ms  p95     8.01  n 1036
+    loop  w0 c0 act       median     7.73 ms  p95     8.04  n 1035
+    loop  w0 c1 act       median     7.73 ms  p95     8.03  n 1035
+    loop  w0 c2 act       median     7.73 ms  p95     8.03  n 1034
+    loop  w0 c3 act       median     7.73 ms  p95     8.01  n 1034
+=== threads_actx8: 8 policies, threads, modes ['eager', 'graph', 'loop'], 10s per mode
+    loaded in 48s
+    eager done
+    graph done
+    loop done
+    eager w0 c0 act       median  1160.97 ms  p95  1193.84  n 7
+    eager w0 c1 act       median  1061.38 ms  p95  1121.39  n 8
+    eager w0 c2 act       median  1068.71 ms  p95  1197.03  n 8
+    eager w0 c3 act       median  1176.15 ms  p95  1238.51  n 7
+    eager w0 c4 act       median  1122.20 ms  p95  1203.60  n 7
+    eager w0 c5 act       median  1117.10 ms  p95  1292.98  n 7
+    eager w0 c6 act       median  1212.64 ms  p95  1268.71  n 6
+    eager w0 c7 act       median  1161.55 ms  p95  1345.39  n 6
+    graph w0 c0 act       median    13.84 ms  p95    14.39  n 578
+    graph w0 c1 act       median    13.85 ms  p95    14.44  n 578
+    graph w0 c2 act       median    13.84 ms  p95    14.42  n 578
+    graph w0 c3 act       median    13.83 ms  p95    14.34  n 578
+    graph w0 c4 act       median    13.87 ms  p95    14.43  n 578
+    graph w0 c5 act       median    13.84 ms  p95    14.37  n 578
+    graph w0 c6 act       median    13.84 ms  p95    14.39  n 578
+    graph w0 c7 act       median    13.84 ms  p95    14.39  n 578
+    loop  w0 c0 act       median    13.90 ms  p95    14.42  n 576
+    loop  w0 c1 act       median    13.89 ms  p95    14.48  n 576
+    loop  w0 c2 act       median    13.90 ms  p95    14.52  n 575
+    loop  w0 c3 act       median    13.90 ms  p95    14.46  n 575
+    loop  w0 c4 act       median    13.89 ms  p95    14.46  n 575
+    loop  w0 c5 act       median    13.90 ms  p95    14.48  n 575
+    loop  w0 c6 act       median    13.89 ms  p95    14.49  n 575
+    loop  w0 c7 act       median    13.90 ms  p95    14.53  n 575
+=== procs_diffusion: 1 policies, procs, modes ['eager', 'graph', 'loop'], 10s per mode
+    loaded in 46s
+    eager done
+    graph done
+    loop done
+    eager w0 c0 diffusion median   136.52 ms  p95   136.60  n 59
+    graph w0 c0 diffusion median   132.04 ms  p95   132.16  n 60
+    loop  w0 c0 diffusion median   130.49 ms  p95   130.54  n 62
+=== procs_diffusionx2: 2 policies, procs, modes ['eager', 'graph', 'loop'], 10s per mode
+    loaded in 45s
+    eager done
+    graph done
+    loop done
+    eager w0 c0 diffusion median   288.79 ms  p95   288.89  n 28
+    eager w1 c0 diffusion median   288.77 ms  p95   288.88  n 28
+    graph w0 c0 diffusion median   281.34 ms  p95   281.40  n 28
+    graph w1 c0 diffusion median   281.33 ms  p95   281.41  n 28
+    loop  w0 c0 diffusion median   278.52 ms  p95   278.79  n 29
+    loop  w1 c0 diffusion median   278.49 ms  p95   278.85  n 29
+=== procs_diffusionx4: 4 policies, procs, modes ['eager', 'graph', 'loop'], 10s per mode
+    loaded in 46s
+    eager done
+    graph done
+    loop done
+    eager w0 c0 diffusion median   577.85 ms  p95   578.23  n 14
+    eager w1 c0 diffusion median   577.85 ms  p95   578.03  n 14
+    eager w2 c0 diffusion median   577.89 ms  p95   578.12  n 14
+    eager w3 c0 diffusion median   577.89 ms  p95   578.17  n 14
+    graph w0 c0 diffusion median   562.72 ms  p95   563.24  n 14
+    graph w1 c0 diffusion median   562.73 ms  p95   563.35  n 14
+    graph w2 c0 diffusion median   562.73 ms  p95   563.04  n 14
+    graph w3 c0 diffusion median   562.74 ms  p95   565.66  n 14
+    loop  w0 c0 diffusion median   558.81 ms  p95   558.91  n 15
+    loop  w1 c0 diffusion median   558.81 ms  p95   558.91  n 15
+    loop  w2 c0 diffusion median   558.81 ms  p95   558.89  n 15
+    loop  w3 c0 diffusion median   558.81 ms  p95   558.87  n 15
+=== procs_diffusionx8: 8 policies, procs, modes ['eager', 'graph', 'loop'], 10s per mode
+    loaded in 53s
+    eager done
+    graph done
+    loop done
+    eager w0 c0 diffusion median  1153.12 ms  p95  1155.54  n 7
+    eager w1 c0 diffusion median  1155.04 ms  p95  1164.66  n 7
+    eager w2 c0 diffusion median  1170.75 ms  p95  1173.20  n 7
+    eager w3 c0 diffusion median  1157.33 ms  p95  1171.25  n 7
+    eager w4 c0 diffusion median  1170.74 ms  p95  1173.08  n 7
+    eager w5 c0 diffusion median  1155.14 ms  p95  1170.20  n 7
+    eager w6 c0 diffusion median  1171.02 ms  p95  1172.71  n 7
+    eager w7 c0 diffusion median  1170.75 ms  p95  1173.23  n 7
+    graph w0 c0 diffusion median  1133.25 ms  p95  1133.38  n 7
+    graph w1 c0 diffusion median  1133.28 ms  p95  1133.40  n 7
+    graph w2 c0 diffusion median  1133.30 ms  p95  1133.42  n 7
+    graph w3 c0 diffusion median  1133.22 ms  p95  1133.47  n 7
+    graph w4 c0 diffusion median  1133.28 ms  p95  1133.42  n 7
+    graph w5 c0 diffusion median  1133.26 ms  p95  1133.48  n 7
+    graph w6 c0 diffusion median  1133.27 ms  p95  1133.38  n 7
+    graph w7 c0 diffusion median  1133.26 ms  p95  1133.35  n 7
+    loop  w0 c0 diffusion median  1123.99 ms  p95  1124.18  n 7
+    loop  w1 c0 diffusion median  1123.89 ms  p95  1124.20  n 7
+    loop  w2 c0 diffusion median  1124.00 ms  p95  1124.16  n 7
+    loop  w3 c0 diffusion median  1123.90 ms  p95  1124.22  n 7
+    loop  w4 c0 diffusion median  1123.88 ms  p95  1124.17  n 7
+    loop  w5 c0 diffusion median  1123.89 ms  p95  1124.21  n 7
+    loop  w6 c0 diffusion median  1123.84 ms  p95  1124.20  n 7
+    loop  w7 c0 diffusion median  1123.92 ms  p95  1124.17  n 8
+=== procs-mps_diffusionx2: 2 policies, procs-mps, modes ['eager', 'graph', 'loop'], 10s per mode
+    loaded in 44s
+    eager done
+    graph done
+    loop done
+    eager w0 c0 diffusion median   140.41 ms  p95   142.10  n 57
+    eager w1 c0 diffusion median   139.58 ms  p95   141.42  n 57
+    graph w0 c0 diffusion median   134.14 ms  p95   136.27  n 59
+    graph w1 c0 diffusion median   134.21 ms  p95   136.20  n 59
+    loop  w0 c0 diffusion median   132.24 ms  p95   132.97  n 60
+    loop  w1 c0 diffusion median   132.26 ms  p95   132.84  n 61
+=== procs-mps_diffusionx4: 4 policies, procs-mps, modes ['eager', 'graph', 'loop'], 10s per mode
+    loaded in 44s
+    eager done
+    graph done
+    loop done
+    eager w0 c0 diffusion median   156.45 ms  p95   156.89  n 51
+    eager w1 c0 diffusion median   156.65 ms  p95   157.09  n 51
+    eager w2 c0 diffusion median   156.46 ms  p95   157.15  n 51
+    eager w3 c0 diffusion median   156.67 ms  p95   157.21  n 51
+    graph w0 c0 diffusion median   151.86 ms  p95   152.32  n 52
+    graph w1 c0 diffusion median   151.84 ms  p95   152.45  n 53
+    graph w2 c0 diffusion median   151.95 ms  p95   152.42  n 52
+    graph w3 c0 diffusion median   152.03 ms  p95   152.47  n 52
+    loop  w0 c0 diffusion median   149.81 ms  p95   150.34  n 54
+    loop  w1 c0 diffusion median   149.86 ms  p95   150.30  n 54
+    loop  w2 c0 diffusion median   149.89 ms  p95   150.23  n 54
+    loop  w3 c0 diffusion median   149.83 ms  p95   150.22  n 54
+=== procs-mps_diffusionx8: 8 policies, procs-mps, modes ['eager', 'graph', 'loop'], 10s per mode
+    loaded in 47s
+    eager done
+    graph done
+    loop done
+    eager w0 c0 diffusion median   221.77 ms  p95   222.71  n 36
+    eager w1 c0 diffusion median   221.88 ms  p95   222.52  n 36
+    eager w2 c0 diffusion median   221.86 ms  p95   223.17  n 36
+    eager w3 c0 diffusion median   222.29 ms  p95   223.62  n 36
+    eager w4 c0 diffusion median   222.30 ms  p95   223.39  n 36
+    eager w5 c0 diffusion median   221.78 ms  p95   222.61  n 36
+    eager w6 c0 diffusion median   221.85 ms  p95   222.90  n 36
+    eager w7 c0 diffusion median   221.75 ms  p95   223.11  n 36
+    graph w0 c0 diffusion median   218.20 ms  p95   218.99  n 37
+    graph w1 c0 diffusion median   218.08 ms  p95   219.21  n 37
+    graph w2 c0 diffusion median   218.41 ms  p95   219.38  n 37
+    graph w3 c0 diffusion median   217.99 ms  p95   219.31  n 37
+    graph w4 c0 diffusion median   217.99 ms  p95   219.33  n 37
+    graph w5 c0 diffusion median   218.10 ms  p95   218.72  n 37
+    graph w6 c0 diffusion median   218.25 ms  p95   219.46  n 37
+    graph w7 c0 diffusion median   218.04 ms  p95   218.87  n 37
+    loop  w0 c0 diffusion median   215.63 ms  p95   216.42  n 37
+    loop  w1 c0 diffusion median   215.63 ms  p95   216.28  n 37
+    loop  w2 c0 diffusion median   215.89 ms  p95   216.81  n 37
+    loop  w3 c0 diffusion median   215.66 ms  p95   216.53  n 37
+    loop  w4 c0 diffusion median   215.62 ms  p95   216.93  n 37
+    loop  w5 c0 diffusion median   215.56 ms  p95   216.55  n 37
+    loop  w6 c0 diffusion median   215.69 ms  p95   216.87  n 37
+    loop  w7 c0 diffusion median   215.65 ms  p95   216.86  n 37
+=== threads_diffusionx2: 2 policies, threads, modes ['eager', 'graph', 'loop'], 10s per mode
+    loaded in 48s
+    eager done
+    graph done
+    loop done
+    eager w0 c0 diffusion median   139.59 ms  p95   142.42  n 57
+    eager w0 c1 diffusion median   140.10 ms  p95   143.08  n 57
+    graph w0 c0 diffusion median   133.75 ms  p95   134.55  n 60
+    graph w0 c1 diffusion median   133.75 ms  p95   134.43  n 60
+    loop  w0 c0 diffusion median   134.02 ms  p95   134.75  n 59
+    loop  w0 c1 diffusion median   134.02 ms  p95   134.79  n 59
+=== threads_diffusionx4: 4 policies, threads, modes ['eager', 'graph', 'loop'], 10s per mode
+    loaded in 52s
+    eager done
+    graph done
+    loop done
+    eager w0 c0 diffusion median   254.19 ms  p95   360.33  n 30
+    eager w0 c1 diffusion median   270.66 ms  p95   391.22  n 28
+    eager w0 c2 diffusion median   251.74 ms  p95   334.68  n 30
+    eager w0 c3 diffusion median   249.25 ms  p95   374.55  n 31
+    graph w0 c0 diffusion median   153.93 ms  p95   155.39  n 52
+    graph w0 c1 diffusion median   152.60 ms  p95   153.94  n 53
+    graph w0 c2 diffusion median   152.61 ms  p95   153.90  n 53
+    graph w0 c3 diffusion median   153.91 ms  p95   155.43  n 52
+    loop  w0 c0 diffusion median   149.49 ms  p95   149.98  n 54
+    loop  w0 c1 diffusion median   149.50 ms  p95   149.98  n 54
+    loop  w0 c2 diffusion median   149.46 ms  p95   149.98  n 54
+    loop  w0 c3 diffusion median   149.47 ms  p95   149.88  n 54
+=== threads_diffusionx8: 8 policies, threads, modes ['eager', 'graph', 'loop'], 10s per mode
+    loaded in 62s
+    eager done
+    graph done
+    loop done
+    eager w0 c0 diffusion median  5518.07 ms  p95  5518.07  n 1
+    eager w0 c1 diffusion median  5528.54 ms  p95  5528.54  n 1
+    eager w0 c2 diffusion median  5293.84 ms  p95  5293.84  n 1
+    eager w0 c3 diffusion median  5433.38 ms  p95  5433.38  n 1
+    eager w0 c4 diffusion median  5542.76 ms  p95  5542.76  n 1
+    eager w0 c5 diffusion median  5398.56 ms  p95  5786.56  n 2
+    eager w0 c6 diffusion median  5459.30 ms  p95  5459.30  n 1
+    eager w0 c7 diffusion median  5382.28 ms  p95  5986.01  n 2
+    graph w0 c0 diffusion median   217.95 ms  p95   219.28  n 37
+    graph w0 c1 diffusion median   217.91 ms  p95   218.99  n 37
+    graph w0 c2 diffusion median   218.15 ms  p95   220.40  n 36
+    graph w0 c3 diffusion median   217.63 ms  p95   218.39  n 37
+    graph w0 c4 diffusion median   217.70 ms  p95   218.52  n 37
+    graph w0 c5 diffusion median   218.05 ms  p95   219.06  n 37
+    graph w0 c6 diffusion median   217.72 ms  p95   218.51  n 36
+    graph w0 c7 diffusion median   218.12 ms  p95   219.92  n 36
+    loop  w0 c0 diffusion median   215.38 ms  p95   216.88  n 37
+    loop  w0 c1 diffusion median   215.74 ms  p95   216.73  n 37
+    loop  w0 c2 diffusion median   215.59 ms  p95   216.50  n 37
+    loop  w0 c3 diffusion median   215.30 ms  p95   216.71  n 37
+    loop  w0 c4 diffusion median   215.66 ms  p95   216.71  n 37
+    loop  w0 c5 diffusion median   215.55 ms  p95   216.66  n 37
+    loop  w0 c6 diffusion median   215.36 ms  p95   216.59  n 37
+    loop  w0 c7 diffusion median   215.68 ms  p95   216.89  n 37
+=== batch_smolvlax4_b4: 4 policies, batch, modes ['eager', 'graph', 'loop'], 10s per mode
+    loaded in 49s
+    eager done
+    graph done
+    loop done
+    eager w0 c0 smolvla   median   180.22 ms  p95   181.75  n 45
+    graph w0 c0 smolvla   median    77.02 ms  p95    77.46  n 104
+    loop  w0 c0 smolvla   median    33.80 ms  p95    34.06  n 236
+=== batch_smolvlax8_b8: 8 policies, batch, modes ['eager', 'graph', 'loop'], 10s per mode
+    loaded in 50s
+    eager done
+    graph done
+    loop done
+    eager w0 c0 smolvla   median   202.35 ms  p95   204.10  n 39
+    graph w0 c0 smolvla   median    98.59 ms  p95   100.22  n 81
+    loop  w0 c0 smolvla   median    39.31 ms  p95    39.32  n 205
+=== procs_smolvla+act: 2 policies, procs, modes ['eager', 'graph', 'loop'], 10s per mode
+    loaded in 49s
+    eager done
+    graph done
+    loop done
+    eager w0 c0 smolvla   median   203.20 ms  p95   203.73  n 40
+    eager w1 c0 act       median     7.59 ms  p95     8.59  n 1063
+    graph w0 c0 smolvla   median   127.89 ms  p95   129.32  n 63
+    graph w1 c0 act       median     6.65 ms  p95     8.76  n 1180
+    loop  w0 c0 smolvla   median    60.36 ms  p95    61.01  n 132
+    loop  w1 c0 act       median     8.69 ms  p95     8.77  n 928
+=== procs-mps_smolvla+act: 2 policies, procs-mps, modes ['eager', 'graph', 'loop'], 10s per mode
+    loaded in 49s
+    eager done
+    graph done
+    loop done
+    eager w0 c0 smolvla   median   171.74 ms  p95   172.85  n 47
+    eager w1 c0 act       median     5.06 ms  p95     6.10  n 1545
+    graph w0 c0 smolvla   median    77.79 ms  p95    79.10  n 103
+    graph w1 c0 act       median     4.57 ms  p95     5.37  n 1710
+    loop  w0 c0 smolvla   median    47.54 ms  p95    48.52  n 169
+    loop  w1 c0 act       median     4.50 ms  p95     4.78  n 1762
+=== threads_smolvla+act: 2 policies, threads, modes ['eager', 'graph', 'loop'], 10s per mode
+    loaded in 51s
+    eager done
+Traceback (most recent call last):
+  File "/mnt/home/awg4562/vla/repo/workloads/multipolicy.py", line 749, in <module>
+    main()
+  File "/mnt/home/awg4562/vla/repo/workloads/multipolicy.py", line 743, in main
+    host(args)
+  File "/mnt/home/awg4562/vla/repo/workloads/multipolicy.py", line 663, in host
+    wait_all(f"done_{mode}", args.warm_s + args.duration + 300, f"phase {mode}")
+  File "/mnt/home/awg4562/vla/repo/workloads/multipolicy.py", line 649, in wait_all
+    alive_or_fail(stage)
+  File "/mnt/home/awg4562/vla/repo/workloads/multipolicy.py", line 641, in alive_or_fail
+    raise RuntimeError(f"worker {wid} died during {stage} (rc {p.returncode}):\n"
+RuntimeError: worker 0 died during phase graph (rc 1):
+  File "/mnt/home/awg4562/vla/repo/workloads/multipolicy.py", line 427, in run_phase
+    raise RuntimeError(f"{mode} phase failed in {len(errors)} thread(s):\n" + "\n".join(errors))
+RuntimeError: graph phase failed in 2 thread(s):
+copy 0 (smolvla): AcceleratorError: CUDA error: an illegal memory access was encountered
+Search for `cudaErrorIllegalAddress' in https://docs.nvidia.com/cuda/cuda-runtime-api/group__CUDART__TYPES.html for more information.
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing CUDA_LAUNCH_BLOCKING=1
+Compile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.
+
+copy 1 (act): AcceleratorError: CUDA error: an illegal memory access was encountered
+Search for `cudaErrorIllegalAddress' in https://docs.nvidia.com/cuda/cuda-runtime-api/group__CUDART__TYPES.html for more information.
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing CUDA_LAUNCH_BLOCKING=1
+Compile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.
+
+FAILED: threads smolvla,act
+=== procs_smolvla+diffusion: 2 policies, procs, modes ['eager', 'graph', 'loop'], 10s per mode
+    loaded in 47s
+    eager done
+    graph done
+    loop done
+    eager w0 c0 smolvla   median   247.26 ms  p95   249.67  n 32
+    eager w1 c0 diffusion median   196.23 ms  p95   199.62  n 41
+    graph w0 c0 smolvla   median   127.36 ms  p95   128.82  n 63
+    graph w1 c0 diffusion median   225.59 ms  p95   230.32  n 36
+    loop  w0 c0 smolvla   median    60.79 ms  p95    61.03  n 132
+    loop  w1 c0 diffusion median   277.69 ms  p95   278.72  n 29
+=== procs-mps_smolvla+diffusion: 2 policies, procs-mps, modes ['eager', 'graph', 'loop'], 10s per mode
+    loaded in 48s
+    eager done
+    graph done
+    loop done
+    eager w0 c0 smolvla   median   167.24 ms  p95   169.33  n 48
+    eager w1 c0 diffusion median   147.87 ms  p95   152.01  n 54
+    graph w0 c0 smolvla   median    63.63 ms  p95    64.28  n 125
+    graph w1 c0 diffusion median   154.47 ms  p95   160.84  n 52
+    loop  w0 c0 smolvla   median    36.50 ms  p95    36.62  n 220
+    loop  w1 c0 diffusion median   146.64 ms  p95   153.80  n 54
+=== threads_smolvla+diffusion: 2 policies, threads, modes ['eager', 'graph', 'loop'], 10s per mode
+    loaded in 52s
+    eager done
+Traceback (most recent call last):
+  File "/mnt/home/awg4562/vla/repo/workloads/multipolicy.py", line 749, in <module>
+    main()
+  File "/mnt/home/awg4562/vla/repo/workloads/multipolicy.py", line 743, in main
+    host(args)
+  File "/mnt/home/awg4562/vla/repo/workloads/multipolicy.py", line 663, in host
+    wait_all(f"done_{mode}", args.warm_s + args.duration + 300, f"phase {mode}")
+  File "/mnt/home/awg4562/vla/repo/workloads/multipolicy.py", line 649, in wait_all
+    alive_or_fail(stage)
+  File "/mnt/home/awg4562/vla/repo/workloads/multipolicy.py", line 641, in alive_or_fail
+    raise RuntimeError(f"worker {wid} died during {stage} (rc {p.returncode}):\n"
+RuntimeError: worker 0 died during phase graph (rc 1):
+  File "/mnt/home/awg4562/vla/repo/workloads/multipolicy.py", line 427, in run_phase
+    raise RuntimeError(f"{mode} phase failed in {len(errors)} thread(s):\n" + "\n".join(errors))
+RuntimeError: graph phase failed in 2 thread(s):
+copy 1 (diffusion): AcceleratorError: CUDA error: an illegal memory access was encountered
+Search for `cudaErrorIllegalAddress' in https://docs.nvidia.com/cuda/cuda-runtime-api/group__CUDART__TYPES.html for more information.
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing CUDA_LAUNCH_BLOCKING=1
+Compile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.
+
+copy 0 (smolvla): AcceleratorError: CUDA error: an illegal memory access was encountered
+Search for `cudaErrorIllegalAddress' in https://docs.nvidia.com/cuda/cuda-runtime-api/group__CUDART__TYPES.html for more information.
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing CUDA_LAUNCH_BLOCKING=1
+Compile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.
+
+FAILED: threads smolvla,diffusion
+=== procs_act+diffusion: 2 policies, procs, modes ['eager', 'graph', 'loop'], 10s per mode
+    loaded in 42s
+    eager done
+    graph done
+    loop done
+    eager w0 c0 act       median    13.54 ms  p95    13.68  n 597
+    eager w1 c0 diffusion median   227.51 ms  p95   227.89  n 35
+    graph w0 c0 act       median     8.71 ms  p95     8.74  n 922
+    graph w1 c0 diffusion median   286.45 ms  p95   286.56  n 28
+    loop  w0 c0 act       median     8.71 ms  p95     8.73  n 920
+    loop  w1 c0 diffusion median   282.84 ms  p95   283.04  n 28
+=== procs-mps_act+diffusion: 2 policies, procs-mps, modes ['eager', 'graph', 'loop'], 10s per mode
+    loaded in 43s
+    eager done
+    graph done
+    loop done
+    eager w0 c0 act       median     5.04 ms  p95     5.12  n 1585
+    eager w1 c0 diffusion median   171.55 ms  p95   174.03  n 47
+    graph w0 c0 act       median     4.35 ms  p95     4.68  n 1820
+    graph w1 c0 diffusion median   176.10 ms  p95   181.80  n 45
+    loop  w0 c0 act       median     4.34 ms  p95     4.67  n 1825
+    loop  w1 c0 diffusion median   173.66 ms  p95   177.43  n 46
+=== threads_act+diffusion: 2 policies, threads, modes ['eager', 'graph', 'loop'], 10s per mode
+    loaded in 46s
+    eager done
+    graph done
+    loop done
+    eager w0 c0 act       median     5.58 ms  p95    11.44  n 1182
+    eager w0 c1 diffusion median   171.99 ms  p95   178.98  n 47
+    graph w0 c0 act       median     4.13 ms  p95     4.24  n 1931
+    graph w0 c1 diffusion median   175.44 ms  p95   181.58  n 46
+    loop  w0 c0 act       median     4.13 ms  p95     4.24  n 1931
+    loop  w0 c1 diffusion median   173.72 ms  p95   178.12  n 46
+=== procs_smolvla+act+diffusion: 3 policies, procs, modes ['eager', 'graph', 'loop'], 10s per mode
+    loaded in 48s
+    eager done
+    graph done
+    loop done
+    eager w0 c0 smolvla   median   279.68 ms  p95   281.22  n 29
+    eager w1 c0 act       median    18.24 ms  p95    18.55  n 458
+    eager w2 c0 diffusion median   293.62 ms  p95   296.58  n 27
+    graph w0 c0 smolvla   median   198.33 ms  p95   202.98  n 40
+    graph w1 c0 act       median    11.11 ms  p95    13.16  n 709
+    graph w2 c0 diffusion median   374.12 ms  p95   377.45  n 21
+    loop  w0 c0 smolvla   median    91.02 ms  p95    91.40  n 87
+    loop  w1 c0 act       median    13.11 ms  p95    13.18  n 615
+    loop  w2 c0 diffusion median   422.43 ms  p95   423.72  n 19
+=== procs-mps_smolvla+act+diffusion: 3 policies, procs-mps, modes ['eager', 'graph', 'loop'], 10s per mode
+    loaded in 50s
+    eager done
+    graph done
+    loop done
+    eager w0 c0 smolvla   median   171.60 ms  p95   174.24  n 48
+    eager w1 c0 act       median     5.18 ms  p95     6.27  n 1511
+    eager w2 c0 diffusion median   180.60 ms  p95   184.15  n 45
+    graph w0 c0 smolvla   median    79.21 ms  p95    80.22  n 102
+    graph w1 c0 act       median     4.67 ms  p95     5.43  n 1679
+    graph w2 c0 diffusion median   184.24 ms  p95   190.37  n 43
+    loop  w0 c0 smolvla   median    48.32 ms  p95    49.56  n 167
+    loop  w1 c0 act       median     4.58 ms  p95     4.91  n 1731
+    loop  w2 c0 diffusion median   177.64 ms  p95   184.01  n 45
+=== threads_smolvla+act+diffusion: 3 policies, threads, modes ['eager', 'graph', 'loop'], 10s per mode
+    loaded in 52s
+    eager done
+Traceback (most recent call last):
+  File "/mnt/home/awg4562/vla/repo/workloads/multipolicy.py", line 749, in <module>
+    main()
+  File "/mnt/home/awg4562/vla/repo/workloads/multipolicy.py", line 743, in main
+    host(args)
+  File "/mnt/home/awg4562/vla/repo/workloads/multipolicy.py", line 663, in host
+    wait_all(f"done_{mode}", args.warm_s + args.duration + 300, f"phase {mode}")
+  File "/mnt/home/awg4562/vla/repo/workloads/multipolicy.py", line 649, in wait_all
+    alive_or_fail(stage)
+  File "/mnt/home/awg4562/vla/repo/workloads/multipolicy.py", line 641, in alive_or_fail
+    raise RuntimeError(f"worker {wid} died during {stage} (rc {p.returncode}):\n"
+RuntimeError: worker 0 died during phase graph (rc 1):
+For debugging consider passing CUDA_LAUNCH_BLOCKING=1
+Compile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.
+
+copy 0 (smolvla): AcceleratorError: CUDA error: an illegal memory access was encountered
+Search for `cudaErrorIllegalAddress' in https://docs.nvidia.com/cuda/cuda-runtime-api/group__CUDART__TYPES.html for more information.
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing CUDA_LAUNCH_BLOCKING=1
+Compile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.
+
+copy 2 (diffusion): AcceleratorError: CUDA error: an illegal memory access was encountered
+Search for `cudaErrorIllegalAddress' in https://docs.nvidia.com/cuda/cuda-runtime-api/group__CUDART__TYPES.html for more information.
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing CUDA_LAUNCH_BLOCKING=1
+Compile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.
+
+FAILED: threads smolvla,act,diffusion
+=== procs_smolvlax2+actx2: 4 policies, procs, modes ['eager', 'graph', 'loop'], 10s per mode
+    loaded in 51s
+    eager done
+    graph done
+    loop done
+    eager w0 c0 smolvla   median   283.95 ms  p95   288.89  n 28
+    eager w1 c0 smolvla   median   283.71 ms  p95   284.35  n 28
+    eager w2 c0 act       median    17.75 ms  p95    19.33  n 458
+    eager w3 c0 act       median    17.76 ms  p95    19.28  n 457
+    graph w0 c0 smolvla   median   249.80 ms  p95   250.36  n 32
+    graph w1 c0 smolvla   median   249.82 ms  p95   250.55  n 32
+    graph w2 c0 act       median    13.45 ms  p95    16.33  n 576
+    graph w3 c0 act       median    13.54 ms  p95    16.29  n 576
+    loop  w0 c0 smolvla   median   120.91 ms  p95   121.56  n 66
+    loop  w1 c0 smolvla   median   120.94 ms  p95   121.62  n 66
+    loop  w2 c0 act       median    17.42 ms  p95    17.55  n 464
+    loop  w3 c0 act       median    17.42 ms  p95    17.55  n 463
+=== procs-mps_smolvlax2+actx2: 4 policies, procs-mps, modes ['eager', 'graph', 'loop'], 10s per mode
+    loaded in 51s
+    eager done
+    graph done
+    loop done
+    eager w0 c0 smolvla   median   154.29 ms  p95   156.48  n 52
+    eager w1 c0 smolvla   median   154.65 ms  p95   156.28  n 52
+    eager w2 c0 act       median     6.29 ms  p95     7.75  n 1221
+    eager w3 c0 act       median     6.29 ms  p95     7.74  n 1221
+    graph w0 c0 smolvla   median   109.84 ms  p95   110.87  n 73
+    graph w1 c0 smolvla   median   109.69 ms  p95   110.97  n 73
+    graph w2 c0 act       median     5.94 ms  p95     6.96  n 1300
+    graph w3 c0 act       median     5.95 ms  p95     7.02  n 1300
+    loop  w0 c0 smolvla   median    72.31 ms  p95    73.26  n 110
+    loop  w1 c0 smolvla   median    72.45 ms  p95    73.11  n 111
+    loop  w2 c0 act       median     5.78 ms  p95     6.03  n 1380
+    loop  w3 c0 act       median     5.78 ms  p95     6.02  n 1380
+=== threads_smolvlax2+actx2: 4 policies, threads, modes ['eager', 'graph', 'loop'], 10s per mode
+    loaded in 56s
+    eager done
+Traceback (most recent call last):
+  File "/mnt/home/awg4562/vla/repo/workloads/multipolicy.py", line 749, in <module>
+    main()
+  File "/mnt/home/awg4562/vla/repo/workloads/multipolicy.py", line 743, in main
+    host(args)
+  File "/mnt/home/awg4562/vla/repo/workloads/multipolicy.py", line 663, in host
+    wait_all(f"done_{mode}", args.warm_s + args.duration + 300, f"phase {mode}")
+  File "/mnt/home/awg4562/vla/repo/workloads/multipolicy.py", line 649, in wait_all
+    alive_or_fail(stage)
+  File "/mnt/home/awg4562/vla/repo/workloads/multipolicy.py", line 641, in alive_or_fail
+    raise RuntimeError(f"worker {wid} died during {stage} (rc {p.returncode}):\n"
+RuntimeError: worker 0 died during phase graph (rc 1):
+For debugging consider passing CUDA_LAUNCH_BLOCKING=1
+Compile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.
+
+copy 3 (act): AcceleratorError: CUDA error: an illegal memory access was encountered
+Search for `cudaErrorIllegalAddress' in https://docs.nvidia.com/cuda/cuda-runtime-api/group__CUDART__TYPES.html for more information.
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing CUDA_LAUNCH_BLOCKING=1
+Compile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.
+
+copy 2 (act): AcceleratorError: CUDA error: an illegal memory access was encountered
+Search for `cudaErrorIllegalAddress' in https://docs.nvidia.com/cuda/cuda-runtime-api/group__CUDART__TYPES.html for more information.
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing CUDA_LAUNCH_BLOCKING=1
+Compile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.
+
+FAILED: threads smolvla,smolvla,act,act

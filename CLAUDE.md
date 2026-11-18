@@ -669,8 +669,12 @@ State:
   network, Bard-Schweitzer MVA). Quick matrix on an RTX PRO 6000 (Empire AI): eager SmolVLA
   co-hosts 2x for free and 4x at 169 ms with MPS; graphed copies serialize and worse without
   MPS (4 copies 191 ms, 3.1x) but overlap with MPS (86 ms, 46.5 steps/s, close to batch 4);
-  threads collapse on the GIL for eager (8x at 4). Model MAPE: procs eager 9%, procs graph 24%
-  (time-slicing costs more than serialization); MPS below the model (overlap). CIMS runs pending.
+  threads collapse on the GIL for eager (8x at 4). Full matrix (47 configs, N up to 8, plus
+  Diffusion): Diffusion is GPU bound by time (95% busy) but 8 copies under MPS give 4.9x the
+  throughput (small grids leave SMs idle); 8 graphed SmolVLA copies under MPS reach 72 steps/s,
+  within 11% of batch 8. Serialized model MAPE for processes without MPS: eager 16%, graph 21%
+  (time-slicing costs more than serialization, growing with kernel count); MPS sits far below
+  the model (needs an SM-sharing term). CIMS runs pending.
 - **Next:**
   1. Paper and slides (deferred by the user until the teammates' work is merged): move the
      headline to `slot_drv` on four GPUs, add ACT/Diffusion (three regimes: dispatch bound,

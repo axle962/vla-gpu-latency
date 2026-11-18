@@ -133,5 +133,48 @@ Known limitation: SmolVLA and ACT as two threads of one process (`threads smolvl
 CUDA illegal memory access in the graph phase on this run (the same-policy threads configs
 ran); not debugged, the process and MPS hostings cover the mixed case.
 
-Not run yet: the CIMS GPUs (2080 Ti, TITAN V, RTX 4070: `scripts/run_multipolicy.sh quick`),
-the full matrix (Diffusion Policy, N = 8, loop mode).
+## Results: full matrix on the same GPU (2026-11-18, job 204101, 85 min)
+
+`results/multipolicy/NVIDIA_RTX_PRO_6000_Blackwell_Server_Edition_alphagpu54_20261118-111750/`:
+47 configs (SmolVLA, ACT, Diffusion Policy at 10 DDPM steps; N = 1, 2, 4, 8; every hosting;
+modes eager, graph, loop; 10 s per mode), 43 ran, 4 failed (the in-process threads mixes that
+include SmolVLA, the limitation above). Alone: Diffusion eager 137 ms, graph 132 ms, GPU busy
+129 ms (95%); SmolVLA loop 32 ms. Median step per copy (ms) and total steps/s:
+
+| hosting | SmolVLA eager | SmolVLA graph | SmolVLA loop | ACT graph | Diffusion graph |
+|---|---|---|---|---|---|
+| alone | 174 (5.9/s) | 60 (16.8/s) | 32 (30.9/s) | 4.1 (242/s) | 132 (7.5/s) |
+| procs x8 | 512 (15.9/s) | 375 (21.3/s) | starved | 33.7 (239/s) | 1133 (7.0/s) |
+| procs-mps x8 | 155 (51.6/s) | 111 (72.1/s) | 57 (141/s) | 14.1 (567/s) | 218 (37.0/s) |
+| threads x8 | starved | starved | 54 (147/s) | 13.8 (578/s) | 218 (36.6/s) |
+| batch 8 | 202 (39.0/s) | 99 (81.0/s) | 39 (205/s) | | |
+
+Three policies at once, one copy each (SmolVLA / ACT / Diffusion, graph mode): procs 198 / 11.1
+/ 374 ms (3.3x / 2.7x / 2.8x alone); procs-mps 79 / 4.7 / 184 ms (1.3x / 1.1x / 1.4x).
+
+What the full matrix adds:
+
+1. "GPU bound" at batch 1 is bound by time, not by SMs. Diffusion Policy keeps the GPU busy
+   95% of its step, and without MPS N copies are exactly serial (8 copies: 8.5x, model error
+   -8 to -11%). Under MPS 8 copies run at 218 ms each, 4.9x the throughput of one: the 10-step
+   UNet at batch 1 launches small grids, so most of the 188 SMs are idle inside a "busy" step.
+   The same holds for ACT (8 copies with MPS: 2.3x throughput) and for SmolVLA's graph loop
+   (8 copies: 4.6x).
+2. Eight eager SmolVLA processes under MPS still run at the solo latency (155 ms, 8.8x the
+   throughput); without MPS they reach 512 ms. Eight graphed copies under MPS run at 111 ms
+   and 72 steps/s, within 11% of batch 8 (81 steps/s) with no change to the policy code.
+3. Context time-slicing without MPS costs more than serialization, and the cost grows with the
+   number of kernels: Diffusion (2.8k kernels per step) runs 8 to 11% above the serialized
+   model, SmolVLA's graph loop (12k kernels) 25 to 43% above it. Eight processes replaying the
+   loop back to back starved each other outright (one step per process in a 10 s window), and
+   eight eager threads of one process starved on the GIL (a step took 40 s): both are marked
+   `steps/copy` < 5 in the report and left out of the prediction tables.
+4. Streams in one process overlap as well as MPS for fully graphed policies (ACT and Diffusion
+   in threads match procs-mps at every N), so for policies that are one graph replay, threads
+   are a cheap way to host; for anything with eager Python per step, processes plus MPS.
+5. The serialized model: procs eager 16% MAPE, graph 21%, loop 17% over 20 cases each (the
+   no-interference bound is at 51 to 64%). Under MPS and for graphed threads the measurements
+   sit far below it (an SM-sharing term is the natural next step for the model).
+
+Not run yet: the CIMS GPUs (2080 Ti, TITAN V, RTX 4070: `scripts/run_multipolicy.sh quick`;
+N = 8 SmolVLA needs ~12 GB and will not fit the 11 to 12 GB cards).

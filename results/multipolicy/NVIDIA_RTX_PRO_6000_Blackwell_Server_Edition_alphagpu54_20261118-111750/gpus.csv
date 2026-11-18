@@ -1,0 +1,2 @@
+index, name, pci.bus_id, utilization.gpu [%], memory.used [MiB]
+0, NVIDIA RTX PRO 6000 Blackwell Server Edition, 00000000:3B:00.0, 0 %, 0 MiB

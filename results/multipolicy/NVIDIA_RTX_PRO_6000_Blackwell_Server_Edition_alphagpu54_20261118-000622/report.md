@@ -15,48 +15,48 @@ D removes the profiler's 0.95 us per kernel (CLAUDE.md 0.1); Z is what the step 
 
 ## Measured: every hosted configuration
 
-| config                | mode   | policy   | copies   |   median ms |   p95 ms | vs alone   |   steps/s (all policies) |
-|:----------------------|:-------|:---------|:---------|------------:|---------:|:-----------|-------------------------:|
-| procs_smolvla         | eager  | smolvla  | 1        |       180.9 |    182.3 | 1.00x      |                     5.58 |
-| procs_smolvla         | graph  | smolvla  | 1        |        61.3 |     61.6 | 1.00x      |                    16.33 |
-| procs_smolvlax2       | eager  | smolvla  | 2        |       181.1 |    183   | 1.00x      |                    11.08 |
-| procs_smolvlax2       | graph  | smolvla  | 2        |       100   |    101.4 | 1.63x      |                    20    |
-| procs_smolvlax4       | eager  | smolvla  | 4        |       268.2 |    271.6 | 1.48x      |                    15    |
-| procs_smolvlax4       | graph  | smolvla  | 4        |       191.1 |    195.1 | 3.12x      |                    20.67 |
-| procs-mps_smolvlax2   | eager  | smolvla  | 2        |       176.7 |    178.9 | 0.98x      |                    11.42 |
-| procs-mps_smolvlax2   | graph  | smolvla  | 2        |        71.4 |     71.9 | 1.17x      |                    28.08 |
-| procs-mps_smolvlax4   | eager  | smolvla  | 4        |       168.6 |    179.9 | 0.93x      |                    23.75 |
-| procs-mps_smolvlax4   | graph  | smolvla  | 4        |        86.2 |     87.2 | 1.41x      |                    46.5  |
-| threads_smolvlax2     | eager  | smolvla  | 2        |       384.6 |    485.2 | 2.13x      |                     5    |
-| threads_smolvlax2     | graph  | smolvla  | 2        |        86.6 |    104.2 | 1.41x      |                    23.25 |
-| threads_smolvlax4     | eager  | smolvla  | 4        |      1492.8 |   1643.6 | 8.25x      |                     2.67 |
-| threads_smolvlax4     | graph  | smolvla  | 4        |       165.8 |    218.7 | 2.71x      |                    24.75 |
-| procs_act             | eager  | act      | 1        |         5   |      5   | 1.00x      |                   200.17 |
-| procs_act             | graph  | act      | 1        |         4.2 |      4.3 | 1.00x      |                   237.67 |
-| procs_actx2           | eager  | act      | 2        |        10.1 |     10.4 | 2.03x      |                   197.83 |
-| procs_actx2           | graph  | act      | 2        |         8.6 |      8.8 | 2.05x      |                   232.83 |
-| procs_actx4           | eager  | act      | 4        |        20.3 |     20.4 | 4.08x      |                   196.67 |
-| procs_actx4           | graph  | act      | 4        |        17.1 |     17.2 | 4.10x      |                   233.42 |
-| procs-mps_actx2       | eager  | act      | 2        |         5.8 |      6   | 1.16x      |                   344.58 |
-| procs-mps_actx2       | graph  | act      | 2        |         5.4 |      5.7 | 1.29x      |                   369    |
-| procs-mps_actx4       | eager  | act      | 4        |         8.3 |      8.7 | 1.67x      |                   481.67 |
-| procs-mps_actx4       | graph  | act      | 4        |         8   |      8.3 | 1.91x      |                   502    |
-| threads_actx2         | eager  | act      | 2        |        10.7 |     16.6 | 2.14x      |                   175.5  |
-| threads_actx2         | graph  | act      | 2        |         5.2 |      5.4 | 1.24x      |                   385    |
-| threads_actx4         | eager  | act      | 4        |        39.9 |     62.2 | 8.01x      |                    93.92 |
-| threads_actx4         | graph  | act      | 4        |         7.8 |      8.1 | 1.86x      |                   515.67 |
-| batch_smolvlax4_b4    | eager  | smolvla  | batch 4  |       191.9 |    193   | 1.06x      |                    21    |
-| batch_smolvlax4_b4    | graph  | smolvla  | batch 4  |        79.8 |     80   | 1.30x      |                    50    |
-| procs_smolvla+act     | eager  | smolvla  | 1        |       207.2 |    208.1 | 1.15x      |                   135.08 |
-| procs_smolvla+act     | eager  | act      | 1        |         7.8 |      8.7 | 1.56x      |                   135.08 |
-| procs_smolvla+act     | graph  | smolvla  | 1        |       131.3 |    131.6 | 2.14x      |                   152.33 |
-| procs_smolvla+act     | graph  | act      | 1        |         6.7 |      8.8 | 1.61x      |                   152.33 |
-| procs-mps_smolvla+act | eager  | smolvla  | 1        |       161.4 |    173.5 | 0.89x      |                   192    |
-| procs-mps_smolvla+act | eager  | act      | 1        |         5.3 |      6.3 | 1.06x      |                   192    |
-| procs-mps_smolvla+act | graph  | smolvla  | 1        |        79.3 |     81   | 1.29x      |                   225.42 |
-| procs-mps_smolvla+act | graph  | act      | 1        |         4.6 |      5.4 | 1.10x      |                   225.42 |
+| config                | mode   | policy   | copies   |   median ms |   p95 ms | vs alone   |   steps/s (all policies) |   steps/copy |
+|:----------------------|:-------|:---------|:---------|------------:|---------:|:-----------|-------------------------:|-------------:|
+| procs_smolvla         | eager  | smolvla  | 1        |       180.9 |    182.3 | 1.00x      |                     5.58 |           67 |
+| procs_smolvla         | graph  | smolvla  | 1        |        61.3 |     61.6 | 1.00x      |                    16.33 |          196 |
+| procs_smolvlax2       | eager  | smolvla  | 2        |       181.1 |    183   | 1.00x      |                    11.08 |           66 |
+| procs_smolvlax2       | graph  | smolvla  | 2        |       100   |    101.4 | 1.63x      |                    20    |          120 |
+| procs_smolvlax4       | eager  | smolvla  | 4        |       268.2 |    271.6 | 1.48x      |                    15    |           45 |
+| procs_smolvlax4       | graph  | smolvla  | 4        |       191.1 |    195.1 | 3.12x      |                    20.67 |           62 |
+| procs-mps_smolvlax2   | eager  | smolvla  | 2        |       176.7 |    178.9 | 0.98x      |                    11.42 |           68 |
+| procs-mps_smolvlax2   | graph  | smolvla  | 2        |        71.4 |     71.9 | 1.17x      |                    28.08 |          168 |
+| procs-mps_smolvlax4   | eager  | smolvla  | 4        |       168.6 |    179.9 | 0.93x      |                    23.75 |           71 |
+| procs-mps_smolvlax4   | graph  | smolvla  | 4        |        86.2 |     87.2 | 1.41x      |                    46.5  |          139 |
+| threads_smolvlax2     | eager  | smolvla  | 2        |       384.6 |    485.2 | 2.13x      |                     5    |           30 |
+| threads_smolvlax2     | graph  | smolvla  | 2        |        86.6 |    104.2 | 1.41x      |                    23.25 |          139 |
+| threads_smolvlax4     | eager  | smolvla  | 4        |      1492.8 |   1643.6 | 8.25x      |                     2.67 |            8 |
+| threads_smolvlax4     | graph  | smolvla  | 4        |       165.8 |    218.7 | 2.71x      |                    24.75 |           74 |
+| procs_act             | eager  | act      | 1        |         5   |      5   | 1.00x      |                   200.17 |         2402 |
+| procs_act             | graph  | act      | 1        |         4.2 |      4.3 | 1.00x      |                   237.67 |         2852 |
+| procs_actx2           | eager  | act      | 2        |        10.1 |     10.4 | 2.03x      |                   197.83 |         1187 |
+| procs_actx2           | graph  | act      | 2        |         8.6 |      8.8 | 2.05x      |                   232.83 |         1397 |
+| procs_actx4           | eager  | act      | 4        |        20.3 |     20.4 | 4.08x      |                   196.67 |          590 |
+| procs_actx4           | graph  | act      | 4        |        17.1 |     17.2 | 4.10x      |                   233.42 |          700 |
+| procs-mps_actx2       | eager  | act      | 2        |         5.8 |      6   | 1.16x      |                   344.58 |         2067 |
+| procs-mps_actx2       | graph  | act      | 2        |         5.4 |      5.7 | 1.29x      |                   369    |         2214 |
+| procs-mps_actx4       | eager  | act      | 4        |         8.3 |      8.7 | 1.67x      |                   481.67 |         1446 |
+| procs-mps_actx4       | graph  | act      | 4        |         8   |      8.3 | 1.91x      |                   502    |         1506 |
+| threads_actx2         | eager  | act      | 2        |        10.7 |     16.6 | 2.14x      |                   175.5  |         1053 |
+| threads_actx2         | graph  | act      | 2        |         5.2 |      5.4 | 1.24x      |                   385    |         2310 |
+| threads_actx4         | eager  | act      | 4        |        39.9 |     62.2 | 8.01x      |                    93.92 |          280 |
+| threads_actx4         | graph  | act      | 4        |         7.8 |      8.1 | 1.86x      |                   515.67 |         1547 |
+| batch_smolvlax4_b4    | eager  | smolvla  | batch 4  |       191.9 |    193   | 1.06x      |                    21    |           63 |
+| batch_smolvlax4_b4    | graph  | smolvla  | batch 4  |        79.8 |     80   | 1.30x      |                    50    |          150 |
+| procs_smolvla+act     | eager  | smolvla  | 1        |       207.2 |    208.1 | 1.15x      |                   135.08 |           58 |
+| procs_smolvla+act     | eager  | act      | 1        |         7.8 |      8.7 | 1.56x      |                   135.08 |         1563 |
+| procs_smolvla+act     | graph  | smolvla  | 1        |       131.3 |    131.6 | 2.14x      |                   152.33 |           92 |
+| procs_smolvla+act     | graph  | act      | 1        |         6.7 |      8.8 | 1.61x      |                   152.33 |         1736 |
+| procs-mps_smolvla+act | eager  | smolvla  | 1        |       161.4 |    173.5 | 0.89x      |                   192    |           73 |
+| procs-mps_smolvla+act | eager  | act      | 1        |         5.3 |      6.3 | 1.06x      |                   192    |         2231 |
+| procs-mps_smolvla+act | graph  | smolvla  | 1        |        79.3 |     81   | 1.29x      |                   225.42 |          152 |
+| procs-mps_smolvla+act | graph  | act      | 1        |         4.6 |      5.4 | 1.10x      |                   225.42 |         2553 |
 
-`vs alone` is the slowdown against the same policy and mode hosted alone (procs x1). `steps/s` sums every hosted copy (times the batch for batch hosting).
+`vs alone` is the slowdown against the same policy and mode hosted alone (procs x1). `steps/s` sums every hosted copy (times the batch for batch hosting). `steps/copy` is the number of timed steps behind the median; rows under 5 are starved copies (the GPU time-slicer or the GIL let one copy run for seconds) and are left out of the prediction tables.
 
 ## Predicted from the policies alone (closed queueing network, host + GPU)
 

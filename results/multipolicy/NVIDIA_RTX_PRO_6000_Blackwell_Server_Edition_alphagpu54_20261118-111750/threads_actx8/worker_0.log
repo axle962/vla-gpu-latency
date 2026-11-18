@@ -1,0 +1,40 @@
+WARNING:root:Unexpected key(s) when loading model: ['normalize_inputs.buffer_observation_images_top.mean', 'normalize_inputs.buffer_observation_images_top.std', 'normalize_inputs.buffer_observation_state.mean', 'normalize_inputs.buffer_observation_state.std', 'normalize_targets.buffer_action.mean', 'normalize_targets.buffer_action.std', 'unnormalize_outputs.buffer_action.mean', 'unnormalize_outputs.buffer_action.std']
+[w0] copy 0 act ready in 35.2s: {"graph_vs_eager_max_abs_diff": 0.0}
+WARNING:root:Unexpected key(s) when loading model: ['normalize_inputs.buffer_observation_images_top.mean', 'normalize_inputs.buffer_observation_images_top.std', 'normalize_inputs.buffer_observation_state.mean', 'normalize_inputs.buffer_observation_state.std', 'normalize_targets.buffer_action.mean', 'normalize_targets.buffer_action.std', 'unnormalize_outputs.buffer_action.mean', 'unnormalize_outputs.buffer_action.std']
+[w0] copy 1 act ready in 0.8s: {"graph_vs_eager_max_abs_diff": 0.0}
+WARNING:root:Unexpected key(s) when loading model: ['normalize_inputs.buffer_observation_images_top.mean', 'normalize_inputs.buffer_observation_images_top.std', 'normalize_inputs.buffer_observation_state.mean', 'normalize_inputs.buffer_observation_state.std', 'normalize_targets.buffer_action.mean', 'normalize_targets.buffer_action.std', 'unnormalize_outputs.buffer_action.mean', 'unnormalize_outputs.buffer_action.std']
+[w0] copy 2 act ready in 0.7s: {"graph_vs_eager_max_abs_diff": 0.0}
+WARNING:root:Unexpected key(s) when loading model: ['normalize_inputs.buffer_observation_images_top.mean', 'normalize_inputs.buffer_observation_images_top.std', 'normalize_inputs.buffer_observation_state.mean', 'normalize_inputs.buffer_observation_state.std', 'normalize_targets.buffer_action.mean', 'normalize_targets.buffer_action.std', 'unnormalize_outputs.buffer_action.mean', 'unnormalize_outputs.buffer_action.std']
+[w0] copy 3 act ready in 0.7s: {"graph_vs_eager_max_abs_diff": 0.0}
+WARNING:root:Unexpected key(s) when loading model: ['normalize_inputs.buffer_observation_images_top.mean', 'normalize_inputs.buffer_observation_images_top.std', 'normalize_inputs.buffer_observation_state.mean', 'normalize_inputs.buffer_observation_state.std', 'normalize_targets.buffer_action.mean', 'normalize_targets.buffer_action.std', 'unnormalize_outputs.buffer_action.mean', 'unnormalize_outputs.buffer_action.std']
+[w0] copy 4 act ready in 0.6s: {"graph_vs_eager_max_abs_diff": 0.0}
+WARNING:root:Unexpected key(s) when loading model: ['normalize_inputs.buffer_observation_images_top.mean', 'normalize_inputs.buffer_observation_images_top.std', 'normalize_inputs.buffer_observation_state.mean', 'normalize_inputs.buffer_observation_state.std', 'normalize_targets.buffer_action.mean', 'normalize_targets.buffer_action.std', 'unnormalize_outputs.buffer_action.mean', 'unnormalize_outputs.buffer_action.std']
+[w0] copy 5 act ready in 0.6s: {"graph_vs_eager_max_abs_diff": 0.0}
+WARNING:root:Unexpected key(s) when loading model: ['normalize_inputs.buffer_observation_images_top.mean', 'normalize_inputs.buffer_observation_images_top.std', 'normalize_inputs.buffer_observation_state.mean', 'normalize_inputs.buffer_observation_state.std', 'normalize_targets.buffer_action.mean', 'normalize_targets.buffer_action.std', 'unnormalize_outputs.buffer_action.mean', 'unnormalize_outputs.buffer_action.std']
+[w0] copy 6 act ready in 0.6s: {"graph_vs_eager_max_abs_diff": 0.0}
+WARNING:root:Unexpected key(s) when loading model: ['normalize_inputs.buffer_observation_images_top.mean', 'normalize_inputs.buffer_observation_images_top.std', 'normalize_inputs.buffer_observation_state.mean', 'normalize_inputs.buffer_observation_state.std', 'normalize_targets.buffer_action.mean', 'normalize_targets.buffer_action.std', 'unnormalize_outputs.buffer_action.mean', 'unnormalize_outputs.buffer_action.std']
+[w0] copy 7 act ready in 0.6s: {"graph_vs_eager_max_abs_diff": 0.0}
+[w0] eager copy 0 act           9 steps, median  1062.14 ms
+[w0] eager copy 1 act           9 steps, median  1029.83 ms
+[w0] eager copy 2 act          10 steps, median  1068.71 ms
+[w0] eager copy 3 act           8 steps, median  1164.42 ms
+[w0] eager copy 4 act           9 steps, median  1112.92 ms
+[w0] eager copy 5 act           9 steps, median  1117.10 ms
+[w0] eager copy 6 act           8 steps, median  1182.90 ms
+[w0] eager copy 7 act           8 steps, median  1161.55 ms
+[w0] graph copy 0 act         723 steps, median    13.84 ms
+[w0] graph copy 1 act         723 steps, median    13.85 ms
+[w0] graph copy 2 act         723 steps, median    13.84 ms
+[w0] graph copy 3 act         723 steps, median    13.83 ms
+[w0] graph copy 4 act         723 steps, median    13.85 ms
+[w0] graph copy 5 act         723 steps, median    13.83 ms
+[w0] graph copy 6 act         723 steps, median    13.84 ms
+[w0] graph copy 7 act         723 steps, median    13.84 ms
+[w0] loop  copy 0 act         719 steps, median    13.90 ms
+[w0] loop  copy 1 act         719 steps, median    13.89 ms
+[w0] loop  copy 2 act         719 steps, median    13.90 ms
+[w0] loop  copy 3 act         719 steps, median    13.90 ms
+[w0] loop  copy 4 act         719 steps, median    13.89 ms
+[w0] loop  copy 5 act         719 steps, median    13.90 ms
+[w0] loop  copy 6 act         719 steps, median    13.89 ms
+[w0] loop  copy 7 act         719 steps, median    13.90 ms

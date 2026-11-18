@@ -27,6 +27,7 @@ from pathlib import Path
 import pandas as pd
 
 MODES = ["eager", "graph", "loop"]
+MIN_STEPS = 5  # copies with fewer timed steps in the window are left out of the prediction
 
 
 def mva(classes: list[tuple[float, float]], cpu_queue: bool, iters: int = 5000):
@@ -152,6 +153,7 @@ def main() -> None:
                     "median ms": f"{med:.1f}", "p95 ms": f"{p95:.1f}",
                     "vs alone": f"{med / ref['T']:.2f}x" if ref else "",
                     "steps/s (all policies)": f"{agg:.2f}",
+                    "steps/copy": int(sp.n.median()),
                 }
                 if batch > 1:
                     r["copies"] = f"batch {batch}"
@@ -165,6 +167,8 @@ def main() -> None:
                 t_pred, x_pred = mva(classes, cpu_queue=(hosting == "threads"))
                 for pol in dict.fromkeys(pols):
                     idx = [i for i, p in enumerate(pols) if p == pol]
+                    if s[s.policy == pol].n.median() < MIN_STEPS:
+                        continue  # starved copies: a median of 1 or 2 steps says nothing
                     meas = s[s.policy == pol].median_ms.median()
                     ref = solo[(pol, mode)]
                     pred = sum(t_pred[i] for i in idx) / len(idx)
@@ -179,7 +183,10 @@ def main() -> None:
     lines += [pd.DataFrame(mrows).to_markdown(index=False), ""]
     lines += [
         "`vs alone` is the slowdown against the same policy and mode hosted alone (procs x1). "
-        "`steps/s` sums every hosted copy (times the batch for batch hosting).",
+        "`steps/s` sums every hosted copy (times the batch for batch hosting). `steps/copy` is "
+        f"the number of timed steps behind the median; rows under {MIN_STEPS} are starved "
+        "copies (the GPU time-slicer or the GIL let one copy run for seconds) and are left out "
+        "of the prediction tables.",
         "",
         "## Predicted from the policies alone (closed queueing network, host + GPU)",
         "",
