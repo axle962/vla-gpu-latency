@@ -20,6 +20,11 @@ MODE=${1:-run}
 PY="$WORK/envs/smolvla/bin/python"
 export HF_HOME="$WORK/.cache/huggingface" HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1
 export CUDA_MODULE_LOADING=EAGER
+# A shared $HF_HOME (symlinked to a teammate's cache) holds their private token file, which
+# huggingface_hub tries to read even offline; point it at a file of our own instead.
+if [[ -e $HF_HOME/token && ! -r $HF_HOME/token ]]; then
+  export HF_TOKEN_PATH="$WORK/.hf_token_unused"
+fi
 [[ -x "$PY" ]] || { echo "no $PY: run scripts/run_cuda2.sh setup first"; exit 1; }
 
 if [[ -z "${CUDA_VISIBLE_DEVICES:-}" ]]; then
