@@ -1,5 +1,0 @@
-gpu,bench,kernel,config,mode,timer,n_runs,mean_us,std_us,min_us,median_us,module_loading
-NVIDIA GeForce RTX 2080 Ti,chain,smolvla_flow,gemm=cublas;steps=10;rows=1194;launched=11940;traced_kernels=11480;traced_gpu_us=34471.7,eager,event,60,56786.5489,10600.4031,52240.3831,52479.6143,EAGER
-NVIDIA GeForce RTX 2080 Ti,chain,smolvla_flow,gemm=cublas;steps=10;rows=1194;launched=11940;traced_kernels=11480;traced_gpu_us=34471.7,eager,host,60,54248.3743,3083.9566,52250.5270,52751.1970,EAGER
-NVIDIA GeForce RTX 2080 Ti,chain,smolvla_flow,gemm=cublas;steps=10;rows=1194;launched=11920;traced_kernels=11480;traced_gpu_us=34471.7,graph,event,60,54861.6367,5659.2951,52300.7698,52511.7607,EAGER
-NVIDIA GeForce RTX 2080 Ti,chain,smolvla_flow,gemm=cublas;steps=10;rows=1194;launched=11920;traced_kernels=11480;traced_gpu_us=34471.7,graph,host,60,72307.3571,27222.6385,52304.8020,53851.1600,EAGER
