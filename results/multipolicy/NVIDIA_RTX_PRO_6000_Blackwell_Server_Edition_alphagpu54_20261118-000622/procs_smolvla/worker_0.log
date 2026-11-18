@@ -1,0 +1,10 @@
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading  HuggingFaceTB/SmolVLM2-500M-Video-Instruct weights ...
+Reducing the number of VLM layers to 16 ...
+[w0] copy 0 smolvla ready in 56.0s: {"split_vs_stock_max_abs_diff": 0.0, "graph_vs_eager_max_abs_diff": 0.0}
+[w0] eager copy 0 smolvla      84 steps, median   180.78 ms
+[w0] graph copy 0 smolvla     246 steps, median    61.26 ms
+/mnt/home/awg4562/vla/envs/smolvla/lib/python3.10/site-packages/torch/profiler/profiler.py:217: UserWarning: Warning: Profiler clears events at the end of each cycle.Only events from the current cycle will be reported.To keep events across cycles, set acc_events=True.
+  _warn_once(
+[w0] profile eager: {"kernels_per_step": 13542.0, "memcpy_per_step": 529.0, "gpu_busy_ms_per_step": 40.954195, "gpu_busy_ms_per_step_corrected": 28.089295, "gpu_span_ms_per_step": 311.361111328125, "kernel_dur_us_median": 1.44}
+[w0] profile graph: {"kernels_per_step": 13962.0, "memcpy_per_step": 122.0, "gpu_busy_ms_per_step": 40.617142, "gpu_busy_ms_per_step_corrected": 27.353242, "gpu_span_ms_per_step": 80.88605810546875, "kernel_dur_us_median": 1.376}

@@ -73,6 +73,65 @@ Memory: N SmolVLA copies need about N x 1.5 GB (FP16 weights plus a context), so
 2080 Ti holds the quick matrix (N <= 4) and the 12 GB TITAN V and RTX 4070 too; N = 8 needs a
 larger card (A100, H100).
 
-## Results
+## Results: RTX PRO 6000 Blackwell (Empire AI, 2026-11-18, quick matrix)
 
-To be filled from `results/multipolicy/<gpu>_<host>_<stamp>/report.md` after the runs.
+`results/multipolicy/NVIDIA_RTX_PRO_6000_Blackwell_Server_Edition_alphagpu54_20261118-000622/`
+(report.md, summary.csv, predictions.csv; Slurm job 203123, 1 GPU of a shared node, 16 cores
+of a Xeon 6960P, torch 2.10.0+cu128, 15 s per mode, all 43 policy copies bit-exact).
+
+Alone: SmolVLA eager 181 ms, with graphs 61 ms (GPU busy 28 ms per step, 16% of the eager
+step); ACT eager 5.0 ms, graph 4.2 ms (GPU busy 4.9 ms, 99%). Median step per copy (ms) and
+total steps per second over all copies:
+
+| hosting | SmolVLA eager | SmolVLA graph | ACT eager | ACT graph |
+|---|---|---|---|---|
+| alone | 181 (5.6/s) | 61 (16.3/s) | 5.0 (200/s) | 4.2 (238/s) |
+| procs x2 | 181 (11.1/s) | 100 (20.0/s) | 10.1 (198/s) | 8.6 (233/s) |
+| procs x4 | 268 (15.0/s) | 191 (20.7/s) | 20.3 (197/s) | 17.1 (233/s) |
+| procs-mps x2 | 177 (11.4/s) | 71 (28.1/s) | 5.8 (345/s) | 5.4 (369/s) |
+| procs-mps x4 | 169 (23.8/s) | 86 (46.5/s) | 8.3 (482/s) | 8.0 (502/s) |
+| threads x2 | 385 (5.0/s) | 87 (23.3/s) | 10.7 (176/s) | 5.2 (385/s) |
+| threads x4 | 1493 (2.7/s) | 166 (24.8/s) | 39.9 (94/s) | 7.8 (516/s) |
+| batch 4 | 192 (21.0/s) | 80 (50.0/s) | | |
+
+Mixed SmolVLA + ACT, one copy each (SmolVLA / ACT ms): procs eager 207 / 7.8, graph 131 / 6.7;
+procs-mps eager 161 / 5.3, graph 79 / 4.6.
+
+What it says:
+
+1. Eager, host-bound policies co-host almost for free. Two eager SmolVLA processes keep the
+   solo latency (181 ms) at twice the throughput; four reach 268 ms without MPS and 169 ms
+   (4.3x the throughput) with it. The GPU was idle 84% of the time, and other processes can
+   use that time.
+2. Graphed policies compete for the GPU, and plain context time-slicing is worse than
+   serialization: four graphed SmolVLA copies take 191 ms each (3.1x) and deliver only 1.3x
+   the solo throughput, while the serialized model (4 x 28 ms of GPU time plus the host part)
+   predicts 120 ms. Under MPS the same four run at 86 ms (1.4x) and 46.5 steps/s, 2.8x the
+   solo throughput and close to batch 4 (50 steps/s): the loop's tiny kernels (median 1.4 us)
+   leave most SMs free, so kernels of different processes overlap once MPS allows it.
+3. ACT is GPU bound by time (99% busy) but not by SMs: without MPS N copies are exactly
+   serial (2.03x, 4.08x; model error -2 to -3%), with MPS four copies run at 8.3 ms for 2.4x
+   the throughput. "GPU bound" at batch 1 still means a mostly empty GPU.
+4. Threads in one process are the wrong way to host eager policies: the GIL serializes the
+   dispatch and the collapse is superlinear (four eager SmolVLA threads: 8.3x, four ACT: 8x).
+   A fully graphed policy (ACT) in threads matches MPS, because a replay is one C++ call; the
+   SmolVLA hybrid still pays its eager prefix under the GIL (166 ms vs 86 ms with MPS).
+5. Mixed hosting without MPS hurts the graphed policy most: ACT's steady GPU demand doubles
+   SmolVLA's graphed step (61 to 131 ms) and SmolVLA's eager dispatch slows ACT 1.6x. MPS
+   removes most of it (79 ms and 4.6 ms).
+6. The hosting model predicts the non-MPS process case for eager policies within 9% MAPE and
+   underpredicts graphed copies (24%), because time-slicing between contexts costs more than
+   serializing their kernels. Under MPS the measurements sit well below the serialized model,
+   as the model is an upper bound there; a prediction for MPS needs an SM-occupancy term.
+
+For a deployment: with CUDA graphs, hosting several policies on one GPU needs MPS (or batching
+when the policies are identical); without it the graph speedup is lost from the second policy
+on. Eager hosting keeps per-policy latency but tops out at a quarter of the throughput of
+graphs plus MPS.
+
+Known limitation: SmolVLA and ACT as two threads of one process (`threads smolvla,act`) hit a
+CUDA illegal memory access in the graph phase on this run (the same-policy threads configs
+ran); not debugged, the process and MPS hostings cover the mixed case.
+
+Not run yet: the CIMS GPUs (2080 Ti, TITAN V, RTX 4070: `scripts/run_multipolicy.sh quick`),
+the full matrix (Diffusion Policy, N = 8, loop mode).
