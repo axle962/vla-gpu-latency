@@ -521,6 +521,27 @@ State:
     every policy at d = 2 to 5 on every GPU, eager at d = 7 to 15: e.g. pi0.5 on the RTX 4070
     65% eager vs 76% with graphs, pi0 25% vs 35%; for SmolVLA the difference is small (44 to 48%
     vs ~50%). Graphs matter for task success where the policy is delay sensitive.
+- **LIBERO with the published protocol (2026-11-16 to 18, Claude Code on cuda2):**
+  - Benchmark reproduction, official `lerobot-eval`, LIBERO-10, `--policy.n_action_steps=10`,
+    10 episodes per task, one task per call (`scripts/libero_benchmark.sh`; all tasks at once
+    builds one EGL context per task and overflows 12 GB GPUs): pi0.5 94% (published checkpoint
+    `lerobot/pi05_libero_finetuned`) / 95% (`_v044`) vs 96% published; SmolVLA 71%, pi0 49%
+    (`results/libero_benchmark/`). The earlier sweep's low numbers came from the default
+    50-action open-loop horizon.
+  - Delay sweep with H = 10 (`EXEC_HORIZON=10 scripts/run_libero.sh`, files `*_h10_*`; for
+    d >= H the robot holds still until the result arrives), success at d = 0 / 2 / 4 / 6 / 8 /
+    10 / 15 steps (0 to 750 ms): SmolVLA 69 / 63 / 68 / 65 / 64 / 55 / 43%, pi0 44 / 51 / 46 /
+    44 / 42 / 39 / 26%, pi0.5 91 / 94 / 95 / 92 / 88 / 84 / 64%. Flat up to ~300 ms, then a
+    drop once the delay reaches the replanning interval; paired McNemar significant at d = 15
+    for all three and at d = 10 for SmolVLA. Measured latencies: graphs put every policy at
+    d = 2 to 5 (pi0.5 93.5%, pi0 45 to 46%, SmolVLA 63 to 66% on every GPU), eager at d = 7 to
+    15 (pi0.5 64 to 86%, pi0 32 to 42%, SmolVLA 48 to 65%): on the RTX 4070, graphs are worth
+    +30 points for pi0.5 and +18 for SmolVLA. `results/libero_analysis.md` covers both horizons.
+  - Fresh-clone reproducibility check on cuda2 (`scripts/cims_final.sh repro`, clone in
+    `/scratch/am16489/repro`): build, calibration (launch chains within 0.3% of 2026-11-12),
+    all 25 correctness checks, and the C++ bench (10-step graph chain 39.2 vs 39.4 ms) pass.
+    Two earlier bench attempts shared GPU 0 with another user's job and were discarded.
+  - `lerobot/smolvla_robotwin` traced on the three CIMS GPUs: times like smolvla_base.
 - **Not done:** RoboTwin 2.0 success evaluation (needs Docker or GPU Podman/CDI, neither on CIMS;
   native build = CuRobo + pytorch3d against torch 2.7.1); a latency trace of
   `lerobot/smolvla_robotwin` at RoboTwin shapes is possible without the simulator. MolmoSpaces

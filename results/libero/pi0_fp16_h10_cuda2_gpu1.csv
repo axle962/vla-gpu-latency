@@ -1,0 +1,301 @@
+policy,precision,suite,task_id,episode,delay_steps,exec_horizon,success,steps,inferences,infer_ms_median,episode_s,hold_steps,gpu,host,task
+pi0,fp16,libero_10,0,0,8,10,0,520,53,488.3,48.4,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the tomato sauce in the basket
+pi0,fp16,libero_10,0,1,8,10,0,520,53,501.7,42.8,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the tomato sauce in the basket
+pi0,fp16,libero_10,0,2,8,10,0,520,53,496.0,43.2,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the tomato sauce in the basket
+pi0,fp16,libero_10,0,3,8,10,0,520,53,502.4,44.3,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the tomato sauce in the basket
+pi0,fp16,libero_10,0,4,8,10,0,520,53,467.7,41.8,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the tomato sauce in the basket
+pi0,fp16,libero_10,0,5,8,10,0,520,53,466.1,40.4,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the tomato sauce in the basket
+pi0,fp16,libero_10,0,6,8,10,0,520,53,481.1,43.5,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the tomato sauce in the basket
+pi0,fp16,libero_10,0,7,8,10,0,520,53,490.1,43.4,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the tomato sauce in the basket
+pi0,fp16,libero_10,0,8,8,10,1,293,31,493.7,26.5,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the tomato sauce in the basket
+pi0,fp16,libero_10,0,9,8,10,0,520,53,495.3,42.4,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the tomato sauce in the basket
+pi0,fp16,libero_10,0,0,10,10,1,263,28,492.4,23.9,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the tomato sauce in the basket
+pi0,fp16,libero_10,0,1,10,10,0,520,53,471.4,43.8,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the tomato sauce in the basket
+pi0,fp16,libero_10,0,2,10,10,0,520,53,470.2,41.2,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the tomato sauce in the basket
+pi0,fp16,libero_10,0,3,10,10,0,520,53,484.9,41.7,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the tomato sauce in the basket
+pi0,fp16,libero_10,0,4,10,10,0,520,53,503.2,43.4,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the tomato sauce in the basket
+pi0,fp16,libero_10,0,5,10,10,0,520,53,502.8,43.1,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the tomato sauce in the basket
+pi0,fp16,libero_10,0,6,10,10,0,520,53,499.9,43.6,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the tomato sauce in the basket
+pi0,fp16,libero_10,0,7,10,10,0,520,53,474.5,41.6,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the tomato sauce in the basket
+pi0,fp16,libero_10,0,8,10,10,1,273,29,467.0,24.2,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the tomato sauce in the basket
+pi0,fp16,libero_10,0,9,10,10,0,520,53,471.1,41.4,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the tomato sauce in the basket
+pi0,fp16,libero_10,0,0,15,10,0,520,36,496.8,34.1,170,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the tomato sauce in the basket
+pi0,fp16,libero_10,0,1,15,10,0,520,36,499.8,33.5,170,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the tomato sauce in the basket
+pi0,fp16,libero_10,0,2,15,10,0,520,36,502.0,34.4,170,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the tomato sauce in the basket
+pi0,fp16,libero_10,0,3,15,10,0,520,36,590.5,37.0,170,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the tomato sauce in the basket
+pi0,fp16,libero_10,0,4,15,10,0,520,36,478.6,33.7,170,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the tomato sauce in the basket
+pi0,fp16,libero_10,0,5,15,10,0,520,36,468.1,32.3,170,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the tomato sauce in the basket
+pi0,fp16,libero_10,0,6,15,10,0,520,36,478.2,33.9,170,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the tomato sauce in the basket
+pi0,fp16,libero_10,0,7,15,10,0,520,36,475.9,32.9,170,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the tomato sauce in the basket
+pi0,fp16,libero_10,0,8,15,10,0,520,36,475.3,32.7,170,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the tomato sauce in the basket
+pi0,fp16,libero_10,0,9,15,10,0,520,36,482.3,34.0,170,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the tomato sauce in the basket
+pi0,fp16,libero_10,1,0,8,10,0,520,53,480.9,41.6,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the cream cheese box and the butter in the basket
+pi0,fp16,libero_10,1,1,8,10,0,520,53,476.6,43.1,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the cream cheese box and the butter in the basket
+pi0,fp16,libero_10,1,2,8,10,1,252,26,475.9,22.6,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the cream cheese box and the butter in the basket
+pi0,fp16,libero_10,1,3,8,10,1,246,26,470.2,21.4,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the cream cheese box and the butter in the basket
+pi0,fp16,libero_10,1,4,8,10,0,520,53,480.7,42.6,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the cream cheese box and the butter in the basket
+pi0,fp16,libero_10,1,5,8,10,1,242,25,480.9,21.4,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the cream cheese box and the butter in the basket
+pi0,fp16,libero_10,1,6,8,10,1,420,43,476.6,35.9,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the cream cheese box and the butter in the basket
+pi0,fp16,libero_10,1,7,8,10,1,239,25,475.9,20.9,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the cream cheese box and the butter in the basket
+pi0,fp16,libero_10,1,8,8,10,0,520,53,479.1,43.0,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the cream cheese box and the butter in the basket
+pi0,fp16,libero_10,1,9,8,10,0,520,53,475.3,42.3,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the cream cheese box and the butter in the basket
+pi0,fp16,libero_10,1,0,10,10,0,520,53,473.5,40.8,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the cream cheese box and the butter in the basket
+pi0,fp16,libero_10,1,1,10,10,0,520,53,483.8,42.4,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the cream cheese box and the butter in the basket
+pi0,fp16,libero_10,1,2,10,10,0,520,53,476.6,41.7,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the cream cheese box and the butter in the basket
+pi0,fp16,libero_10,1,3,10,10,1,249,26,483.7,21.9,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the cream cheese box and the butter in the basket
+pi0,fp16,libero_10,1,4,10,10,1,235,25,476.8,20.8,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the cream cheese box and the butter in the basket
+pi0,fp16,libero_10,1,5,10,10,1,248,26,489.2,22.1,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the cream cheese box and the butter in the basket
+pi0,fp16,libero_10,1,6,10,10,0,520,53,467.7,41.7,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the cream cheese box and the butter in the basket
+pi0,fp16,libero_10,1,7,10,10,0,520,53,475.4,42.0,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the cream cheese box and the butter in the basket
+pi0,fp16,libero_10,1,8,10,10,1,244,26,481.7,22.9,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the cream cheese box and the butter in the basket
+pi0,fp16,libero_10,1,9,10,10,0,520,53,481.0,41.8,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the cream cheese box and the butter in the basket
+pi0,fp16,libero_10,1,0,15,10,0,520,36,482.6,33.3,170,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the cream cheese box and the butter in the basket
+pi0,fp16,libero_10,1,1,15,10,0,520,36,491.9,35.7,170,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the cream cheese box and the butter in the basket
+pi0,fp16,libero_10,1,2,15,10,1,357,25,484.6,25.2,117,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the cream cheese box and the butter in the basket
+pi0,fp16,libero_10,1,3,15,10,0,520,36,479.0,34.0,170,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the cream cheese box and the butter in the basket
+pi0,fp16,libero_10,1,4,15,10,0,520,36,485.6,33.9,170,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the cream cheese box and the butter in the basket
+pi0,fp16,libero_10,1,5,15,10,0,520,36,484.3,34.9,170,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the cream cheese box and the butter in the basket
+pi0,fp16,libero_10,1,6,15,10,1,315,22,479.6,23.6,105,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the cream cheese box and the butter in the basket
+pi0,fp16,libero_10,1,7,15,10,0,520,36,475.1,32.7,170,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the cream cheese box and the butter in the basket
+pi0,fp16,libero_10,1,8,15,10,0,520,36,473.6,33.2,170,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the cream cheese box and the butter in the basket
+pi0,fp16,libero_10,1,9,15,10,1,357,25,576.7,31.7,117,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the cream cheese box and the butter in the basket
+pi0,fp16,libero_10,2,0,8,10,1,249,26,477.5,20.3,0,NVIDIA GeForce RTX 2080 Ti,cuda2,turn on the stove and put the moka pot on it
+pi0,fp16,libero_10,2,1,8,10,0,520,53,470.9,39.9,0,NVIDIA GeForce RTX 2080 Ti,cuda2,turn on the stove and put the moka pot on it
+pi0,fp16,libero_10,2,2,8,10,1,249,26,470.1,20.1,0,NVIDIA GeForce RTX 2080 Ti,cuda2,turn on the stove and put the moka pot on it
+pi0,fp16,libero_10,2,3,8,10,0,520,53,477.5,40.0,0,NVIDIA GeForce RTX 2080 Ti,cuda2,turn on the stove and put the moka pot on it
+pi0,fp16,libero_10,2,4,8,10,1,217,23,578.2,19.4,0,NVIDIA GeForce RTX 2080 Ti,cuda2,turn on the stove and put the moka pot on it
+pi0,fp16,libero_10,2,5,8,10,1,244,26,478.6,22.0,0,NVIDIA GeForce RTX 2080 Ti,cuda2,turn on the stove and put the moka pot on it
+pi0,fp16,libero_10,2,6,8,10,1,226,24,478.2,19.3,0,NVIDIA GeForce RTX 2080 Ti,cuda2,turn on the stove and put the moka pot on it
+pi0,fp16,libero_10,2,7,8,10,1,234,25,469.9,19.1,0,NVIDIA GeForce RTX 2080 Ti,cuda2,turn on the stove and put the moka pot on it
+pi0,fp16,libero_10,2,8,8,10,0,520,53,475.1,39.4,0,NVIDIA GeForce RTX 2080 Ti,cuda2,turn on the stove and put the moka pot on it
+pi0,fp16,libero_10,2,9,8,10,1,242,25,476.4,20.7,0,NVIDIA GeForce RTX 2080 Ti,cuda2,turn on the stove and put the moka pot on it
+pi0,fp16,libero_10,2,0,10,10,1,218,23,483.2,46.8,0,NVIDIA GeForce RTX 2080 Ti,cuda2,turn on the stove and put the moka pot on it
+pi0,fp16,libero_10,2,1,10,10,0,520,53,472.2,39.6,0,NVIDIA GeForce RTX 2080 Ti,cuda2,turn on the stove and put the moka pot on it
+pi0,fp16,libero_10,2,2,10,10,1,241,26,474.2,20.4,0,NVIDIA GeForce RTX 2080 Ti,cuda2,turn on the stove and put the moka pot on it
+pi0,fp16,libero_10,2,3,10,10,1,259,27,469.6,21.4,0,NVIDIA GeForce RTX 2080 Ti,cuda2,turn on the stove and put the moka pot on it
+pi0,fp16,libero_10,2,4,10,10,1,217,23,478.2,18.4,0,NVIDIA GeForce RTX 2080 Ti,cuda2,turn on the stove and put the moka pot on it
+pi0,fp16,libero_10,2,5,10,10,1,246,26,476.4,21.5,0,NVIDIA GeForce RTX 2080 Ti,cuda2,turn on the stove and put the moka pot on it
+pi0,fp16,libero_10,2,6,10,10,0,520,53,476.0,39.6,0,NVIDIA GeForce RTX 2080 Ti,cuda2,turn on the stove and put the moka pot on it
+pi0,fp16,libero_10,2,7,10,10,0,520,53,480.7,41.0,0,NVIDIA GeForce RTX 2080 Ti,cuda2,turn on the stove and put the moka pot on it
+pi0,fp16,libero_10,2,8,10,10,1,241,26,474.2,19.8,0,NVIDIA GeForce RTX 2080 Ti,cuda2,turn on the stove and put the moka pot on it
+pi0,fp16,libero_10,2,9,10,10,1,240,25,472.8,19.3,0,NVIDIA GeForce RTX 2080 Ti,cuda2,turn on the stove and put the moka pot on it
+pi0,fp16,libero_10,2,0,15,10,0,520,36,469.2,30.6,170,NVIDIA GeForce RTX 2080 Ti,cuda2,turn on the stove and put the moka pot on it
+pi0,fp16,libero_10,2,1,15,10,1,363,26,471.7,22.6,120,NVIDIA GeForce RTX 2080 Ti,cuda2,turn on the stove and put the moka pot on it
+pi0,fp16,libero_10,2,2,15,10,0,520,36,470.4,30.6,170,NVIDIA GeForce RTX 2080 Ti,cuda2,turn on the stove and put the moka pot on it
+pi0,fp16,libero_10,2,3,15,10,1,312,22,482.5,36.8,102,NVIDIA GeForce RTX 2080 Ti,cuda2,turn on the stove and put the moka pot on it
+pi0,fp16,libero_10,2,4,15,10,0,520,36,478.8,31.6,170,NVIDIA GeForce RTX 2080 Ti,cuda2,turn on the stove and put the moka pot on it
+pi0,fp16,libero_10,2,5,15,10,0,520,36,478.8,31.1,170,NVIDIA GeForce RTX 2080 Ti,cuda2,turn on the stove and put the moka pot on it
+pi0,fp16,libero_10,2,6,15,10,0,520,36,476.9,31.4,170,NVIDIA GeForce RTX 2080 Ti,cuda2,turn on the stove and put the moka pot on it
+pi0,fp16,libero_10,2,7,15,10,0,520,36,480.9,31.3,170,NVIDIA GeForce RTX 2080 Ti,cuda2,turn on the stove and put the moka pot on it
+pi0,fp16,libero_10,2,8,15,10,1,309,22,473.4,19.7,100,NVIDIA GeForce RTX 2080 Ti,cuda2,turn on the stove and put the moka pot on it
+pi0,fp16,libero_10,2,9,15,10,0,520,36,472.8,30.4,170,NVIDIA GeForce RTX 2080 Ti,cuda2,turn on the stove and put the moka pot on it
+pi0,fp16,libero_10,3,0,8,10,0,520,53,469.6,42.0,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put the black bowl in the bottom drawer of the cabinet and close it
+pi0,fp16,libero_10,3,1,8,10,0,520,53,499.4,41.3,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put the black bowl in the bottom drawer of the cabinet and close it
+pi0,fp16,libero_10,3,2,8,10,0,520,53,506.8,44.0,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put the black bowl in the bottom drawer of the cabinet and close it
+pi0,fp16,libero_10,3,3,8,10,1,211,22,500.1,18.9,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put the black bowl in the bottom drawer of the cabinet and close it
+pi0,fp16,libero_10,3,4,8,10,1,218,23,507.1,19.5,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put the black bowl in the bottom drawer of the cabinet and close it
+pi0,fp16,libero_10,3,5,8,10,1,218,23,505.3,19.8,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put the black bowl in the bottom drawer of the cabinet and close it
+pi0,fp16,libero_10,3,6,8,10,1,217,23,497.6,33.1,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put the black bowl in the bottom drawer of the cabinet and close it
+pi0,fp16,libero_10,3,7,8,10,1,201,21,505.9,18.2,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put the black bowl in the bottom drawer of the cabinet and close it
+pi0,fp16,libero_10,3,8,8,10,1,211,22,505.8,19.6,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put the black bowl in the bottom drawer of the cabinet and close it
+pi0,fp16,libero_10,3,9,8,10,1,274,29,469.4,24.6,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put the black bowl in the bottom drawer of the cabinet and close it
+pi0,fp16,libero_10,3,0,10,10,0,520,53,464.5,39.8,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put the black bowl in the bottom drawer of the cabinet and close it
+pi0,fp16,libero_10,3,1,10,10,0,520,53,472.5,40.6,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put the black bowl in the bottom drawer of the cabinet and close it
+pi0,fp16,libero_10,3,2,10,10,1,230,24,512.7,21.0,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put the black bowl in the bottom drawer of the cabinet and close it
+pi0,fp16,libero_10,3,3,10,10,1,219,23,504.9,19.6,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put the black bowl in the bottom drawer of the cabinet and close it
+pi0,fp16,libero_10,3,4,10,10,1,217,23,502.1,20.3,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put the black bowl in the bottom drawer of the cabinet and close it
+pi0,fp16,libero_10,3,5,10,10,1,213,23,505.0,19.5,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put the black bowl in the bottom drawer of the cabinet and close it
+pi0,fp16,libero_10,3,6,10,10,0,520,53,507.0,44.0,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put the black bowl in the bottom drawer of the cabinet and close it
+pi0,fp16,libero_10,3,7,10,10,1,206,22,497.0,18.5,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put the black bowl in the bottom drawer of the cabinet and close it
+pi0,fp16,libero_10,3,8,10,10,1,396,41,472.7,33.3,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put the black bowl in the bottom drawer of the cabinet and close it
+pi0,fp16,libero_10,3,9,10,10,0,520,53,465.9,39.7,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put the black bowl in the bottom drawer of the cabinet and close it
+pi0,fp16,libero_10,3,0,15,10,0,520,36,469.9,32.0,170,NVIDIA GeForce RTX 2080 Ti,cuda2,put the black bowl in the bottom drawer of the cabinet and close it
+pi0,fp16,libero_10,3,1,15,10,0,520,36,503.1,32.4,170,NVIDIA GeForce RTX 2080 Ti,cuda2,put the black bowl in the bottom drawer of the cabinet and close it
+pi0,fp16,libero_10,3,2,15,10,1,280,20,505.9,20.4,90,NVIDIA GeForce RTX 2080 Ti,cuda2,put the black bowl in the bottom drawer of the cabinet and close it
+pi0,fp16,libero_10,3,3,15,10,1,310,22,496.1,23.5,100,NVIDIA GeForce RTX 2080 Ti,cuda2,put the black bowl in the bottom drawer of the cabinet and close it
+pi0,fp16,libero_10,3,4,15,10,0,520,36,509.7,36.6,170,NVIDIA GeForce RTX 2080 Ti,cuda2,put the black bowl in the bottom drawer of the cabinet and close it
+pi0,fp16,libero_10,3,5,15,10,1,309,22,498.6,24.1,100,NVIDIA GeForce RTX 2080 Ti,cuda2,put the black bowl in the bottom drawer of the cabinet and close it
+pi0,fp16,libero_10,3,6,15,10,1,333,24,496.2,24.0,110,NVIDIA GeForce RTX 2080 Ti,cuda2,put the black bowl in the bottom drawer of the cabinet and close it
+pi0,fp16,libero_10,3,7,15,10,0,520,36,504.3,33.5,170,NVIDIA GeForce RTX 2080 Ti,cuda2,put the black bowl in the bottom drawer of the cabinet and close it
+pi0,fp16,libero_10,3,8,15,10,1,287,21,463.2,19.1,95,NVIDIA GeForce RTX 2080 Ti,cuda2,put the black bowl in the bottom drawer of the cabinet and close it
+pi0,fp16,libero_10,3,9,15,10,1,293,21,472.6,19.7,95,NVIDIA GeForce RTX 2080 Ti,cuda2,put the black bowl in the bottom drawer of the cabinet and close it
+pi0,fp16,libero_10,4,0,8,10,0,520,53,466.0,41.6,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put the white mug on the left plate and put the yellow and white mug on the right plate
+pi0,fp16,libero_10,4,1,8,10,1,216,23,502.7,21.1,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put the white mug on the left plate and put the yellow and white mug on the right plate
+pi0,fp16,libero_10,4,2,8,10,1,236,25,502.6,22.7,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put the white mug on the left plate and put the yellow and white mug on the right plate
+pi0,fp16,libero_10,4,3,8,10,0,520,53,505.2,44.3,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put the white mug on the left plate and put the yellow and white mug on the right plate
+pi0,fp16,libero_10,4,4,8,10,0,520,53,510.2,42.2,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put the white mug on the left plate and put the yellow and white mug on the right plate
+pi0,fp16,libero_10,4,5,8,10,0,520,53,508.3,43.6,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put the white mug on the left plate and put the yellow and white mug on the right plate
+pi0,fp16,libero_10,4,6,8,10,0,520,53,467.2,41.7,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put the white mug on the left plate and put the yellow and white mug on the right plate
+pi0,fp16,libero_10,4,7,8,10,1,210,22,466.6,19.3,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put the white mug on the left plate and put the yellow and white mug on the right plate
+pi0,fp16,libero_10,4,8,8,10,0,520,53,480.6,43.1,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put the white mug on the left plate and put the yellow and white mug on the right plate
+pi0,fp16,libero_10,4,9,8,10,0,520,53,481.2,42.4,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put the white mug on the left plate and put the yellow and white mug on the right plate
+pi0,fp16,libero_10,4,0,10,10,0,520,53,479.1,42.2,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put the white mug on the left plate and put the yellow and white mug on the right plate
+pi0,fp16,libero_10,4,1,10,10,0,520,53,475.0,42.0,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put the white mug on the left plate and put the yellow and white mug on the right plate
+pi0,fp16,libero_10,4,2,10,10,0,520,53,463.4,41.3,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put the white mug on the left plate and put the yellow and white mug on the right plate
+pi0,fp16,libero_10,4,3,10,10,0,520,53,466.5,40.6,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put the white mug on the left plate and put the yellow and white mug on the right plate
+pi0,fp16,libero_10,4,4,10,10,1,241,26,479.3,22.1,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put the white mug on the left plate and put the yellow and white mug on the right plate
+pi0,fp16,libero_10,4,5,10,10,0,520,53,478.4,41.2,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put the white mug on the left plate and put the yellow and white mug on the right plate
+pi0,fp16,libero_10,4,6,10,10,0,520,53,479.8,41.2,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put the white mug on the left plate and put the yellow and white mug on the right plate
+pi0,fp16,libero_10,4,7,10,10,0,520,53,475.8,42.7,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put the white mug on the left plate and put the yellow and white mug on the right plate
+pi0,fp16,libero_10,4,8,10,10,0,520,53,466.6,41.0,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put the white mug on the left plate and put the yellow and white mug on the right plate
+pi0,fp16,libero_10,4,9,10,10,1,253,27,460.5,23.0,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put the white mug on the left plate and put the yellow and white mug on the right plate
+pi0,fp16,libero_10,4,0,15,10,0,520,36,474.4,32.3,170,NVIDIA GeForce RTX 2080 Ti,cuda2,put the white mug on the left plate and put the yellow and white mug on the right plate
+pi0,fp16,libero_10,4,1,15,10,1,288,21,475.7,23.3,95,NVIDIA GeForce RTX 2080 Ti,cuda2,put the white mug on the left plate and put the yellow and white mug on the right plate
+pi0,fp16,libero_10,4,2,15,10,1,320,23,483.3,23.2,105,NVIDIA GeForce RTX 2080 Ti,cuda2,put the white mug on the left plate and put the yellow and white mug on the right plate
+pi0,fp16,libero_10,4,3,15,10,0,520,36,484.4,33.8,170,NVIDIA GeForce RTX 2080 Ti,cuda2,put the white mug on the left plate and put the yellow and white mug on the right plate
+pi0,fp16,libero_10,4,4,15,10,0,520,36,480.3,34.1,170,NVIDIA GeForce RTX 2080 Ti,cuda2,put the white mug on the left plate and put the yellow and white mug on the right plate
+pi0,fp16,libero_10,4,5,15,10,0,520,36,467.2,32.5,170,NVIDIA GeForce RTX 2080 Ti,cuda2,put the white mug on the left plate and put the yellow and white mug on the right plate
+pi0,fp16,libero_10,4,6,15,10,0,520,36,464.8,32.9,170,NVIDIA GeForce RTX 2080 Ti,cuda2,put the white mug on the left plate and put the yellow and white mug on the right plate
+pi0,fp16,libero_10,4,7,15,10,0,520,36,466.0,33.2,170,NVIDIA GeForce RTX 2080 Ti,cuda2,put the white mug on the left plate and put the yellow and white mug on the right plate
+pi0,fp16,libero_10,4,8,15,10,0,520,36,481.3,33.3,170,NVIDIA GeForce RTX 2080 Ti,cuda2,put the white mug on the left plate and put the yellow and white mug on the right plate
+pi0,fp16,libero_10,4,9,15,10,0,520,36,479.6,32.6,170,NVIDIA GeForce RTX 2080 Ti,cuda2,put the white mug on the left plate and put the yellow and white mug on the right plate
+pi0,fp16,libero_10,5,0,8,10,1,189,20,490.8,17.1,0,NVIDIA GeForce RTX 2080 Ti,cuda2,pick up the book and place it in the back compartment of the caddy
+pi0,fp16,libero_10,5,1,8,10,1,179,19,478.0,15.1,0,NVIDIA GeForce RTX 2080 Ti,cuda2,pick up the book and place it in the back compartment of the caddy
+pi0,fp16,libero_10,5,2,8,10,1,173,19,483.1,15.4,0,NVIDIA GeForce RTX 2080 Ti,cuda2,pick up the book and place it in the back compartment of the caddy
+pi0,fp16,libero_10,5,3,8,10,1,177,19,485.4,16.0,0,NVIDIA GeForce RTX 2080 Ti,cuda2,pick up the book and place it in the back compartment of the caddy
+pi0,fp16,libero_10,5,4,8,10,1,332,34,462.1,26.6,0,NVIDIA GeForce RTX 2080 Ti,cuda2,pick up the book and place it in the back compartment of the caddy
+pi0,fp16,libero_10,5,5,8,10,1,186,20,467.1,15.3,0,NVIDIA GeForce RTX 2080 Ti,cuda2,pick up the book and place it in the back compartment of the caddy
+pi0,fp16,libero_10,5,6,8,10,1,278,29,466.2,22.0,0,NVIDIA GeForce RTX 2080 Ti,cuda2,pick up the book and place it in the back compartment of the caddy
+pi0,fp16,libero_10,5,7,8,10,1,203,22,567.7,18.7,0,NVIDIA GeForce RTX 2080 Ti,cuda2,pick up the book and place it in the back compartment of the caddy
+pi0,fp16,libero_10,5,8,8,10,1,188,20,465.3,15.4,0,NVIDIA GeForce RTX 2080 Ti,cuda2,pick up the book and place it in the back compartment of the caddy
+pi0,fp16,libero_10,5,9,8,10,0,520,53,479.6,40.5,0,NVIDIA GeForce RTX 2080 Ti,cuda2,pick up the book and place it in the back compartment of the caddy
+pi0,fp16,libero_10,5,0,10,10,1,181,20,473.3,16.8,0,NVIDIA GeForce RTX 2080 Ti,cuda2,pick up the book and place it in the back compartment of the caddy
+pi0,fp16,libero_10,5,1,10,10,1,181,20,473.7,16.2,0,NVIDIA GeForce RTX 2080 Ti,cuda2,pick up the book and place it in the back compartment of the caddy
+pi0,fp16,libero_10,5,2,10,10,1,168,18,474.0,14.5,0,NVIDIA GeForce RTX 2080 Ti,cuda2,pick up the book and place it in the back compartment of the caddy
+pi0,fp16,libero_10,5,3,10,10,1,173,19,468.9,14.7,0,NVIDIA GeForce RTX 2080 Ti,cuda2,pick up the book and place it in the back compartment of the caddy
+pi0,fp16,libero_10,5,4,10,10,1,182,20,477.7,16.0,0,NVIDIA GeForce RTX 2080 Ti,cuda2,pick up the book and place it in the back compartment of the caddy
+pi0,fp16,libero_10,5,5,10,10,1,202,22,468.6,16.8,0,NVIDIA GeForce RTX 2080 Ti,cuda2,pick up the book and place it in the back compartment of the caddy
+pi0,fp16,libero_10,5,6,10,10,0,520,53,468.4,38.9,0,NVIDIA GeForce RTX 2080 Ti,cuda2,pick up the book and place it in the back compartment of the caddy
+pi0,fp16,libero_10,5,7,10,10,1,188,20,464.1,15.3,0,NVIDIA GeForce RTX 2080 Ti,cuda2,pick up the book and place it in the back compartment of the caddy
+pi0,fp16,libero_10,5,8,10,10,1,173,19,467.5,15.0,0,NVIDIA GeForce RTX 2080 Ti,cuda2,pick up the book and place it in the back compartment of the caddy
+pi0,fp16,libero_10,5,9,10,10,1,171,19,472.8,15.2,0,NVIDIA GeForce RTX 2080 Ti,cuda2,pick up the book and place it in the back compartment of the caddy
+pi0,fp16,libero_10,5,0,15,10,1,247,18,473.2,16.2,80,NVIDIA GeForce RTX 2080 Ti,cuda2,pick up the book and place it in the back compartment of the caddy
+pi0,fp16,libero_10,5,1,15,10,1,243,18,473.8,15.8,80,NVIDIA GeForce RTX 2080 Ti,cuda2,pick up the book and place it in the back compartment of the caddy
+pi0,fp16,libero_10,5,2,15,10,0,520,36,468.4,29.9,170,NVIDIA GeForce RTX 2080 Ti,cuda2,pick up the book and place it in the back compartment of the caddy
+pi0,fp16,libero_10,5,3,15,10,1,217,16,474.1,17.7,70,NVIDIA GeForce RTX 2080 Ti,cuda2,pick up the book and place it in the back compartment of the caddy
+pi0,fp16,libero_10,5,4,15,10,0,520,36,477.0,30.7,170,NVIDIA GeForce RTX 2080 Ti,cuda2,pick up the book and place it in the back compartment of the caddy
+pi0,fp16,libero_10,5,5,15,10,1,232,17,459.4,15.0,75,NVIDIA GeForce RTX 2080 Ti,cuda2,pick up the book and place it in the back compartment of the caddy
+pi0,fp16,libero_10,5,6,15,10,1,242,18,470.7,16.2,80,NVIDIA GeForce RTX 2080 Ti,cuda2,pick up the book and place it in the back compartment of the caddy
+pi0,fp16,libero_10,5,7,15,10,1,264,19,489.2,17.9,85,NVIDIA GeForce RTX 2080 Ti,cuda2,pick up the book and place it in the back compartment of the caddy
+pi0,fp16,libero_10,5,8,15,10,0,520,36,468.2,29.1,170,NVIDIA GeForce RTX 2080 Ti,cuda2,pick up the book and place it in the back compartment of the caddy
+pi0,fp16,libero_10,5,9,15,10,1,282,20,476.2,20.0,92,NVIDIA GeForce RTX 2080 Ti,cuda2,pick up the book and place it in the back compartment of the caddy
+pi0,fp16,libero_10,6,0,8,10,0,520,53,470.5,40.0,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put the white mug on the plate and put the chocolate pudding to the right of the plate
+pi0,fp16,libero_10,6,1,8,10,0,520,53,474.4,40.6,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put the white mug on the plate and put the chocolate pudding to the right of the plate
+pi0,fp16,libero_10,6,2,8,10,0,520,53,469.6,40.4,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put the white mug on the plate and put the chocolate pudding to the right of the plate
+pi0,fp16,libero_10,6,3,8,10,1,209,22,470.7,18.9,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put the white mug on the plate and put the chocolate pudding to the right of the plate
+pi0,fp16,libero_10,6,4,8,10,1,438,45,472.7,36.6,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put the white mug on the plate and put the chocolate pudding to the right of the plate
+pi0,fp16,libero_10,6,5,8,10,0,520,53,468.7,41.6,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put the white mug on the plate and put the chocolate pudding to the right of the plate
+pi0,fp16,libero_10,6,6,8,10,0,520,53,471.0,40.9,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put the white mug on the plate and put the chocolate pudding to the right of the plate
+pi0,fp16,libero_10,6,7,8,10,0,520,53,475.1,39.9,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put the white mug on the plate and put the chocolate pudding to the right of the plate
+pi0,fp16,libero_10,6,8,8,10,0,520,53,477.1,41.6,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put the white mug on the plate and put the chocolate pudding to the right of the plate
+pi0,fp16,libero_10,6,9,8,10,0,520,53,469.0,40.6,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put the white mug on the plate and put the chocolate pudding to the right of the plate
+pi0,fp16,libero_10,6,0,10,10,0,520,53,464.6,39.4,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put the white mug on the plate and put the chocolate pudding to the right of the plate
+pi0,fp16,libero_10,6,1,10,10,0,520,53,474.1,41.5,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put the white mug on the plate and put the chocolate pudding to the right of the plate
+pi0,fp16,libero_10,6,2,10,10,0,520,53,474.0,40.1,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put the white mug on the plate and put the chocolate pudding to the right of the plate
+pi0,fp16,libero_10,6,3,10,10,0,520,53,468.4,41.8,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put the white mug on the plate and put the chocolate pudding to the right of the plate
+pi0,fp16,libero_10,6,4,10,10,0,520,53,474.9,43.3,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put the white mug on the plate and put the chocolate pudding to the right of the plate
+pi0,fp16,libero_10,6,5,10,10,0,520,53,461.9,39.3,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put the white mug on the plate and put the chocolate pudding to the right of the plate
+pi0,fp16,libero_10,6,6,10,10,0,520,53,468.0,40.7,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put the white mug on the plate and put the chocolate pudding to the right of the plate
+pi0,fp16,libero_10,6,7,10,10,0,520,53,469.8,41.0,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put the white mug on the plate and put the chocolate pudding to the right of the plate
+pi0,fp16,libero_10,6,8,10,10,1,213,23,472.7,19.8,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put the white mug on the plate and put the chocolate pudding to the right of the plate
+pi0,fp16,libero_10,6,9,10,10,0,520,53,472.0,41.1,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put the white mug on the plate and put the chocolate pudding to the right of the plate
+pi0,fp16,libero_10,6,0,15,10,1,485,34,467.9,31.1,160,NVIDIA GeForce RTX 2080 Ti,cuda2,put the white mug on the plate and put the chocolate pudding to the right of the plate
+pi0,fp16,libero_10,6,1,15,10,1,295,21,468.2,20.1,95,NVIDIA GeForce RTX 2080 Ti,cuda2,put the white mug on the plate and put the chocolate pudding to the right of the plate
+pi0,fp16,libero_10,6,2,15,10,0,520,36,468.9,31.5,170,NVIDIA GeForce RTX 2080 Ti,cuda2,put the white mug on the plate and put the chocolate pudding to the right of the plate
+pi0,fp16,libero_10,6,3,15,10,0,520,36,472.3,32.2,170,NVIDIA GeForce RTX 2080 Ti,cuda2,put the white mug on the plate and put the chocolate pudding to the right of the plate
+pi0,fp16,libero_10,6,4,15,10,0,520,36,469.9,33.5,170,NVIDIA GeForce RTX 2080 Ti,cuda2,put the white mug on the plate and put the chocolate pudding to the right of the plate
+pi0,fp16,libero_10,6,5,15,10,0,520,36,472.7,31.5,170,NVIDIA GeForce RTX 2080 Ti,cuda2,put the white mug on the plate and put the chocolate pudding to the right of the plate
+pi0,fp16,libero_10,6,6,15,10,0,520,36,467.5,32.5,170,NVIDIA GeForce RTX 2080 Ti,cuda2,put the white mug on the plate and put the chocolate pudding to the right of the plate
+pi0,fp16,libero_10,6,7,15,10,0,520,36,475.5,31.7,170,NVIDIA GeForce RTX 2080 Ti,cuda2,put the white mug on the plate and put the chocolate pudding to the right of the plate
+pi0,fp16,libero_10,6,8,15,10,0,520,36,465.2,31.6,170,NVIDIA GeForce RTX 2080 Ti,cuda2,put the white mug on the plate and put the chocolate pudding to the right of the plate
+pi0,fp16,libero_10,6,9,15,10,0,520,36,469.7,33.5,170,NVIDIA GeForce RTX 2080 Ti,cuda2,put the white mug on the plate and put the chocolate pudding to the right of the plate
+pi0,fp16,libero_10,7,0,8,10,1,272,28,476.3,23.1,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the cream cheese box in the basket
+pi0,fp16,libero_10,7,1,8,10,0,520,53,477.0,40.9,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the cream cheese box in the basket
+pi0,fp16,libero_10,7,2,8,10,0,520,53,480.0,41.0,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the cream cheese box in the basket
+pi0,fp16,libero_10,7,3,8,10,0,520,53,479.1,41.0,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the cream cheese box in the basket
+pi0,fp16,libero_10,7,4,8,10,0,520,53,481.9,40.3,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the cream cheese box in the basket
+pi0,fp16,libero_10,7,5,8,10,0,520,53,470.8,40.2,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the cream cheese box in the basket
+pi0,fp16,libero_10,7,6,8,10,0,520,53,465.8,38.9,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the cream cheese box in the basket
+pi0,fp16,libero_10,7,7,8,10,0,520,53,468.8,39.0,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the cream cheese box in the basket
+pi0,fp16,libero_10,7,8,8,10,0,520,53,498.7,41.2,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the cream cheese box in the basket
+pi0,fp16,libero_10,7,9,8,10,1,259,27,504.7,22.8,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the cream cheese box in the basket
+pi0,fp16,libero_10,7,0,10,10,1,266,28,496.8,23.5,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the cream cheese box in the basket
+pi0,fp16,libero_10,7,1,10,10,0,520,53,503.6,41.3,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the cream cheese box in the basket
+pi0,fp16,libero_10,7,2,10,10,0,520,53,474.5,40.5,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the cream cheese box in the basket
+pi0,fp16,libero_10,7,3,10,10,1,291,31,464.8,24.2,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the cream cheese box in the basket
+pi0,fp16,libero_10,7,4,10,10,1,254,27,466.2,23.5,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the cream cheese box in the basket
+pi0,fp16,libero_10,7,5,10,10,0,520,53,492.3,40.5,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the cream cheese box in the basket
+pi0,fp16,libero_10,7,6,10,10,0,520,53,501.9,41.8,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the cream cheese box in the basket
+pi0,fp16,libero_10,7,7,10,10,0,520,53,494.3,41.3,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the cream cheese box in the basket
+pi0,fp16,libero_10,7,8,10,10,0,520,53,493.0,40.3,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the cream cheese box in the basket
+pi0,fp16,libero_10,7,9,10,10,0,520,53,468.3,39.1,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the cream cheese box in the basket
+pi0,fp16,libero_10,7,0,15,10,1,392,28,470.4,25.2,130,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the cream cheese box in the basket
+pi0,fp16,libero_10,7,1,15,10,0,520,36,565.2,33.4,170,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the cream cheese box in the basket
+pi0,fp16,libero_10,7,2,15,10,0,520,36,485.2,31.4,170,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the cream cheese box in the basket
+pi0,fp16,libero_10,7,3,15,10,0,520,36,486.7,31.5,170,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the cream cheese box in the basket
+pi0,fp16,libero_10,7,4,15,10,0,520,36,502.4,32.9,170,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the cream cheese box in the basket
+pi0,fp16,libero_10,7,5,15,10,0,520,36,500.8,33.2,170,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the cream cheese box in the basket
+pi0,fp16,libero_10,7,6,15,10,0,520,36,469.4,31.1,170,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the cream cheese box in the basket
+pi0,fp16,libero_10,7,7,15,10,0,520,36,467.8,30.6,170,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the cream cheese box in the basket
+pi0,fp16,libero_10,7,8,15,10,0,520,36,473.0,32.1,170,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the cream cheese box in the basket
+pi0,fp16,libero_10,7,9,15,10,0,520,36,490.6,31.3,170,NVIDIA GeForce RTX 2080 Ti,cuda2,put both the alphabet soup and the cream cheese box in the basket
+pi0,fp16,libero_10,8,0,8,10,0,520,53,494.3,41.7,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both moka pots on the stove
+pi0,fp16,libero_10,8,1,8,10,0,520,53,493.5,42.6,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both moka pots on the stove
+pi0,fp16,libero_10,8,2,8,10,1,380,39,494.0,32.1,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both moka pots on the stove
+pi0,fp16,libero_10,8,3,8,10,0,520,53,477.8,40.4,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both moka pots on the stove
+pi0,fp16,libero_10,8,4,8,10,1,478,49,473.8,39.0,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both moka pots on the stove
+pi0,fp16,libero_10,8,5,8,10,0,520,53,476.5,40.9,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both moka pots on the stove
+pi0,fp16,libero_10,8,6,8,10,1,384,40,487.9,32.1,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both moka pots on the stove
+pi0,fp16,libero_10,8,7,8,10,0,520,53,490.7,41.4,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both moka pots on the stove
+pi0,fp16,libero_10,8,8,8,10,0,520,53,483.3,41.1,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both moka pots on the stove
+pi0,fp16,libero_10,8,9,8,10,0,520,53,469.2,40.1,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both moka pots on the stove
+pi0,fp16,libero_10,8,0,10,10,1,424,44,467.9,33.6,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both moka pots on the stove
+pi0,fp16,libero_10,8,1,10,10,0,520,53,471.9,40.1,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both moka pots on the stove
+pi0,fp16,libero_10,8,2,10,10,0,520,53,473.5,41.0,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both moka pots on the stove
+pi0,fp16,libero_10,8,3,10,10,0,520,53,476.8,40.4,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both moka pots on the stove
+pi0,fp16,libero_10,8,4,10,10,0,520,53,471.3,39.8,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both moka pots on the stove
+pi0,fp16,libero_10,8,5,10,10,0,520,53,469.0,40.2,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both moka pots on the stove
+pi0,fp16,libero_10,8,6,10,10,0,520,53,464.8,40.3,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both moka pots on the stove
+pi0,fp16,libero_10,8,7,10,10,0,520,53,471.8,40.4,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both moka pots on the stove
+pi0,fp16,libero_10,8,8,10,10,0,520,53,480.8,40.2,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both moka pots on the stove
+pi0,fp16,libero_10,8,9,10,10,0,520,53,472.3,41.0,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put both moka pots on the stove
+pi0,fp16,libero_10,8,0,15,10,0,520,36,473.2,32.3,170,NVIDIA GeForce RTX 2080 Ti,cuda2,put both moka pots on the stove
+pi0,fp16,libero_10,8,1,15,10,0,520,36,466.8,31.4,170,NVIDIA GeForce RTX 2080 Ti,cuda2,put both moka pots on the stove
+pi0,fp16,libero_10,8,2,15,10,0,520,36,467.1,31.4,170,NVIDIA GeForce RTX 2080 Ti,cuda2,put both moka pots on the stove
+pi0,fp16,libero_10,8,3,15,10,0,520,36,469.2,31.4,170,NVIDIA GeForce RTX 2080 Ti,cuda2,put both moka pots on the stove
+pi0,fp16,libero_10,8,4,15,10,0,520,36,487.2,32.7,170,NVIDIA GeForce RTX 2080 Ti,cuda2,put both moka pots on the stove
+pi0,fp16,libero_10,8,5,15,10,0,520,36,486.0,32.7,170,NVIDIA GeForce RTX 2080 Ti,cuda2,put both moka pots on the stove
+pi0,fp16,libero_10,8,6,15,10,0,520,36,484.3,32.9,170,NVIDIA GeForce RTX 2080 Ti,cuda2,put both moka pots on the stove
+pi0,fp16,libero_10,8,7,15,10,0,520,36,486.2,32.8,170,NVIDIA GeForce RTX 2080 Ti,cuda2,put both moka pots on the stove
+pi0,fp16,libero_10,8,8,15,10,0,520,36,465.3,31.3,170,NVIDIA GeForce RTX 2080 Ti,cuda2,put both moka pots on the stove
+pi0,fp16,libero_10,8,9,15,10,0,520,36,466.0,31.1,170,NVIDIA GeForce RTX 2080 Ti,cuda2,put both moka pots on the stove
+pi0,fp16,libero_10,9,0,8,10,1,274,29,461.7,23.3,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put the yellow and white mug in the microwave and close it
+pi0,fp16,libero_10,9,1,8,10,0,520,53,471.3,38.9,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put the yellow and white mug in the microwave and close it
+pi0,fp16,libero_10,9,2,8,10,0,520,53,469.6,39.4,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put the yellow and white mug in the microwave and close it
+pi0,fp16,libero_10,9,3,8,10,1,255,27,471.9,21.3,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put the yellow and white mug in the microwave and close it
+pi0,fp16,libero_10,9,4,8,10,0,520,53,472.5,40.1,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put the yellow and white mug in the microwave and close it
+pi0,fp16,libero_10,9,5,8,10,1,256,27,461.3,21.2,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put the yellow and white mug in the microwave and close it
+pi0,fp16,libero_10,9,6,8,10,0,520,53,466.5,38.7,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put the yellow and white mug in the microwave and close it
+pi0,fp16,libero_10,9,7,8,10,0,520,53,472.1,41.2,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put the yellow and white mug in the microwave and close it
+pi0,fp16,libero_10,9,8,8,10,0,520,53,470.7,40.2,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put the yellow and white mug in the microwave and close it
+pi0,fp16,libero_10,9,9,8,10,0,520,53,473.6,40.0,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put the yellow and white mug in the microwave and close it
+pi0,fp16,libero_10,9,0,10,10,0,520,53,468.3,40.4,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put the yellow and white mug in the microwave and close it
+pi0,fp16,libero_10,9,1,10,10,0,520,53,461.5,39.0,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put the yellow and white mug in the microwave and close it
+pi0,fp16,libero_10,9,2,10,10,1,246,26,468.3,21.3,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put the yellow and white mug in the microwave and close it
+pi0,fp16,libero_10,9,3,10,10,0,520,53,464.2,38.6,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put the yellow and white mug in the microwave and close it
+pi0,fp16,libero_10,9,4,10,10,1,264,28,478.6,23.0,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put the yellow and white mug in the microwave and close it
+pi0,fp16,libero_10,9,5,10,10,0,520,53,476.3,42.2,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put the yellow and white mug in the microwave and close it
+pi0,fp16,libero_10,9,6,10,10,1,258,27,473.8,21.8,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put the yellow and white mug in the microwave and close it
+pi0,fp16,libero_10,9,7,10,10,0,520,53,466.8,40.0,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put the yellow and white mug in the microwave and close it
+pi0,fp16,libero_10,9,8,10,10,1,308,32,462.7,25.2,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put the yellow and white mug in the microwave and close it
+pi0,fp16,libero_10,9,9,10,10,0,520,53,466.3,38.9,0,NVIDIA GeForce RTX 2080 Ti,cuda2,put the yellow and white mug in the microwave and close it
+pi0,fp16,libero_10,9,0,15,10,0,520,36,468.3,31.4,170,NVIDIA GeForce RTX 2080 Ti,cuda2,put the yellow and white mug in the microwave and close it
+pi0,fp16,libero_10,9,1,15,10,1,426,30,474.5,28.2,140,NVIDIA GeForce RTX 2080 Ti,cuda2,put the yellow and white mug in the microwave and close it
+pi0,fp16,libero_10,9,2,15,10,0,520,36,475.6,31.5,170,NVIDIA GeForce RTX 2080 Ti,cuda2,put the yellow and white mug in the microwave and close it
+pi0,fp16,libero_10,9,3,15,10,0,520,36,467.7,30.8,170,NVIDIA GeForce RTX 2080 Ti,cuda2,put the yellow and white mug in the microwave and close it
+pi0,fp16,libero_10,9,4,15,10,0,520,36,470.2,32.3,170,NVIDIA GeForce RTX 2080 Ti,cuda2,put the yellow and white mug in the microwave and close it
+pi0,fp16,libero_10,9,5,15,10,0,520,36,466.0,31.3,170,NVIDIA GeForce RTX 2080 Ti,cuda2,put the yellow and white mug in the microwave and close it
+pi0,fp16,libero_10,9,6,15,10,0,520,36,463.0,31.1,170,NVIDIA GeForce RTX 2080 Ti,cuda2,put the yellow and white mug in the microwave and close it
+pi0,fp16,libero_10,9,7,15,10,0,520,36,470.0,31.0,170,NVIDIA GeForce RTX 2080 Ti,cuda2,put the yellow and white mug in the microwave and close it
+pi0,fp16,libero_10,9,8,15,10,1,337,24,471.8,22.3,110,NVIDIA GeForce RTX 2080 Ti,cuda2,put the yellow and white mug in the microwave and close it
+pi0,fp16,libero_10,9,9,15,10,0,520,36,470.1,30.9,170,NVIDIA GeForce RTX 2080 Ti,cuda2,put the yellow and white mug in the microwave and close it
