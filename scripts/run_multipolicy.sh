@@ -22,8 +22,10 @@ MODE=${1:-quick}
 PY=${PY:-$WORK/envs/smolvla/bin/python}
 DUR=${DUR:-15}
 MODES=${MODES:-eager,graph}
-export HF_HOME="${HF_HOME:-$WORK/.cache/huggingface}" HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1
-export TORCH_HOME="${TORCH_HOME:-$WORK/.cache/torch}" CUDA_MODULE_LOADING=EAGER
+# Caches come from WORK (as in run_cuda2.sh), not from the login shell: a Slurm job inherits the
+# submitting shell's HF_HOME, which may point at another project's cache.
+export HF_HOME="$WORK/.cache/huggingface" HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1
+export TORCH_HOME="$WORK/.cache/torch" CUDA_MODULE_LOADING=EAGER
 [[ -x "$PY" ]] || { echo "no $PY: run scripts/run_cuda2.sh setup first"; exit 1; }
 
 if [[ -z "${CUDA_VISIBLE_DEVICES:-}" ]]; then
@@ -142,4 +144,8 @@ custom)
   ;;
 esac
 mps_stop
-"$PY" model/multipolicy_report.py "$OUT" > /dev/null && echo "report: $OUT/report.md"
+if [[ -f "$OUT/latency.csv" ]]; then
+  "$PY" model/multipolicy_report.py "$OUT" > /dev/null && echo "report: $OUT/report.md"
+else
+  echo "no config succeeded: no report (see $OUT/run.log)"
+fi
