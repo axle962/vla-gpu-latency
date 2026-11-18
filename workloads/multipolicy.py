@@ -408,17 +408,23 @@ def run_phase(copies: list[Copy], mode: str, start: float, duration: float) -> l
     if len(copies) == 1:
         return [closed_loop(copies[0], mode, start, end)]
     out: list = [None] * len(copies)
+    errors: list[str] = []
     bar = threading.Barrier(len(copies))
 
     def run(i: int) -> None:
-        bar.wait()
-        out[i] = closed_loop(copies[i], mode, start, end)
+        try:
+            bar.wait()
+            out[i] = closed_loop(copies[i], mode, start, end)
+        except Exception as e:  # reported by the worker, not swallowed by the thread
+            errors.append(f"copy {i} ({copies[i].name}): {type(e).__name__}: {e}")
 
     ts = [threading.Thread(target=run, args=(i,), name=f"copy{i}") for i in range(len(copies))]
     for t in ts:
         t.start()
     for t in ts:
         t.join()
+    if errors:
+        raise RuntimeError(f"{mode} phase failed in {len(errors)} thread(s):\n" + "\n".join(errors))
     return out
 
 
