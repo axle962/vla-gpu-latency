@@ -39,6 +39,15 @@ def fit_copy(calib: pd.DataFrame) -> dict[tuple[str, str], tuple[float, float]]:
     return out
 
 
+def md(df: pd.DataFrame) -> str:
+    """Markdown table without the optional tabulate dependency (not in every env)."""
+    cols = [str(c) for c in df.columns]
+    rows = [[str(v) for v in r] for r in df.itertuples(index=False)]
+    out = ["| " + " | ".join(cols) + " |", "|" + "|".join("---" for _ in cols) + "|"]
+    out += ["| " + " | ".join(r) + " |" for r in rows]
+    return "\n".join(out)
+
+
 def pct(pred: float, meas: float) -> str:
     return f"{100 * (pred - meas) / meas:+.1f}%"
 
@@ -87,7 +96,7 @@ def main() -> None:
         r["best vs gpu best"] = f"{(h or e) / (base_h or base_e):.2f}x" if base_e and e else ""
         r["max diff vs first"] = f"{info['max_abs_diff_vs_first']:.1e}"
         rows.append(r)
-    lines += [pd.DataFrame(rows).to_markdown(index=False), ""]
+    lines += [md(pd.DataFrame(rows)), ""]
     lines += [
         "`best` is e2e_hybrid where the denoise device is a GPU (CUDA graph), else e2e_eager.",
         "",
@@ -101,7 +110,7 @@ def main() -> None:
              "bandwidth (GB/s)": f"{bw * 1e3 / 1e9:.2f}"}
             for (s, d), (t0, bw) in fits.items()
         ]
-        lines += [pd.DataFrame(rows).to_markdown(index=False), ""]
+        lines += [md(pd.DataFrame(rows)), ""]
 
         lines += ["## Split placements predicted from colocated parts", ""]
         rows = []
@@ -136,7 +145,7 @@ def main() -> None:
                 r[f"{label} err"] = pct(pred, meas)
             rows.append(r)
         if rows:
-            lines += [pd.DataFrame(rows).to_markdown(index=False), ""]
+            lines += [md(pd.DataFrame(rows)), ""]
         else:
             lines += ["No split placement with its colocated baselines in this run.", ""]
 
@@ -151,7 +160,7 @@ def main() -> None:
             "placement": p, "sum of parts": f"{sum(parts):.1f}", "e2e_eager": f"{e:.1f}",
             "gap": pct(sum(parts), e),
         })
-    lines += [pd.DataFrame(rows).to_markdown(index=False), ""]
+    lines += [md(pd.DataFrame(rows)), ""]
     lines += [
         "A negative gap means the end-to-end step costs more than its parts timed alone "
         "(for example cold caches after the handoff, or the two halves competing for host "
