@@ -1,0 +1,80 @@
+{
+  "model": "smolvla",
+  "host": "cuda2.cims.nyu.edu",
+  "cpu": "Intel(R) Xeon(R) CPU E5-2660 v3 @ 2.60GHz",
+  "cpu_count": 40,
+  "torch_threads": 20,
+  "affinity_cpus": 20,
+  "gpus": [
+    "NVIDIA GeForce RTX 2080 Ti",
+    "NVIDIA GeForce RTX 2080 Ti"
+  ],
+  "cuda_visible_devices": "0,1",
+  "torch": "2.10.0+cu128",
+  "cuda_runtime": "12.8",
+  "cuda_module_loading": "EAGER",
+  "params": 450046176,
+  "dtype_by_device": {
+    "cuda:0": "torch.float16",
+    "cuda:1": "torch.float16",
+    "cpu": "torch.float32"
+  },
+  "cameras": 3,
+  "num_steps": 10,
+  "chunk_size": 50,
+  "placements": {
+    "gpu": {
+      "dev_prefix": "cuda:0",
+      "dev_denoise": "cuda:0",
+      "reps": 30,
+      "kv_bytes": 4935921,
+      "kv_tensors": 33,
+      "graph_ok": true,
+      "graph_error": "",
+      "graph_vs_eager_max_abs_diff": 0.0,
+      "max_abs_diff_vs_first": 0.0
+    },
+    "gpu-gpu": {
+      "dev_prefix": "cuda:0",
+      "dev_denoise": "cuda:1",
+      "reps": 30,
+      "kv_bytes": 4935921,
+      "kv_tensors": 33,
+      "graph_ok": true,
+      "graph_error": "",
+      "graph_vs_eager_max_abs_diff": 0.0,
+      "max_abs_diff_vs_first": 0.0
+    },
+    "gpu-cpu": {
+      "dev_prefix": "cuda:0",
+      "dev_denoise": "cpu",
+      "reps": 5,
+      "kv_bytes": 4935921,
+      "kv_tensors": 33,
+      "graph_ok": false,
+      "graph_error": "",
+      "max_abs_diff_vs_first": 0.0005981326103210449
+    },
+    "cpu-gpu": {
+      "dev_prefix": "cpu",
+      "dev_denoise": "cuda:0",
+      "reps": 5,
+      "kv_bytes": 9871601,
+      "kv_tensors": 33,
+      "graph_ok": true,
+      "graph_error": "",
+      "graph_vs_eager_max_abs_diff": 0.0,
+      "max_abs_diff_vs_first": 0.38547271490097046
+    },
+    "cpu": {
+      "dev_prefix": "cpu",
+      "dev_denoise": "cpu",
+      "reps": 5,
+      "kv_bytes": 9871601,
+      "kv_tensors": 33,
+      "graph_ok": false,
+      "graph_error": "",
+      "max_abs_diff_vs_first": 0.3852487802505493
+    }
+  }
+}

@@ -1,0 +1,33 @@
+building smolvla on cuda:0
+Traceback (most recent call last):
+  File "/scratch/aj4762/vla-gpu-latency/workloads/placement.py", line 542, in <module>
+    main()
+  File "/scratch/aj4762/vla-gpu-latency/workloads/placement.py", line 467, in main
+    halves[d] = BUILDERS[args.model](torch.device(d), args)
+  File "/scratch/aj4762/vla-gpu-latency/workloads/placement.py", line 144, in build_smolvla
+    policy = SmolVLAPolicy.from_pretrained(MODEL_ID)
+  File "/scratch/aj4762/envs/smolvla/lib/python3.10/site-packages/lerobot/policies/pretrained.py", line 96, in from_pretrained
+    config = PreTrainedConfig.from_pretrained(
+  File "/scratch/aj4762/envs/smolvla/lib/python3.10/site-packages/lerobot/configs/policies.py", line 190, in from_pretrained
+    config_file = hf_hub_download(
+  File "/scratch/aj4762/envs/smolvla/lib/python3.10/site-packages/huggingface_hub/utils/_validators.py", line 114, in _inner_fn
+    return fn(*args, **kwargs)
+  File "/scratch/aj4762/envs/smolvla/lib/python3.10/site-packages/huggingface_hub/file_download.py", line 972, in hf_hub_download
+    hf_headers = build_hf_headers(
+  File "/scratch/aj4762/envs/smolvla/lib/python3.10/site-packages/huggingface_hub/utils/_deprecation.py", line 101, in inner_f
+    return f(*args, **kwargs)
+  File "/scratch/aj4762/envs/smolvla/lib/python3.10/site-packages/huggingface_hub/utils/_validators.py", line 114, in _inner_fn
+    return fn(*args, **kwargs)
+  File "/scratch/aj4762/envs/smolvla/lib/python3.10/site-packages/huggingface_hub/utils/_headers.py", line 126, in build_hf_headers
+    token_to_send = get_token_to_send(token)
+  File "/scratch/aj4762/envs/smolvla/lib/python3.10/site-packages/huggingface_hub/utils/_headers.py", line 154, in get_token_to_send
+    cached_token = get_token()
+  File "/scratch/aj4762/envs/smolvla/lib/python3.10/site-packages/huggingface_hub/utils/_auth.py", line 49, in get_token
+    return _get_token_from_google_colab() or _get_token_from_environment() or _get_token_from_file()
+  File "/scratch/aj4762/envs/smolvla/lib/python3.10/site-packages/huggingface_hub/utils/_auth.py", line 123, in _get_token_from_file
+    return _clean_token(Path(constants.HF_TOKEN_PATH).read_text())
+  File "/scratch/am16489/.uv-python/cpython-3.10-linux-x86_64-gnu/lib/python3.10/pathlib.py", line 1134, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+  File "/scratch/am16489/.uv-python/cpython-3.10-linux-x86_64-gnu/lib/python3.10/pathlib.py", line 1119, in open
+    return self._accessor.open(self, mode, buffering, encoding, errors,
+PermissionError: [Errno 13] Permission denied: '/scratch/aj4762/.cache/huggingface/token'
