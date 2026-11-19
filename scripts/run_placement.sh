@@ -6,6 +6,8 @@
 #   WORK=/scratch/$USER scripts/run_placement.sh            # all placements, default threads
 #   WORK=/scratch/$USER scripts/run_placement.sh threads    # + CPU thread sweep (1 4 8 all)
 #   WORK=/scratch/$USER scripts/run_placement.sh smoke      # toy model, 1 minute, no weights
+#   CUDA_VISIBLE_DEVICES=1 WORK=... scripts/run_placement.sh run --placements gpu
+#                                                   # colocated baseline on GPU 1 only (~3 min)
 #
 # GPU-GPU needs two idle GPUs (cuda2: 2x RTX 2080 Ti, cuda3: 2x TITAN V). With one GPU (cuda5)
 # that placement is skipped. The script refuses to start while another process is on a GPU it
@@ -72,7 +74,9 @@ smoke)
   one "${TMPDIR:-/tmp}/placement_smoke_$STAMP" --model toy --reps 5 --reps-cpu 3
   ;;
 run)
-  one "$BASE" --profile
+  # Extra arguments go to workloads/placement.py, e.g. `run --placements gpu` for a quick
+  # colocated baseline on whichever GPU CUDA_VISIBLE_DEVICES selects.
+  one "$BASE" --profile "${@:2}"
   ;;
 threads)
   one "$BASE" --profile
