@@ -14,6 +14,8 @@ Host `cuda3.cims.nyu.edu` (Intel(R) Xeon(R) Gold 5118 CPU @ 2.30GHz, 24 torch th
 
 `best` is e2e_hybrid where the denoise device is a GPU (CUDA graph), else e2e_eager.
 
+No drift check in this run (older script). Runs made before the fix of 2026-11-19 profiled each placement right after timing it, which slowed every later placement; compare only within a placement.
+
 ## Copy calibration
 
 | src | dst | per-tensor t0 (us) | bandwidth (GB/s) |

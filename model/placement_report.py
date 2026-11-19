@@ -27,11 +27,16 @@ COLOCATED = {"cuda:0": "gpu", "cuda:1": "gpu", "cpu": "cpu"}
 
 
 def fit_copy(calib: pd.DataFrame) -> dict[tuple[str, str], tuple[float, float]]:
-    """(src, dst) -> (t0_ms per tensor, bandwidth in bytes per ms)."""
+    """(src, dst) -> (t0_ms per tensor, bandwidth in bytes per ms). t0 is the per-copy cost of
+    32 small copies queued with one sync (the handoff pattern) when the run measured it, else
+    the single synced 4 KB copy (older runs; overstates t0 for async GPU-GPU copies)."""
+    if "batch" not in calib.columns:
+        calib = calib.assign(batch=1)
     out = {}
     for (src, dst), g in calib.groupby(["src", "dst"]):
-        g = g.sort_values("bytes")
-        t0 = float(g.median_ms.iloc[0])
+        b = g[g.batch > 1]
+        g = g[g.batch == 1].sort_values("bytes")
+        t0 = float(b.median_ms.iloc[0]) if len(b) else float(g.median_ms.iloc[0])
         big = g[g.bytes >= 16 << 20]
         x, y = big.bytes.astype(float), big.median_ms.astype(float)
         slope = ((x - x.mean()) * (y - y.mean())).sum() / ((x - x.mean()) ** 2).sum()
@@ -101,6 +106,25 @@ def main() -> None:
         "`best` is e2e_hybrid where the denoise device is a GPU (CUDA graph), else e2e_eager.",
         "",
     ]
+    first = next(iter(meta["placements"]))
+    e0, e1 = get(first, "e2e_eager"), get(first, "e2e_eager_repeat")
+    if e0 and e1:
+        ok = abs(e1 - e0) / e0 < 0.03
+        lines += [
+            f"Drift check: `{first}` e2e_eager {e0:.1f} ms first, {e1:.1f} ms after all other "
+            f"placements ({pct(e1, e0)}). "
+            + ("Within 3%: placements are comparable." if ok else
+               "**More than 3%: later placements ran under different conditions; treat "
+               "cross-placement comparisons with care.**"),
+            "",
+        ]
+    else:
+        lines += [
+            "No drift check in this run (older script). Runs made before the fix of "
+            "2026-11-19 profiled each placement right after timing it, which slowed every "
+            "later placement; compare only within a placement.",
+            "",
+        ]
 
     fits = fit_copy(calib) if len(calib) else {}
     if fits:

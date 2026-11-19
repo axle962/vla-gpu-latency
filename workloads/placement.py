@@ -291,7 +291,10 @@ def capture_graph(half: Half, pad, kv):
                 half.denoise(static_pad, static_kv, static_x)
         torch.cuda.current_stream(half.dev).wait_stream(s)
         torch.cuda.synchronize(half.dev)
-        with torch.cuda.graph(g):
+        # torch.cuda.graph's default capture stream is one per process, created on the device
+        # that captured first (cuda:0); capturing cuda:1 work on it invalidates the capture.
+        cs = torch.cuda.Stream(device=half.dev)
+        with torch.cuda.graph(g, stream=cs):
             static_out = half.denoise(static_pad, static_kv, static_x)
     return g, static_pad, static_kv, static_out
 
@@ -308,6 +311,16 @@ def copy_calibration(pairs: set[tuple[str, str]], reps: int) -> list[dict]:
                 "median_ms": statistics.median(t),
             })
             del x
+        # Per-copy cost when 32 small copies are queued with one sync at the end, as in the
+        # KV handoff (the single-copy rows above include a full sync per copy).
+        xs = [torch.zeros(2048, dtype=torch.float16, device=s) for _ in range(32)]
+        t = timed(lambda xs=xs, d=d: [x.to(d) for x in xs], (s, d), 3, reps)
+        rows.append({
+            "src": src, "dst": dst, "bytes": 4 << 10, "n": reps,
+            "median_ms": statistics.median(t) / 32, "batch": 32,
+        })
+    for r in rows:
+        r.setdefault("batch", 1)
     return rows
 
 
@@ -371,23 +384,29 @@ def run_placement(name: str, a: Half, b: Half, args, lat: list[dict]) -> dict:
         ]
         print(f"[{name}] {mode:14s} median {statistics.median(t):9.3f} ms  (n={reps})", flush=True)
 
-    if args.profile:
-        from torch.profiler import ProfilerActivity, profile, record_function
-
-        acts = [ProfilerActivity.CPU]
-        if "cuda" in (a.dev.type, b.dev.type):
-            acts.append(ProfilerActivity.CUDA)
-        p = Path(args.out) / f"trace_{name}.json"
-        with profile(activities=acts, record_shapes=True) as prof:
-            for i in range(2):
-                with record_function(f"vla_step_{i}"):
-                    e2e_eager()
-                sync(*devs)
-        prof.export_chrome_trace(str(p))
-        with open(p, "rb") as f, gzip.open(str(p) + ".gz", "wb") as z:
-            z.write(f.read())
-        p.unlink()
+    info["e2e_eager_fn"] = e2e_eager
     return info
+
+
+def profile_placement(name: str, fn: Callable[[], object], devs: tuple, out: Path) -> None:
+    """torch.profiler trace of 2 end-to-end steps. Runs only after every placement has been
+    timed: CUPTI stays active after a profiler session and slows later timings (first cuda3
+    run: prefix 59 -> 68 ms, eager loop 280 -> 349 ms, graph loop 66.5 -> 72.9 ms)."""
+    from torch.profiler import ProfilerActivity, profile, record_function
+
+    acts = [ProfilerActivity.CPU]
+    if any(d.type == "cuda" for d in devs):
+        acts.append(ProfilerActivity.CUDA)
+    p = out / f"trace_{name}.json"
+    with profile(activities=acts, record_shapes=True) as prof:
+        for i in range(2):
+            with record_function(f"vla_step_{i}"):
+                fn()
+            sync(*devs)
+    prof.export_chrome_trace(str(p))
+    with open(p, "rb") as f, gzip.open(str(p) + ".gz", "wb") as z:
+        z.write(f.read())
+    p.unlink()
 
 
 def cpu_model() -> str:
@@ -457,8 +476,28 @@ def main() -> None:
         info["max_abs_diff_vs_first"] = (o - ref).abs().max().item()
         infos[p] = info
 
+    # Drift check: time the first placement's end-to-end step again after all the others. A
+    # large change means something left over from later placements (CPU threads, memory,
+    # clocks) affected the timings, and the comparison across placements is not clean.
+    first = todo[0]
+    devs0 = tuple(torch.device(d) for d in PLACEMENTS[first])
+    reps0 = args.reps_cpu if any(d.type == "cpu" for d in devs0) else args.reps
+    t = timed(infos[first]["e2e_eager_fn"], devs0, min(args.warmup, reps0), reps0)
+    lat += [
+        {"placement": first, "mode": "e2e_eager_repeat", "step": i, "wall_ms": v}
+        for i, v in enumerate(t)
+    ]
+    print(f"[{first}] e2e_eager_repeat median {statistics.median(t):9.3f} ms (drift check)")
+
     pairs = {PLACEMENTS[p] for p in todo if PLACEMENTS[p][0] != PLACEMENTS[p][1]}
     calib = copy_calibration(pairs, 10)
+
+    if args.profile:
+        for p in todo:
+            devs = tuple(torch.device(d) for d in PLACEMENTS[p])
+            profile_placement(p, infos[p]["e2e_eager_fn"], devs, out)
+    for info in infos.values():
+        info.pop("e2e_eager_fn")
 
     import pandas as pd
 
@@ -472,7 +511,7 @@ def main() -> None:
     summ.insert(1, "dev_prefix", summ.placement.map(lambda p: PLACEMENTS[p][0]))
     summ.insert(2, "dev_denoise", summ.placement.map(lambda p: PLACEMENTS[p][1]))
     summ.to_csv(out / "summary.csv", index=False)
-    pd.DataFrame(calib, columns=["src", "dst", "bytes", "n", "median_ms"]).to_csv(
+    pd.DataFrame(calib, columns=["src", "dst", "bytes", "n", "median_ms", "batch"]).to_csv(
         out / "copy_calib.csv", index=False
     )
     meta = {
