@@ -22,7 +22,8 @@ export HF_HOME="$WORK/.cache/huggingface" HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=
 export CUDA_MODULE_LOADING=EAGER
 # A shared $HF_HOME (symlinked to a teammate's cache) holds their private token file, which
 # huggingface_hub tries to read even offline; point it at a file of our own instead.
-if [[ -e $HF_HOME/token && ! -r $HF_HOME/token ]]; then
+# (-e is false when the token is a link into a home directory we cannot enter, so test -r.)
+if [[ -z ${HF_TOKEN_PATH:-} && ! -r $HF_HOME/token ]]; then
   export HF_TOKEN_PATH="$WORK/.hf_token_unused"
 fi
 [[ -x "$PY" ]] || { echo "no $PY: run scripts/run_cuda2.sh setup first"; exit 1; }
