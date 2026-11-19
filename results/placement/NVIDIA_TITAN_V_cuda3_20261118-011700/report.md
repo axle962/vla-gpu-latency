@@ -32,6 +32,8 @@ No drift check in this run (older script). Runs made before the fix of 2026-11-1
 | gpu-cpu | 4.9 | 33 | 3.93 | 3.55 | +10.9% | 1007.5 | 1056.3 | -4.6% |  |  |  |
 | cpu-gpu | 9.9 | 33 | 3.33 | 4.29 | -22.2% | 2280.5 | 2431.1 | -6.2% | 2066.6 | 2111.8 | -2.1% |
 
+Colocated baselines: all from this run (a second GPU is assumed as fast as cuda:0).
+
 ## Additivity inside each placement
 
 | placement | sum of parts | e2e_eager | gap |

@@ -61,6 +61,11 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("run", help="results/placement/<run> directory")
     ap.add_argument("--out", default=None)
+    ap.add_argument(
+        "--device-baseline", action="append", default=[], metavar="DEV=RUN",
+        help="take the colocated baseline for DEV (e.g. cuda:1) from the `gpu` placement of "
+        "another run made with only that GPU visible; needed when the two GPUs differ in speed",
+    )
     args = ap.parse_args()
     run = Path(args.run)
     summ = pd.read_csv(run / "summary.csv")
@@ -68,6 +73,20 @@ def main() -> None:
     meta = json.loads((run / "meta.json").read_text())
     med = summ.pivot(index="placement", columns="mode", values="median_ms")
     med = med.reindex([p for p in meta["placements"] if p in med.index])
+
+    ext: dict[str, pd.DataFrame] = {}
+    for spec in args.device_baseline:
+        dev, d = spec.split("=", 1)
+        s2 = pd.read_csv(Path(d) / "summary.csv")
+        ext[dev] = s2[s2.placement == "gpu"].set_index("mode").median_ms
+
+    def colocated(dev: str, mode: str) -> float | None:
+        """Time of `mode` with both halves on dev: from --device-baseline if given, else from
+        this run's colocated placement (cuda:1 then reuses cuda:0's numbers)."""
+        if dev in ext:
+            v = ext[dev].get(mode)
+            return None if v is None or pd.isna(v) else float(v)
+        return get(COLOCATED[dev], mode)
 
     def get(p: str, mode: str) -> float | None:
         if p in med.index and mode in med.columns and pd.notna(med.loc[p, mode]):
@@ -154,12 +173,12 @@ def main() -> None:
                 "handoff meas": f"{hand:.2f}" if hand else "",
                 "err": pct(hand_pred, hand) if hand else "",
             }
-            pre = get(COLOCATED[a], "prefix")
+            pre = colocated(a, "prefix")
             for label, part, e2e in (
                 ("eager", "denoise_eager", "e2e_eager"),
                 ("hybrid", "denoise_graph", "e2e_hybrid"),
             ):
-                den, meas = get(COLOCATED[b], part), get(p, e2e)
+                den, meas = colocated(b, part), get(p, e2e)
                 if pre is None or den is None or meas is None:
                     r[f"{label} pred"] = r[f"{label} meas"] = r[f"{label} err"] = ""
                     continue
@@ -170,6 +189,14 @@ def main() -> None:
             rows.append(r)
         if rows:
             lines += [md(pd.DataFrame(rows)), ""]
+            base = ", ".join(f"{k} from `{v}`" for k, v in
+                             (x.split("=", 1) for x in args.device_baseline))
+            lines += [
+                "Colocated baselines: "
+                + (base + "; others from this run." if base else
+                   "all from this run (a second GPU is assumed as fast as cuda:0)."),
+                "",
+            ]
         else:
             lines += ["No split placement with its colocated baselines in this run.", ""]
 

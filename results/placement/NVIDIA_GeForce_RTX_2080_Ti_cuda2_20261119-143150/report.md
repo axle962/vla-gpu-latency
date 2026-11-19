@@ -28,9 +28,11 @@ Drift check: `gpu` e2e_eager 481.9 ms first, 497.7 ms after all other placements
 
 | placement | KV MB | tensors | handoff pred | handoff meas | err | eager pred | eager meas | eager err | hybrid pred | hybrid meas | hybrid err |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| gpu-gpu | 4.9 | 33 | 1.98 | 1.54 | +28.9% | 482.5 | 496.0 | -2.7% | 135.4 | 120.6 | +12.3% |
+| gpu-gpu | 4.9 | 33 | 1.98 | 1.54 | +28.9% | 483.7 | 496.0 | -2.5% | 120.8 | 120.6 | +0.2% |
 | gpu-cpu | 4.9 | 33 | 3.00 | 2.74 | +9.5% | 745.1 | 737.5 | +1.0% |  |  |  |
 | cpu-gpu | 9.9 | 33 | 1.64 | 3.20 | -48.6% | 2088.3 | 2040.4 | +2.3% | 1741.1 | 1750.7 | -0.5% |
+
+Colocated baselines: cuda:1 from `results/placement/NVIDIA_GeForce_RTX_2080_Ti_cuda2_20261119-153552`; others from this run.
 
 ## Additivity inside each placement
 
