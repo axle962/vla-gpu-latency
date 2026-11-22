@@ -1,0 +1,106 @@
+{
+  "per_task": [
+    {
+      "task_group": "stack_blocks_two",
+      "task_id": 0,
+      "metrics": {
+        "sum_rewards": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "max_rewards": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "successes": [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ],
+        "video_paths": [
+          "/scratch/am16489/vla-gpu-latency/results/robotwin/screen_stack_blocks_two_d0_34881/videos/stack_blocks_two_0/eval_episode_0.mp4",
+          "/scratch/am16489/vla-gpu-latency/results/robotwin/screen_stack_blocks_two_d0_34881/videos/stack_blocks_two_0/eval_episode_1.mp4",
+          "/scratch/am16489/vla-gpu-latency/results/robotwin/screen_stack_blocks_two_d0_34881/videos/stack_blocks_two_0/eval_episode_2.mp4",
+          "/scratch/am16489/vla-gpu-latency/results/robotwin/screen_stack_blocks_two_d0_34881/videos/stack_blocks_two_0/eval_episode_3.mp4",
+          "/scratch/am16489/vla-gpu-latency/results/robotwin/screen_stack_blocks_two_d0_34881/videos/stack_blocks_two_0/eval_episode_4.mp4",
+          "/scratch/am16489/vla-gpu-latency/results/robotwin/screen_stack_blocks_two_d0_34881/videos/stack_blocks_two_0/eval_episode_5.mp4",
+          "/scratch/am16489/vla-gpu-latency/results/robotwin/screen_stack_blocks_two_d0_34881/videos/stack_blocks_two_0/eval_episode_6.mp4",
+          "/scratch/am16489/vla-gpu-latency/results/robotwin/screen_stack_blocks_two_d0_34881/videos/stack_blocks_two_0/eval_episode_7.mp4"
+        ],
+        "predicted_video_paths": []
+      },
+      "n_episodes": 8,
+      "n_success": 0,
+      "pc_success": 0.0,
+      "pc_success_ci95": [
+        0.0,
+        32.44075648838801
+      ]
+    }
+  ],
+  "per_group": {
+    "stack_blocks_two": {
+      "avg_sum_reward": 0.0,
+      "avg_max_reward": 0.0,
+      "pc_success": 0.0,
+      "n_episodes": 8,
+      "n_success": 0,
+      "pc_success_ci95": [
+        0.0,
+        32.44075648838801
+      ],
+      "video_paths": [
+        "/scratch/am16489/vla-gpu-latency/results/robotwin/screen_stack_blocks_two_d0_34881/videos/stack_blocks_two_0/eval_episode_0.mp4",
+        "/scratch/am16489/vla-gpu-latency/results/robotwin/screen_stack_blocks_two_d0_34881/videos/stack_blocks_two_0/eval_episode_1.mp4",
+        "/scratch/am16489/vla-gpu-latency/results/robotwin/screen_stack_blocks_two_d0_34881/videos/stack_blocks_two_0/eval_episode_2.mp4",
+        "/scratch/am16489/vla-gpu-latency/results/robotwin/screen_stack_blocks_two_d0_34881/videos/stack_blocks_two_0/eval_episode_3.mp4",
+        "/scratch/am16489/vla-gpu-latency/results/robotwin/screen_stack_blocks_two_d0_34881/videos/stack_blocks_two_0/eval_episode_4.mp4",
+        "/scratch/am16489/vla-gpu-latency/results/robotwin/screen_stack_blocks_two_d0_34881/videos/stack_blocks_two_0/eval_episode_5.mp4",
+        "/scratch/am16489/vla-gpu-latency/results/robotwin/screen_stack_blocks_two_d0_34881/videos/stack_blocks_two_0/eval_episode_6.mp4",
+        "/scratch/am16489/vla-gpu-latency/results/robotwin/screen_stack_blocks_two_d0_34881/videos/stack_blocks_two_0/eval_episode_7.mp4"
+      ],
+      "predicted_video_paths": []
+    }
+  },
+  "overall": {
+    "avg_sum_reward": 0.0,
+    "avg_max_reward": 0.0,
+    "pc_success": 0.0,
+    "n_episodes": 8,
+    "n_success": 0,
+    "pc_success_ci95": [
+      0.0,
+      32.44075648838801
+    ],
+    "eval_s": 5285.985823631287,
+    "eval_ep_s": 660.7482280433178,
+    "video_paths": [
+      "/scratch/am16489/vla-gpu-latency/results/robotwin/screen_stack_blocks_two_d0_34881/videos/stack_blocks_two_0/eval_episode_0.mp4",
+      "/scratch/am16489/vla-gpu-latency/results/robotwin/screen_stack_blocks_two_d0_34881/videos/stack_blocks_two_0/eval_episode_1.mp4",
+      "/scratch/am16489/vla-gpu-latency/results/robotwin/screen_stack_blocks_two_d0_34881/videos/stack_blocks_two_0/eval_episode_2.mp4",
+      "/scratch/am16489/vla-gpu-latency/results/robotwin/screen_stack_blocks_two_d0_34881/videos/stack_blocks_two_0/eval_episode_3.mp4",
+      "/scratch/am16489/vla-gpu-latency/results/robotwin/screen_stack_blocks_two_d0_34881/videos/stack_blocks_two_0/eval_episode_4.mp4",
+      "/scratch/am16489/vla-gpu-latency/results/robotwin/screen_stack_blocks_two_d0_34881/videos/stack_blocks_two_0/eval_episode_5.mp4",
+      "/scratch/am16489/vla-gpu-latency/results/robotwin/screen_stack_blocks_two_d0_34881/videos/stack_blocks_two_0/eval_episode_6.mp4",
+      "/scratch/am16489/vla-gpu-latency/results/robotwin/screen_stack_blocks_two_d0_34881/videos/stack_blocks_two_0/eval_episode_7.mp4"
+    ],
+    "predicted_video_paths": []
+  }
+}

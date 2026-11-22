@@ -1,0 +1,98 @@
+{
+  "per_task": [
+    {
+      "task_group": "libero_10",
+      "task_id": 2,
+      "metrics": {
+        "sum_rewards": [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "max_rewards": [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "successes": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+        ],
+        "video_paths": [
+          "/scratch/am16489/tmp/libero_benchmark/libero_10/pi05_libero_finetuned_cuda5/task2/videos/libero_10_2/eval_episode_0.mp4",
+          "/scratch/am16489/tmp/libero_benchmark/libero_10/pi05_libero_finetuned_cuda5/task2/videos/libero_10_2/eval_episode_1.mp4",
+          "/scratch/am16489/tmp/libero_benchmark/libero_10/pi05_libero_finetuned_cuda5/task2/videos/libero_10_2/eval_episode_2.mp4",
+          "/scratch/am16489/tmp/libero_benchmark/libero_10/pi05_libero_finetuned_cuda5/task2/videos/libero_10_2/eval_episode_3.mp4",
+          "/scratch/am16489/tmp/libero_benchmark/libero_10/pi05_libero_finetuned_cuda5/task2/videos/libero_10_2/eval_episode_4.mp4",
+          "/scratch/am16489/tmp/libero_benchmark/libero_10/pi05_libero_finetuned_cuda5/task2/videos/libero_10_2/eval_episode_5.mp4",
+          "/scratch/am16489/tmp/libero_benchmark/libero_10/pi05_libero_finetuned_cuda5/task2/videos/libero_10_2/eval_episode_6.mp4",
+          "/scratch/am16489/tmp/libero_benchmark/libero_10/pi05_libero_finetuned_cuda5/task2/videos/libero_10_2/eval_episode_7.mp4",
+          "/scratch/am16489/tmp/libero_benchmark/libero_10/pi05_libero_finetuned_cuda5/task2/videos/libero_10_2/eval_episode_8.mp4",
+          "/scratch/am16489/tmp/libero_benchmark/libero_10/pi05_libero_finetuned_cuda5/task2/videos/libero_10_2/eval_episode_9.mp4"
+        ]
+      }
+    }
+  ],
+  "per_group": {
+    "libero_10": {
+      "avg_sum_reward": 1.0,
+      "avg_max_reward": 1.0,
+      "pc_success": 100.0,
+      "n_episodes": 10,
+      "video_paths": [
+        "/scratch/am16489/tmp/libero_benchmark/libero_10/pi05_libero_finetuned_cuda5/task2/videos/libero_10_2/eval_episode_0.mp4",
+        "/scratch/am16489/tmp/libero_benchmark/libero_10/pi05_libero_finetuned_cuda5/task2/videos/libero_10_2/eval_episode_1.mp4",
+        "/scratch/am16489/tmp/libero_benchmark/libero_10/pi05_libero_finetuned_cuda5/task2/videos/libero_10_2/eval_episode_2.mp4",
+        "/scratch/am16489/tmp/libero_benchmark/libero_10/pi05_libero_finetuned_cuda5/task2/videos/libero_10_2/eval_episode_3.mp4",
+        "/scratch/am16489/tmp/libero_benchmark/libero_10/pi05_libero_finetuned_cuda5/task2/videos/libero_10_2/eval_episode_4.mp4",
+        "/scratch/am16489/tmp/libero_benchmark/libero_10/pi05_libero_finetuned_cuda5/task2/videos/libero_10_2/eval_episode_5.mp4",
+        "/scratch/am16489/tmp/libero_benchmark/libero_10/pi05_libero_finetuned_cuda5/task2/videos/libero_10_2/eval_episode_6.mp4",
+        "/scratch/am16489/tmp/libero_benchmark/libero_10/pi05_libero_finetuned_cuda5/task2/videos/libero_10_2/eval_episode_7.mp4",
+        "/scratch/am16489/tmp/libero_benchmark/libero_10/pi05_libero_finetuned_cuda5/task2/videos/libero_10_2/eval_episode_8.mp4",
+        "/scratch/am16489/tmp/libero_benchmark/libero_10/pi05_libero_finetuned_cuda5/task2/videos/libero_10_2/eval_episode_9.mp4"
+      ]
+    }
+  },
+  "overall": {
+    "avg_sum_reward": 1.0,
+    "avg_max_reward": 1.0,
+    "pc_success": 100.0,
+    "n_episodes": 10,
+    "eval_s": 265.2382526397705,
+    "eval_ep_s": 26.523825454711915,
+    "video_paths": [
+      "/scratch/am16489/tmp/libero_benchmark/libero_10/pi05_libero_finetuned_cuda5/task2/videos/libero_10_2/eval_episode_0.mp4",
+      "/scratch/am16489/tmp/libero_benchmark/libero_10/pi05_libero_finetuned_cuda5/task2/videos/libero_10_2/eval_episode_1.mp4",
+      "/scratch/am16489/tmp/libero_benchmark/libero_10/pi05_libero_finetuned_cuda5/task2/videos/libero_10_2/eval_episode_2.mp4",
+      "/scratch/am16489/tmp/libero_benchmark/libero_10/pi05_libero_finetuned_cuda5/task2/videos/libero_10_2/eval_episode_3.mp4",
+      "/scratch/am16489/tmp/libero_benchmark/libero_10/pi05_libero_finetuned_cuda5/task2/videos/libero_10_2/eval_episode_4.mp4",
+      "/scratch/am16489/tmp/libero_benchmark/libero_10/pi05_libero_finetuned_cuda5/task2/videos/libero_10_2/eval_episode_5.mp4",
+      "/scratch/am16489/tmp/libero_benchmark/libero_10/pi05_libero_finetuned_cuda5/task2/videos/libero_10_2/eval_episode_6.mp4",
+      "/scratch/am16489/tmp/libero_benchmark/libero_10/pi05_libero_finetuned_cuda5/task2/videos/libero_10_2/eval_episode_7.mp4",
+      "/scratch/am16489/tmp/libero_benchmark/libero_10/pi05_libero_finetuned_cuda5/task2/videos/libero_10_2/eval_episode_8.mp4",
+      "/scratch/am16489/tmp/libero_benchmark/libero_10/pi05_libero_finetuned_cuda5/task2/videos/libero_10_2/eval_episode_9.mp4"
+    ]
+  }
+}

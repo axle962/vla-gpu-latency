@@ -40,7 +40,7 @@ commit and push (or tar) the results. Never run GPU work on the `access` gateway
 
 ---
 
-## 0.1 Resume here (updated 2026-11-12 ~22:30)
+## 0.1 Resume here (updated 2026-11-17)
 
 State:
 - **Calibration done on A100** (`results/calib/NVIDIA_A100*`, two nodes; launch numbers agree
@@ -521,6 +521,27 @@ State:
     every policy at d = 2 to 5 on every GPU, eager at d = 7 to 15: e.g. pi0.5 on the RTX 4070
     65% eager vs 76% with graphs, pi0 25% vs 35%; for SmolVLA the difference is small (44 to 48%
     vs ~50%). Graphs matter for task success where the policy is delay sensitive.
+- **LIBERO with the published protocol (2026-11-16 to 18, Claude Code on cuda2):**
+  - Benchmark reproduction, official `lerobot-eval`, LIBERO-10, `--policy.n_action_steps=10`,
+    10 episodes per task, one task per call (`scripts/libero_benchmark.sh`; all tasks at once
+    builds one EGL context per task and overflows 12 GB GPUs): pi0.5 94% (published checkpoint
+    `lerobot/pi05_libero_finetuned`) / 95% (`_v044`) vs 96% published; SmolVLA 71%, pi0 49%
+    (`results/libero_benchmark/`). The earlier sweep's low numbers came from the default
+    50-action open-loop horizon.
+  - Delay sweep with H = 10 (`EXEC_HORIZON=10 scripts/run_libero.sh`, files `*_h10_*`; for
+    d >= H the robot holds still until the result arrives), success at d = 0 / 2 / 4 / 6 / 8 /
+    10 / 15 steps (0 to 750 ms): SmolVLA 69 / 63 / 68 / 65 / 64 / 55 / 43%, pi0 44 / 51 / 46 /
+    44 / 42 / 39 / 26%, pi0.5 91 / 94 / 95 / 92 / 88 / 84 / 64%. Flat up to ~300 ms, then a
+    drop once the delay reaches the replanning interval; paired McNemar significant at d = 15
+    for all three and at d = 10 for SmolVLA. Measured latencies: graphs put every policy at
+    d = 2 to 5 (pi0.5 93.5%, pi0 45 to 46%, SmolVLA 63 to 66% on every GPU), eager at d = 7 to
+    15 (pi0.5 64 to 86%, pi0 32 to 42%, SmolVLA 48 to 65%): on the RTX 4070, graphs are worth
+    +30 points for pi0.5 and +18 for SmolVLA. `results/libero_analysis.md` covers both horizons.
+  - Fresh-clone reproducibility check on cuda2 (`scripts/cims_final.sh repro`, clone in
+    `/scratch/am16489/repro`): build, calibration (launch chains within 0.3% of 2026-11-12),
+    all 25 correctness checks, and the C++ bench (10-step graph chain 39.2 vs 39.4 ms) pass.
+    Two earlier bench attempts shared GPU 0 with another user's job and were discarded.
+  - `lerobot/smolvla_robotwin` traced on the three CIMS GPUs: times like smolvla_base.
 - **Not done:** RoboTwin 2.0 success evaluation (needs Docker or GPU Podman/CDI, neither on CIMS;
   native build = CuRobo + pytorch3d against torch 2.7.1); a latency trace of
   `lerobot/smolvla_robotwin` at RoboTwin shapes is possible without the simulator. MolmoSpaces
@@ -592,20 +613,95 @@ State:
     (it was trained at 480x640; the simulator default is 240x320). **Cost: 430 s per episode
     on one A100** (36 min for 5; episodes run up to 1200 steps), so 100 episodes ~12 GPU-h per
     (task, delay) point: the plan's 5 to 15 GPU-h covers about one point, not a delay sweep.
-    Not started: delay model port (lerobot 0.7 rollout), parallel envs (`eval.batch_size` > 1;
-    the A100 node has 12 CPUs), the RoboTwin-shape latency trace. Waiting for the user to pick
-    the scope.
+  - **User chose (2026-11-16): throughput test first, then a firm estimate before any sweep.**
+    Parallel envs (job 34318, `EVAL_BATCH=4`, 12 CPUs / 80 GB requested,
+    `results/robotwin/tput4_34318/`): 8 episodes in 1975 s = **247 s per episode** (1.74x vs
+    serial; a batch runs until its slowest episode ends), 6 / 8 success. Together with the smoke
+    test: 8 / 13 at d = 0.
+  - **Delay model ported:** `workloads/robotwin_delay_eval.py` runs lerobot 0.7's own
+    `lerobot-eval` and only wraps the policy returned by `make_policy` (same model as
+    `libero_eval.py`; torch reseeded per rollout for paired noise; writes `delay_info.json`
+    with inference count/times). `ROBOTWIN_DELAY=d` in `robotwin_eval.sbatch` switches to it.
+    `workloads/test_robotwin_delay.py` (CPU) checks it step for step against the LIBERO loop
+    for d = 0, 1, 5, 20: passes. Note: with a 50-action chunk and horizon 50, a delayed chunk
+    starts at index d, so only 50 - d of its actions run and planning happens every 50 - d
+    steps (same in the LIBERO harness). Not yet run on the GPU. RoboTwin runs at 25 Hz, so
+    d control steps = 40 ms each (LIBERO: 50 ms).
+  - **RoboTwin delay sweep submitted 2026-11-17 00:05 (user chose 100 episodes per delay,
+    ~28 GPU-h):** SmolVLA, `beat_block_hammer`, d = 0 / 3 / 10 / 20 (0 / 120 / 400 / 800 ms;
+    ~3 is the graph-mode latency, ~10 eager on the A100), 4 parallel envs. Per delay two jobs:
+    52 episodes (`EVAL_SEED=1000`, `ROBOTWIN_NOISE_SEED=10000`) and 48 episodes (1052, 20000),
+    identical across delays (paired). Jobs 34666/34667 (d=0), 34668/34669 (3), 34670/34671 (10),
+    34672/34673 (20); outputs `results/robotwin/sweep_d<d>_s<seed>_<job>/`, logs
+    `logs/rtw-d<d>-s<seed>-<job>.out`. 34672 was requeued after a failed boot, cancelled and
+    rerun as 34689.
+  - **RoboTwin sweep done 2026-11-17** (`model/robotwin_analysis.py` ->
+    `results/robotwin_analysis.md`; ~33 GPU-h including the 4 parallel envs' wall time, 217 to
+    330 s per episode). Success at d = 0 / 3 / 10 / 20 (0 / 120 / 400 / 800 ms): **63 / 63 / 70 /
+    73%**, 100 paired episodes each, paired McNemar vs d = 0 p = 1.0 / 0.4 / 0.2. **Delay does not
+    hurt on beat_block_hammer** (unlike LIBERO-Long), so graphs buy no task success here.
+    Confound: larger d also replans every 50 - d steps (more feedback); a control (replan every
+    50 - d steps, no delay) would separate them. Outcomes are noisy: only 29 of 100 seeds have
+    the same outcome at every d. One slow quasi-static task only. In-harness eager policy call
+    on the A100: ~328 ms (d ~ 9); the graph-mode hybrid (~95 ms) is d = 3. Sweep videos (first 10
+    episodes per job, ~28 MB) are git-ignored and stay on /scratch.
+  - **RoboTwin round 2 done 2026-11-17** (jobs 34876 to 34883, ~18.5 GPU-h, no requeues):
+    - **Replanning control** (`ROBOTWIN_DELAY=0 ROBOTWIN_EXEC_H=H`, `results/robotwin/ctrl_h{40,30}_*`):
+      replanning every 40 / 30 steps with no delay gives 70 / 72%, vs 70 / 73% for d = 10 / 20,
+      which plan at the same steps. Paired discordant pairs delay vs control 15/15 and 13/14
+      (p = 1.0). **Staleness up to 800 ms costs nothing on beat_block_hammer**; the small rise
+      with d is the replanning rate (vs d = 0: p = 0.35 / 0.22, not significant).
+    - **Task screen** (d = 0, 8 episodes, `results/robotwin/screen_*`): handover_block 1/8,
+      stack_blocks_two 0/8, lift_pot 5/8 (427 s per episode, so ~12 GPU-h per 100-episode
+      point). lift_pot is the only candidate for a second delay study (not run; user decides).
+    - **Latency trace** of `lerobot/smolvla_robotwin` (job 34883, `traces/smolvlarobotwin_cam3_steps10_chunk50/`;
+      `trace_smolvla.py --model`, which drops config keys lerobot 0.4.4 does not know): 480x640
+      x 3 cameras, state 14, same latency as the base model (eager 378, prefix 58, graph loop
+      35.4, hybrid 94 ms; bit-exact).
+    - `model/robotwin_analysis.py` now has control and screen sections.
+  - **lift_pot delay study submitted 2026-11-17 ~15:00 (user approved, ~36 GPU-h):** d = 0, d = 20
+    and control H = 30 (`ROBOTWIN_EXEC_H=30`, no delay), 100 paired episodes each, split in four
+    seed blocks so each job fits 6 h: seeds 1000 (28 episodes, noise 10000), 1028 (24, 20000),
+    1052 (24, 30000), 1076 (24, 40000). Jobs 35039 to 35050 (per block: d0, d20, ctrlh30);
+    outputs `results/robotwin/lift_pot_{d0,d20,ctrlh30}_s<seed>_<job>/`, logs
+    `logs/lp-<cond>-s<seed>-<job>.out`. `model/robotwin_analysis.py` reports it per task once
+    finished (resubmit any block that requeues or fails, same env vars).
+    **Status 2026-11-17 evening:** 35043/35044/35046/35047/35049 died at node boot
+    (`CANCELLED by 0`, ~11 to 15 min each) and were resubmitted as 35290 (d20 s1028), 35291
+    (ctrlh30 s1028), 35292 (d20 s1052), 35293 (ctrlh30 s1052), 35294 (d20 s1076); env
+    `EVAL_BATCH=4 EVAL_SEED=<seed> ROBOTWIN_NOISE_SEED=<noise> ROBOTWIN_DELAY=<0|20>
+    [ROBOTWIN_EXEC_H=30]`, plus `-A csci_ga_3033_025-2026fa` (sbatch from the OOD shell needs it
+    even after `source site.sh`). Done so far: d0 s1000 14/28, s1028 12/24, s1052 11/24;
+    ctrlh30 s1000 12/28. lift_pot runs ~510 s per episode with 4 envs (slower than the screen
+    suggested), so a 24-episode block takes ~3.5 to 4.5 h.
+    **lift_pot done 2026-11-18 01:15** (all 12 blocks, ~43 GPU-h incl. failed boots;
+    `results/robotwin_analysis.md`, "Reading (lift_pot)"): d = 0 45%, d = 20 (800 ms) 40%
+    (12 lost / 7 gained, p = 0.4), control H = 30 40%; delay vs control 8/8 (p = 1.0).
+    Staleness costs nothing on lift_pot either; both RoboTwin tasks say SmolVLA's success is
+    insensitive to delay up to 800 ms (LIBERO-Long is where delay hurts). Run the analysis with
+    `envs/smolvla/bin/python model/robotwin_analysis.py > results/robotwin_analysis.md`
+    (system python has no numpy). Team status page: `docs/status_2026-11-17.{html,pdf}`
+    (artifact https://claude.ai/artifact/J7Y2PKjshfJbY6D6YNVV7D).
 - **Next:**
   1. Paper and slides (deferred by the user until the teammates' work is merged): move the
      headline to `slot_drv` on four GPUs, add ACT/Diffusion (three regimes: dispatch bound,
      mixed, GPU bound) and the cuDNN algorithm-selection finding; verify bibliography; compile
      on Overleaf.
-  2. RoboTwin: scope decision (see the smoke-test bullet), then delay sweep and latency trace.
+  2. RoboTwin: done (beat_block_hammer and lift_pot). Optional: a delay-sensitive task.
   3. Optional: spec-only what-if predictions for H100/H200/L40S remain a stated limitation.
-- GPU-hours used on `csci_ga_3033_025-2026fa`: 4.81 of 300 (2026-11-16).
-- Pending for the user (CIMS): see "Needs the user" in section 1 and the cuda2 commands in
-  section 6. The user asked for a full "what to run on cuda machines and elsewhere" list once
-  the cluster runs are finished.
+- GPU-hours used on `csci_ga_3033_025-2026fa`: 109.5 of 300 (2026-11-18, `sacct -D` tally). Nothing queued.
+- **Run list (2026-11-17, all planned measurements are done; everything below is optional or
+  administrative):**
+  - CIMS: final reproducibility check from a fresh clone on cuda2 (`git pull`, `module load
+    cuda-12.4`, `make -C bench`, `scripts/run_calib.sh`, `scripts/run_bench.sh`), as the course
+    requires the code to run there. Optional: `trace_smolvla.py --model lerobot/smolvla_robotwin`
+    on cuda2/3/5 (expected equal to the base traces).
+  - Cluster: nothing pending; L4 still unusable.
+  - Elsewhere (needs access the user must request): T4 / V100 / RTX PRO 6000 partitions for this
+    account (NYU HPC), H200 / L40S on Torch; with access, rerun calib + dispatch table + SmolVLA
+    trace sweep there as real targets (would replace the spec-only what-if, whose spec values in
+    `model/whatif.py` are still marked TODO verify).
+  - User only: professor approval status, team size, deadlines (section 1 table).
 
 ### 0.2 Memory note to carry over
 

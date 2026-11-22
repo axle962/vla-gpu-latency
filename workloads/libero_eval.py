@@ -6,11 +6,14 @@ select_action's queue so that inference latency can be modeled in control steps.
 
 Delay model (naive asynchronous execution, as the baseline in real-time chunking work): a
 robot keeps moving while the policy computes. With a delay of d control steps (latency divided
-by the 50 ms control period at LIBERO's 20 Hz), inference for the next chunk starts when d
-actions of the current chunk remain, from the observation at that moment; the robot executes
-those d actions; then the new chunk takes over from its index d (its first d actions belong to
-the past). d = 0 is ordinary synchronous chunked execution. The first chunk of an episode is
-synchronous. The simulator pauses during inference, so d is set by the flag, not by the
+by the 50 ms control period at LIBERO's 20 Hz) and an execution horizon of H actions per chunk,
+inference for the next chunk starts when min(d, H) actions of the current chunk remain, from
+the observation at that moment; the robot executes those actions and, if d > H, then holds
+still (zero motion, gripper unchanged) until the result arrives d steps after the trigger; the
+new chunk then takes over from the index equal to the number of actions executed since the
+trigger (its earlier actions belong to the past). For d < H this is: start d actions early,
+skip the first d. d = 0 is ordinary synchronous chunked execution. The first chunk of an
+episode is synchronous. The simulator pauses during inference, so d is set by the flag, not by the
 measured wall time (which is recorded too).
 
 Episodes: task k, episode e starts from LIBERO's fixed init state e and seeds torch/numpy with
@@ -81,6 +84,14 @@ def load_policy(name: str, precision: str):
     return policy, pre, post
 
 
+def hold_action(prev: np.ndarray) -> np.ndarray:
+    """Stay put under LIBERO's relative (delta end-effector) control: zero motion, gripper
+    command unchanged."""
+    a = np.zeros_like(prev)
+    a[..., -1] = prev[..., -1]
+    return a
+
+
 def parse_ids(s: str) -> list[int]:
     out = []
     for part in s.split(","):
@@ -105,7 +116,6 @@ def main() -> None:
     policy, pre, post = load_policy(args.policy, args.precision)
     H = args.exec_horizon or policy.config.n_action_steps
     delays = [int(x) for x in args.delays.split(",")]
-    assert max(delays) < H, "delay must be shorter than the execution horizon"
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)
     new = not out.exists()
@@ -114,7 +124,7 @@ def main() -> None:
     if new:
         w.writerow(["policy", "precision", "suite", "task_id", "episode", "delay_steps",
                     "exec_horizon", "success", "steps", "inferences", "infer_ms_median",
-                    "episode_s", "gpu",
+                    "episode_s", "hold_steps", "gpu",
                     "host", "task"])
 
     for tid in parse_ids(args.tasks):
@@ -153,20 +163,30 @@ def main() -> None:
                     return acts
 
                 queue = deque(infer(obs)[:H])
-                pending = None
+                pending, waited, executed, holds = None, 0, 0, 0
+                last = queue[0]
                 success, step = False, 0
                 while step < max_steps:
-                    if d > 0 and pending is None and len(queue) == d:
-                        pending = infer(obs)          # planned from the current observation
                     if not queue:
                         if d == 0:
                             queue = deque(infer(obs)[:H])
-                        else:
-                            if pending is None:       # cannot happen when d < H
-                                pending = infer(obs)
-                            queue = deque(pending[d:d + H])
+                        elif pending is not None and waited >= d:  # the result has arrived
+                            queue = deque(pending[executed:executed + H])
                             pending = None
-                    obs, rew, term, trunc, info = env.step(queue.popleft())
+                    # after a possible switch, so that for d >= H the next inference starts
+                    # as soon as the new chunk is installed
+                    if d > 0 and pending is None and len(queue) == min(d, H):
+                        pending = infer(obs)          # planned from the current observation
+                        waited = executed = 0
+                    if queue:
+                        a = queue.popleft()
+                        executed += 1
+                    else:                             # d > H: out of actions, hold still
+                        a = hold_action(last)
+                        holds += 1
+                    last = a
+                    obs, rew, term, trunc, info = env.step(a)
+                    waited += 1
                     step += 1
                     if "final_info" in info:
                         success = bool(info["final_info"]["is_success"][0])
@@ -174,7 +194,7 @@ def main() -> None:
                         break
                 w.writerow([args.policy, args.precision, args.suite, tid, e, d, H, int(success),
                             step, len(infer_ms), f"{np.median(infer_ms):.1f}",
-                            f"{time.perf_counter() - t_ep:.1f}",
+                            f"{time.perf_counter() - t_ep:.1f}", holds,
                             torch.cuda.get_device_name(0), platform.node().split(".")[0],
                             task_text])
                 f.flush()

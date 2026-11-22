@@ -1,0 +1,24 @@
+gpu,key,value
+NVIDIA GeForce RTX 2080 Ti,device_index,0
+NVIDIA GeForce RTX 2080 Ti,cc_major,7
+NVIDIA GeForce RTX 2080 Ti,cc_minor,5
+NVIDIA GeForce RTX 2080 Ti,sm_count,68
+NVIDIA GeForce RTX 2080 Ti,l2_bytes,5767168
+NVIDIA GeForce RTX 2080 Ti,persisting_l2_max_bytes,0
+NVIDIA GeForce RTX 2080 Ti,global_mem_bytes,11347623936
+NVIDIA GeForce RTX 2080 Ti,smem_per_sm_bytes,65536
+NVIDIA GeForce RTX 2080 Ti,smem_per_block_optin_bytes,65536
+NVIDIA GeForce RTX 2080 Ti,regs_per_sm,65536
+NVIDIA GeForce RTX 2080 Ti,max_threads_per_sm,1024
+NVIDIA GeForce RTX 2080 Ti,max_blocks_per_sm,16
+NVIDIA GeForce RTX 2080 Ti,warp_size,32
+NVIDIA GeForce RTX 2080 Ti,sm_clock_khz,1635000
+NVIDIA GeForce RTX 2080 Ti,mem_clock_khz,7000000
+NVIDIA GeForce RTX 2080 Ti,mem_bus_bits,352
+NVIDIA GeForce RTX 2080 Ti,theoretical_dram_bw_mbps,616000
+NVIDIA GeForce RTX 2080 Ti,async_engines,3
+NVIDIA GeForce RTX 2080 Ti,concurrent_kernels,1
+NVIDIA GeForce RTX 2080 Ti,ecc_enabled,0
+NVIDIA GeForce RTX 2080 Ti,pci_bus_id,131
+NVIDIA GeForce RTX 2080 Ti,driver_version,13020
+NVIDIA GeForce RTX 2080 Ti,runtime_version,12040
