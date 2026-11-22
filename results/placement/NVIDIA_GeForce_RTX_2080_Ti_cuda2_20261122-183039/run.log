@@ -1,0 +1,50 @@
+skip gpu-gpu: no device ['cuda:1'] (visible GPUs: 1)
+building smolvla on cuda:0
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading  HuggingFaceTB/SmolVLM2-500M-Video-Instruct weights ...
+Reducing the number of VLM layers to 16 ...
+building smolvla on cpu
+Loading  HuggingFaceTB/SmolVLM2-500M-Video-Instruct weights ...
+Reducing the number of VLM layers to 16 ...
+[gpu] prefix         median    73.458 ms  (n=30)
+[gpu] denoise_eager  median   389.188 ms  (n=30)
+[gpu] e2e_eager      median   468.988 ms  (n=30)
+[gpu] denoise_graph  median    39.839 ms  (n=30)
+[gpu] e2e_hybrid     median   114.016 ms  (n=30)
+[gpu-cpu] prefix         median    73.509 ms  (n=5)
+[gpu-cpu] denoise_eager  median   649.619 ms  (n=5)
+[gpu-cpu] e2e_eager      median   734.536 ms  (n=5)
+[gpu-cpu] handoff        median     2.843 ms  (n=5)
+[cpu-gpu] prefix         median  1659.169 ms  (n=5)
+[cpu-gpu] denoise_eager  median   381.388 ms  (n=5)
+[cpu-gpu] e2e_eager      median  2011.068 ms  (n=5)
+[cpu-gpu] handoff        median     3.168 ms  (n=5)
+[cpu-gpu] denoise_graph  median    39.869 ms  (n=5)
+[cpu-gpu] e2e_hybrid     median  1719.843 ms  (n=5)
+[cpu] prefix         median  1667.359 ms  (n=5)
+[cpu] denoise_eager  median   657.059 ms  (n=5)
+[cpu] e2e_eager      median  2348.339 ms  (n=5)
+/scratch/aj4762/envs/smolvla/lib/python3.10/site-packages/torch/profiler/profiler.py:217: UserWarning: Warning: Profiler clears events at the end of each cycle.Only events from the current cycle will be reported.To keep events across cycles, set acc_events=True.
+  _warn_once(
+[gpu] e2e_eager_repeat median   472.909 ms (drift check)
+placement dev_prefix dev_denoise             mode  n   median_ms     mean_ms    std_ms      min_ms
+      gpu     cuda:0      cuda:0           prefix 30   73.457984   73.504323  0.170284   73.325406
+      gpu     cuda:0      cuda:0    denoise_eager 30  389.187869  389.516548  1.107117  387.905341
+      gpu     cuda:0      cuda:0        e2e_eager 30  468.988499  469.266501  1.215466  468.006012
+      gpu     cuda:0      cuda:0    denoise_graph 30   39.839133   39.842876  0.014140   39.825689
+      gpu     cuda:0      cuda:0       e2e_hybrid 30  114.015672  114.099727  0.219295  113.784802
+  gpu-cpu     cuda:0         cpu           prefix  5   73.508701   73.621186  0.296529   73.462277
+  gpu-cpu     cuda:0         cpu    denoise_eager  5  649.618711  649.681314  1.190897  648.303288
+  gpu-cpu     cuda:0         cpu        e2e_eager  5  734.536164  734.703415  0.974956  733.711473
+  gpu-cpu     cuda:0         cpu          handoff  5    2.843338    2.842379  0.005391    2.833413
+  cpu-gpu        cpu      cuda:0           prefix  5 1659.168678 1663.536789 26.614343 1635.672415
+  cpu-gpu        cpu      cuda:0    denoise_eager  5  381.388107  381.618137  0.446395  381.183347
+  cpu-gpu        cpu      cuda:0        e2e_eager  5 2011.068454 2003.757527 27.685752 1963.305003
+  cpu-gpu        cpu      cuda:0          handoff  5    3.167596    3.168008  0.002652    3.164409
+  cpu-gpu        cpu      cuda:0    denoise_graph  5   39.869238   40.254795  0.907644   39.821348
+  cpu-gpu        cpu      cuda:0       e2e_hybrid  5 1719.843494 1719.539799  7.798444 1712.478190
+      cpu        cpu         cpu           prefix  5 1667.359488 1664.227094 14.265169 1645.103408
+      cpu        cpu         cpu    denoise_eager  5  657.058825  657.070255  0.706139  656.151416
+      cpu        cpu         cpu        e2e_eager  5 2348.339194 2372.217444 41.433596 2340.297624
+      gpu     cuda:0      cuda:0 e2e_eager_repeat 30  472.909472  473.114841  1.397332  470.680052
+wrote results/placement/NVIDIA_GeForce_RTX_2080_Ti_cuda2_20261122-183039
