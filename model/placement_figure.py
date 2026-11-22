@@ -42,7 +42,7 @@ def medians(run: Path) -> pd.DataFrame:
     return s.pivot(index="placement", columns="mode", values="median_ms")
 
 
-def rows_for(run: Path, gpu1: Path | None) -> list[dict]:
+def rows_for(run: Path, gpu1: Path | None, extras: list[str] = ()) -> list[dict]:
     med = medians(run)
     order = list(json.loads((run / "meta.json").read_text())["placements"])
     two_gpus = gpu1 is not None
@@ -56,6 +56,10 @@ def rows_for(run: Path, gpu1: Path | None) -> list[dict]:
         out.append({"label": label, "src": med, "p": p})
         if p == "gpu" and two_gpus:
             out.append({"label": LABELS[p] + " (GPU 1)", "src": medians(gpu1), "p": "gpu"})
+        if p == "gpu":
+            for spec in extras:  # RUN=PLACEMENT=LABEL, inserted after the colocated row
+                erun, ep, elabel = spec.split("=", 2)
+                out.append({"label": elabel, "src": medians(Path(erun)), "p": ep})
     rows = []
     for r in out:
         src, p = r["src"], r["p"]
@@ -75,12 +79,14 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("run")
     ap.add_argument("--gpu1-baseline", default=None)
+    ap.add_argument("--extra", action="append", default=[], metavar="RUN=PLACEMENT=LABEL",
+                    help="add a row from another run (e.g. gpu-gpu from a two-GPU run)")
     ap.add_argument("--title", default=None)
     ap.add_argument("--out", default="paper/figures/placement")
     args = ap.parse_args()
     run = Path(args.run)
     meta = json.loads((run / "meta.json").read_text())
-    rows = rows_for(run, Path(args.gpu1_baseline) if args.gpu1_baseline else None)
+    rows = rows_for(run, Path(args.gpu1_baseline) if args.gpu1_baseline else None, args.extra)
 
     plt.rcParams.update({"font.size": 9, "font.family": "sans-serif"})
     fig, axes = plt.subplots(1, 2, figsize=(7.2, 0.42 * len(rows) + 1.3), sharey=True,
