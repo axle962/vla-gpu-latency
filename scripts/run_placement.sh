@@ -41,6 +41,16 @@ for g in ${CUDA_VISIBLE_DEVICES//,/ }; do
     nvidia-smi -i "$g" --query-compute-apps=pid,used_memory --format=csv
     exit 1
   fi
+  # An idle GPU should drop to a low power state (P8). One that stays in P0 with no process on it
+  # may be stuck at a fixed clock (cuda2 GPU 0 since about 17 Nov 2026: P0, 1350 MHz, 37% slower
+  # in graph mode). Wait a minute after another job and re-run before overriding with FORCE=1.
+  read -r ps clk < <(nvidia-smi -i "$g" --query-gpu=pstate,clocks.sm --format=csv,noheader \
+    | tr -d ',' | awk '{print $1, $2}')
+  if [[ $n -eq 0 && $ps == P0 && -z "${FORCE:-}" ]]; then
+    echo "GPU $g is idle but in $ps at $clk MHz (expected P8): possibly stuck at a fixed clock."
+    echo "Use another GPU (e.g. CUDA_VISIBLE_DEVICES=1) or set FORCE=1 to run anyway."
+    exit 1
+  fi
 done
 
 DEV=${CUDA_VISIBLE_DEVICES%%,*}
@@ -59,7 +69,7 @@ echo "GPUs $CUDA_VISIBLE_DEVICES on $HOST ${pin[*]:-(unpinned)}"
 one() {  # out_dir, then extra args
   local out=$1; shift
   mkdir -p "$out"
-  nvidia-smi --query-gpu=index,name,pci.bus_id,utilization.gpu,memory.used --format=csv \
+  nvidia-smi --query-gpu=index,name,pci.bus_id,pstate,clocks.sm,clocks.max.sm,temperature.gpu,power.draw,utilization.gpu,memory.used --format=csv \
     > "$out/gpus.csv"
   # Peer-to-peer capability between the two GPUs (decides whether GPU->GPU copies bounce
   # through host memory); not available on every driver.
