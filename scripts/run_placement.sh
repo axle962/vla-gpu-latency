@@ -46,7 +46,10 @@ for g in ${CUDA_VISIBLE_DEVICES//,/ }; do
   # in graph mode). Wait a minute after another job and re-run before overriding with FORCE=1.
   read -r ps clk < <(nvidia-smi -i "$g" --query-gpu=pstate,clocks.sm --format=csv,noheader \
     | tr -d ',' | awk '{print $1, $2}')
-  if [[ $n -eq 0 && $ps == P0 && -z "${FORCE:-}" ]]; then
+  # Only consumer cards (GeForce, TITAN) are expected in P8 when idle; datacenter GPUs (A100,
+  # H100, ...) often idle in P0 normally.
+  name=$(nvidia-smi -i "$g" --query-gpu=name --format=csv,noheader)
+  if [[ $n -eq 0 && $ps == P0 && $name =~ GeForce|TITAN && -z "${FORCE:-}" ]]; then
     echo "GPU $g is idle but in $ps at $clk MHz (expected P8): possibly stuck at a fixed clock."
     echo "Use another GPU (e.g. CUDA_VISIBLE_DEVICES=1) or set FORCE=1 to run anyway."
     exit 1
