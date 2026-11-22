@@ -16,8 +16,8 @@ NUMA node); the end-to-end step re-timed after all placements moved by 3.3\%.
   \includegraphics[width=\linewidth]{figures/placement_cuda2.pdf}
   \caption{SmolVLA step time per placement on cuda2, split into prefix, KV handoff (1.5 to
   3.2\,ms, too small to see) and action-expert loop. Left: eager PyTorch. Right: CUDA graph for
-  the loop when it runs on a GPU. The two GPUs are the same model but differ by 37\% in graph
-  mode.}
+  the loop when it runs on a GPU. GPU 0 was stuck at a reduced clock during these runs (37\%
+  slower in graph mode, unchanged in eager mode).}
   \label{fig:placement}
 \end{figure}
 
@@ -37,11 +37,14 @@ GPU. The action loop on 20 CPU threads takes 651\,ms, only 1.6 times the eager G
 the GPU loop takes 40\,ms, 16 times faster than the CPU. On the TITAN V host (24 threads) the
 CPU loop is 3.3 times the eager loop and 14 times the graph loop.
 
-\paragraph{Same GPU model, different speed.} On cuda2 the graph loop takes 54.1\,ms on GPU 0
+\paragraph{Graph mode exposes a faulty GPU.} On cuda2 the graph loop takes 54.1\,ms on GPU 0
 and 39.6\,ms on GPU 1, while the eager step is 482\,ms on both: host-bound eager execution
-hides the difference and graph mode exposes it. GPU 0 idles at 1,350\,MHz in P0 while GPU 1
-drops to P8; as with the TITAN V (Section~\ref{sec:crossgpu}), a lower sustained SM clock is the
-likely cause. Cross-device comparisons in graph mode therefore need a per-device baseline;
-with it, the split prediction above is within 0.2\%, without it 12\%.
+hides the difference and graph mode exposes it. GPU 0 is not slower by design. A week
+earlier it held 1,950\,MHz under load and ran a C++ replay of the loop as fast as GPU 1; since
+then it idles stuck in the P0 power state at a reduced clock (1,350\,MHz when sampled), and
+$1950/1350 = 1.44$ is close to the $1.37$ loop ratio. As with the TITAN V
+(Section~\ref{sec:crossgpu}), the clock a GPU actually runs at sets the graph-mode latency.
+Cross-device predictions in graph mode therefore need a per-device baseline; with it, the
+split prediction above is within 0.2\%, without it 12\%.
 % TODO: confirm GPU 0's clock under load (scripts/clock_probe.sh). Needs \label{sec:crossgpu}
 % on main.tex's "Cross-GPU accuracy" subsection (where the sustained-clock finding is).

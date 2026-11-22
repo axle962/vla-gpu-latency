@@ -65,14 +65,17 @@ with t0 and BW from the copy calibration and each GPU's own baseline
    1.6x (cuda2) to 3.3x (cuda3) slower than the dispatch-bound eager GPU loop, and 14 to 16x
    slower than the graph loop. The eager GPU loop is so host bound that a CPU gets within 1.6x
    of it on cuda2; CUDA graphs remove that.
-4. **Two GPUs of the same model differ by 37% in graph mode.** On cuda2, GPU 0 runs the graph
+4. **Graph mode exposed a faulty GPU that eager mode hid.** On cuda2, GPU 0 runs the graph
    loop in 54.1 ms and GPU 1 in 39.6 ms (the project's earlier 2080 Ti traces: 40.1 ms). Eager
-   timings are identical (482 ms) because eager is host bound, so only graph mode exposes it.
-   At idle, GPU 0 sits in P0 at 1,350 MHz while GPU 1 drops to P8; the clock under load was not
-   sampled. Earlier in this project the TITAN V gap was traced to its SM clock (1,335 vs
-   1,950 MHz); 1,950 / 1,350 = 1.44 is close to the 1.37 seen here, so a lower sustained clock
-   on GPU 0 is the likely cause (to confirm with `scripts/clock_probe.sh` on GPU 0). Any
-   comparison of graph-mode latency across cards needs a per-card baseline.
+   timings are identical (482 ms) because eager is host bound, so only graph mode shows it.
+   GPU 0 is not slower by design: the project's own runs show it idle in P8 at 36 to 38 C on
+   12 and 13 Nov, holding 1,950 MHz under load with a 10-step C++ graph chain of 38.9 ms (equal
+   to GPU 1). From 17 Nov on it idles stuck in P0 at 54 C and 63 W (`nvidia_smi.txt` of the
+   17 and 18 Nov runs on main; 1,350 MHz in our 19 Nov snapshot, `cuda2_gpu0_clocks.txt`).
+   1,950 / 1,350 = 1.44, close to the 1.37 graph-loop ratio, so a clock held near 1,350 MHz is
+   the likely cause; the clock under load since then has not been sampled. Any comparison of
+   graph-mode latency across devices needs a per-device baseline: with it the split prediction
+   is within 0.2%, without it 12%. Reported to the team; cuda2 GPU 1 for timings until fixed.
 5. **No P2P on cuda2** (`nvidia-smi topo -p2p r`: chipset not supported), so GPU 0 to GPU 1
    copies go through host memory; cuda3 reports P2P OK although its GPUs sit on different
    sockets. Both handoffs are about 1.5 ms, so it does not matter at this KV size.
@@ -85,5 +88,6 @@ with t0 and BW from the copy calibration and each GPU's own baseline
 
 - cuda3 rerun with the fixed script (needs both TITAN Vs idle, about 20 min) for a second
   clean machine.
-- Sample GPU 0's SM clock under load on cuda2 (`scripts/clock_probe.sh`).
+- Sample GPU 0's SM clock under load on cuda2 (`scripts/clock_probe.sh`) to confirm the
+  stuck clock; report it to helpdesk@cims.nyu.edu.
 - Optional: CPU thread sweep (`scripts/run_placement.sh threads`).
