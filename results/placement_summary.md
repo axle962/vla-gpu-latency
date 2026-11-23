@@ -11,6 +11,8 @@ and can that cost be predicted from single-device measurements?
 | Run | Machine | Status |
 |---|---|---|
 | `NVIDIA_A100-SXM4-40GB_b-20-3_20261123-003524` | NYU HPC Cloud Bursting, 2x A100 40 GB (P2P, 267 GB/s), cloud Xeon 2.2 GHz, 12 torch threads | **Clean, all five placements**, drift check 0.0% (job 40230, about 1.3 GPU-h) |
+| `NVIDIA_A100-SXM4-40GB_b-20-4_20261123-013831` | NYU HPC, 2x A100 (job 40298) | **Pipelining**, 1 GPU and 2 GPUs, outputs checked (drift 0.0%) |
+| `NVIDIA_A100-SXM4-40GB_b-20-3_20261123-010931`, `pipecheck_20261123-012524` | | First pipelining run (timings only) and the diagnostic that found the bug below |
 | `NVIDIA_GeForce_RTX_2080_Ti_cuda2_20261122-183039` | cuda2, GPU 1 only (RTX 2080 Ti), Xeon E5-2660 v3, 20 threads (NUMA node 1) | **Headline.** 1 GPU, GPU+CPU, CPU+GPU, CPU only; drift check +0.8% |
 | `NVIDIA_GeForce_RTX_2080_Ti_cuda2_20261119-143150` | cuda2, both GPUs; GPU 0 stuck at a reduced clock | **Only the GPU-GPU row** (see its `NOTE.md`); the other rows are superseded |
 | `NVIDIA_GeForce_RTX_2080_Ti_cuda2_20261119-153552` | cuda2, GPU 1 only | Colocated baseline used to predict the GPU-GPU split |
@@ -51,6 +53,18 @@ graph loop 35.6 to 35.8, hybrid 94 ms). Figure: `paper/figures/placement_a100.{p
 TITAN V (cuda3), usable numbers: 1 GPU prefix 59.2, loop eager 280.4, loop graph 66.5, step
 eager 340.6, best 126.2 ms; handoff GPU->GPU 1.36, GPU->CPU 3.55, CPU->GPU 4.29 ms; CPU
 prefix about 2.0 s, CPU loop 928 to 944 ms.
+
+## Pipelining (2x A100)
+
+The prefix of request t+1 runs while the CUDA-graph loop of request t replays: on a second
+stream of the same GPU, or on the second GPU. Requests alternate between two observations;
+every pipelined output equals the sequential output for its observation (max |diff| 0), and
+the observations really differ (KV 3.5, actions 0.73).
+
+| Setup | One at a time (ms/request) | Pipelined (ms/request) | Throughput gain | Bound max(prefix, handoff + loop) | Measured vs bound |
+|---|---|---|---|---|---|
+| 1 GPU, two streams | 94.9 | **61.2** | 1.55x | 58.1 | +5.4% |
+| 2 GPUs | 95.2 | **61.6** | 1.54x | 58.8 | +4.8% |
 
 ## Predicted from single-device parts
 
@@ -105,6 +119,24 @@ with t0 and BW from the copy calibration and each device's own baseline
    Moving the prefix to the CPU (FP32 instead of FP16) changes them by up to 0.39, the same in
    all three runs. So the FP16 prefix, not the loop, is where FP16 and FP32 SmolVLA diverge.
    This may relate to the FP16 vs stock LIBERO gap (50 vs 58% success), untested.
+
+7. **Pipelining gives 1.55x throughput, and a second GPU adds nothing to it.** One request
+   at a time, the best step is 95 ms; with the next prefix overlapping the current graph
+   loop, a request completes every 61 ms on one GPU (second stream) and 62 ms on two GPUs.
+   The prefix is host bound (58 ms of Python and dispatch with the GPU mostly idle), so the
+   graph loop (36 ms of GPU work) fits into its idle time on the same GPU. The two-stage bound
+   max(prefix, handoff + loop) predicts both within 5.4%. Per-request latency stays about
+   95 ms; what grows is throughput. With Shrikar's MPS results (direction 6): one GPU, used
+   well, already gives the capacity that splitting a policy across GPUs might have promised.
+
+8. **A bug in this study, found by the pipelining check.** `capture_graph` did not keep the
+   graph's static noise input alive, so after the first later allocations every replay
+   computed on reused memory. Timings are unaffected (same kernels on the same shapes; the
+   fixed rerun matches the earlier one within 1%), and right after capture every graph had
+   matched eager exactly, but the graph-mode outputs of the placement runs before
+   2026-11-23 01:38 UTC were not valid. Fixed (e3ed026, 02e736c); every run now re-checks the
+   graph path against eager after all timing. Aditya's tracers keep their static inputs alive
+   and are not affected.
 
 ## Open items
 

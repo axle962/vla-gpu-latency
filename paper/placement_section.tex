@@ -54,9 +54,19 @@ can be predicted from single-device runs:
 $T(A,B) = T_\mathrm{prefix}(A) + n\,t_0 + S/\mathit{BW}_{A\to B} + T_\mathrm{loop}(B)$, with
 $t_0$ and $\mathit{BW}$ from a copy calibration and each device's own baseline. All six split
 placements are predicted within 0.1 to 2.5\% (Table~\ref{tab:placement}, eager mode within
-2.5\%). Splitting does not shorten one inference, since the halves run in sequence; it adds
-capacity, which hosting several policies on one GPU (Section~\ref{sec:multipolicy}) provides
-more cheaply.
+2.5\%). Splitting does not shorten one inference, since the halves run in sequence.
+
+\paragraph{Pipelining needs a second stream, not a second GPU.} Splitting could still add
+throughput if the prefix of request $t{+}1$ ran while the loop of request $t$ replays. On the
+A100 node this pipelining cuts the time per request from 94.9 to 61.2\,ms (1.55x) when the
+loop replays on a second stream of the same GPU, and to 61.6\,ms (1.54x) when it replays on
+the second GPU. The prefix is host bound (58\,ms of Python and dispatch with the GPU mostly
+idle), so the 36\,ms graph loop fits into its idle time on the same GPU; the two-stage bound
+$\max(T_\mathrm{prefix}, T_\mathrm{handoff} + T_\mathrm{loop})$ predicts both within 5.4\%.
+Requests alternated between two observations and every pipelined output equalled the
+sequential one. Together with hosting several policies on one GPU
+(Section~\ref{sec:multipolicy}), this means a single GPU used well already provides the
+capacity that splitting a policy across GPUs might promise.
 
 \paragraph{The CPU is not a useful host.} The prefix is 15 (A100 host) to 23 (cuda2) times
 slower on the CPU than on the GPU, and CPU-only inference is 15 to 21 times slower than the
