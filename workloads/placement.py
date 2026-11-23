@@ -446,6 +446,21 @@ def measure_pipeline(name, a, b, g, s_pad, s_kv, s_out, args, lat, info) -> None
     """Steady-state interval per request with the prefix of t+1 overlapping the loop of t."""
     devs = (a.dev, b.dev)
     loop_stream = torch.cuda.Stream(device=b.dev)
+    # Where do the two observations diverge? KV cache, eager loop output, graph output. If the
+    # KV differs but the graph outputs do not, the replay does not read the copied KV.
+    kvs = [a.prefix(i) for i in range(2)]
+    sync(*devs)
+    info["pipe_kv_diff"] = max(
+        (kvs[0][1][li][k].float() - kvs[1][1][li][k].float()).abs().max().item()
+        for li in kvs[0][1] for k in kvs[0][1][li]
+    )
+    eager = []
+    for pad, kv in kvs:
+        if a.dev != b.dev:
+            pad, kv = move(pad, kv, b.dev, b.dtype)
+        eager.append(b.denoise(pad, kv, b.noise).float().cpu())
+    info["pipe_eager_out_diff"] = (eager[0] - eager[1]).abs().max().item()
+    del kvs
     # Sequential reference output per observation (prefix, copy, replay, one at a time).
     refs = []
     for i in range(2):
@@ -454,7 +469,13 @@ def measure_pipeline(name, a, b, g, s_pad, s_kv, s_out, args, lat, info) -> None
         g.replay()
         sync(*devs)
         refs.append(s_out.float().cpu().clone())
-    info["pipe_obs_differ"] = bool((refs[0] - refs[1]).abs().max().item() > 0)
+    info["pipe_graph_out_diff"] = (refs[0] - refs[1]).abs().max().item()
+    info["pipe_obs_differ"] = bool(info["pipe_graph_out_diff"] > 0)
+    info["pipe_graph_vs_eager_per_obs"] = max(
+        (refs[i] - eager[i]).abs().max().item() for i in range(2))
+    print(f"[{name}] observations differ by: KV {info['pipe_kv_diff']:.3e}, eager output "
+          f"{info['pipe_eager_out_diff']:.3e}, graph output {info['pipe_graph_out_diff']:.3e}; "
+          f"graph vs eager per observation {info['pipe_graph_vs_eager_per_obs']:.3e}", flush=True)
     n, windows = args.pipe_requests, args.pipe_windows
     run_pipelined(a, g, s_pad, s_kv, s_out, loop_stream, 4)  # warm-up
     sync(*devs)

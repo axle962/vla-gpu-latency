@@ -91,6 +91,10 @@ for s in "${STAGES[@]}"; do
     # job its GPU exclusively, so the runner's shared-GPU checks are skipped (FORCE=1).
     run placement sh -c "WORK=$WORK FORCE=1 scripts/run_placement.sh run"
     ;;
+  pipecheck)
+    # Short diagnostic: does the graph loop follow a new KV cache? (1 GPU, no profiling)
+    run pipecheck sh -c "$PY workloads/placement.py --placements gpu --pipeline --reps 5 --pipe-windows 2 --out results/placement/pipecheck_$(date +%Y%m%d-%H%M%S)"
+    ;;
   pipe)
     run pipe-smoke sh -c "WORK=$WORK FORCE=1 scripts/run_placement.sh smoke --placements gpu,gpu-gpu --pipeline"
     run pipe sh -c "WORK=$WORK FORCE=1 scripts/run_placement.sh run --placements gpu,gpu-gpu --pipeline"
