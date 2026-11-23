@@ -296,7 +296,10 @@ BUILDERS = {"smolvla": build_smolvla, "toy": build_toy}
 
 def capture_graph(half: Half, pad, kv):
     """Capture half.denoise on half.dev with static inputs. Returns (graph, static_pad,
-    static_kv, static_out) or raises."""
+    static_kv, static_out, static_x) or raises. The caller must keep every static tensor
+    alive as long as it replays the graph: the graph reads their addresses, and a freed
+    static input (static_x was, until 2026-11-22) gets reused by later allocations, after
+    which the replay computes on garbage. Timings stay valid (same kernels), outputs do not."""
     static_x = half.noise.clone()
     static_pad = pad.clone()
     static_kv = {i: {k: v.clone() for k, v in layer.items()} for i, layer in kv.items()}
@@ -314,7 +317,7 @@ def capture_graph(half: Half, pad, kv):
         cs = torch.cuda.Stream(device=half.dev)
         with torch.cuda.graph(g, stream=cs):
             static_out = half.denoise(static_pad, static_kv, static_x)
-    return g, static_pad, static_kv, static_out
+    return g, static_pad, static_kv, static_out, static_x
 
 
 def run_pipelined(a: Half, g, s_pad, s_kv, s_out, loop_stream, n: int) -> list[torch.Tensor]:
@@ -410,7 +413,8 @@ def run_placement(name: str, a: Half, b: Half, args, lat: list[dict]) -> dict:
     info["graph_ok"], info["graph_error"] = False, ""
     if b.dev.type == "cuda" and not args.no_graph:
         try:
-            g, s_pad, s_kv, s_out = capture_graph(b, pad_b, kv_b)
+            # s_x is a local of this function on purpose: it must outlive every replay below.
+            g, s_pad, s_kv, s_out, s_x = capture_graph(b, pad_b, kv_b)
             g.replay()
             sync(b.dev)
             diff = (s_out.float().cpu() - info["output"]).abs().max().item()
@@ -434,6 +438,19 @@ def run_placement(name: str, a: Half, b: Half, args, lat: list[dict]) -> dict:
             {"placement": name, "mode": mode, "step": i, "wall_ms": v} for i, v in enumerate(t)
         ]
         print(f"[{name}] {mode:14s} median {statistics.median(t):9.3f} ms  (n={reps})", flush=True)
+
+    if info["graph_ok"]:
+        # After all the timing: does the hybrid path (prefix, copy, replay) still give the
+        # eager output? Catches stale or freed static buffers.
+        pad, kv = a.prefix()
+        copy_into(pad, kv, s_pad, s_kv)
+        g.replay()
+        sync(*devs)
+        diff = (s_out.float().cpu() - info["output"]).abs().max().item()
+        info["hybrid_vs_eager_after_timing"] = diff
+        print(f"[{name}] hybrid vs eager after timing: max |diff| {diff:.1e}", flush=True)
+        if diff > 1e-2:
+            print(f"[{name}] WARNING: the graph path disagrees with eager", flush=True)
 
     if args.pipeline and info["graph_ok"] and a.dev.type == "cuda":
         measure_pipeline(name, a, b, g, s_pad, s_kv, s_out, args, lat, info)
