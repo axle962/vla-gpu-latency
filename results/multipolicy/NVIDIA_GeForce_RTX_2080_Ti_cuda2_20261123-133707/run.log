@@ -1,0 +1,178 @@
+=== procs_smolvla: 1 policies, procs, modes ['eager', 'graph'], 15s per mode
+    loaded in 51s
+    eager done
+    graph done
+    eager w0 c0 smolvla   median   484.51 ms  p95   487.74  n 25
+    graph w0 c0 smolvla   median   135.39 ms  p95   135.79  n 89
+=== procs_smolvlax2: 2 policies, procs, modes ['eager', 'graph'], 15s per mode
+    loaded in 22s
+    eager done
+    graph done
+    eager w0 c0 smolvla   median   512.33 ms  p95   513.78  n 24
+    eager w1 c0 smolvla   median   511.87 ms  p95   514.07  n 24
+    graph w0 c0 smolvla   median   241.25 ms  p95   241.93  n 50
+    graph w1 c0 smolvla   median   241.24 ms  p95   241.78  n 50
+=== procs_smolvlax4: 4 policies, procs, modes ['eager', 'graph'], 15s per mode
+    loaded in 26s
+    eager done
+    graph done
+    eager w0 c0 smolvla   median   562.57 ms  p95   568.29  n 21
+    eager w1 c0 smolvla   median   558.77 ms  p95   573.63  n 21
+    eager w2 c0 smolvla   median   565.57 ms  p95   571.55  n 22
+    eager w3 c0 smolvla   median   561.04 ms  p95   567.72  n 21
+    graph w0 c0 smolvla   median   440.16 ms  p95   441.31  n 28
+    graph w1 c0 smolvla   median   440.28 ms  p95   441.02  n 28
+    graph w2 c0 smolvla   median   440.09 ms  p95   440.84  n 28
+    graph w3 c0 smolvla   median   440.17 ms  p95   440.84  n 28
+=== procs-mps_smolvlax2: 2 policies, procs-mps, modes ['eager', 'graph'], 15s per mode
+    loaded in 22s
+    eager done
+    graph done
+    eager w0 c0 smolvla   median   474.74 ms  p95   486.77  n 25
+    eager w1 c0 smolvla   median   487.70 ms  p95   499.77  n 24
+    graph w0 c0 smolvla   median   161.67 ms  p95   162.64  n 75
+    graph w1 c0 smolvla   median   161.78 ms  p95   162.56  n 74
+=== procs-mps_smolvlax4: 4 policies, procs-mps, modes ['eager', 'graph'], 15s per mode
+    loaded in 26s
+    eager done
+    graph done
+    eager w0 c0 smolvla   median   618.22 ms  p95   630.82  n 19
+    eager w1 c0 smolvla   median   497.79 ms  p95   510.35  n 24
+    eager w2 c0 smolvla   median   491.27 ms  p95   498.98  n 25
+    eager w3 c0 smolvla   median   485.09 ms  p95   502.49  n 24
+    graph w0 c0 smolvla   median   240.98 ms  p95   243.66  n 50
+    graph w1 c0 smolvla   median   230.65 ms  p95   234.31  n 52
+    graph w2 c0 smolvla   median   231.16 ms  p95   234.68  n 52
+    graph w3 c0 smolvla   median   230.27 ms  p95   234.42  n 52
+=== threads_smolvlax2: 2 policies, threads, modes ['eager', 'graph'], 15s per mode
+    loaded in 30s
+    eager done
+    graph done
+    eager w0 c0 smolvla   median   707.40 ms  p95   717.94  n 17
+    eager w0 c1 smolvla   median   836.06 ms  p95   854.84  n 15
+    graph w0 c0 smolvla   median   186.44 ms  p95   191.97  n 64
+    graph w0 c1 smolvla   median   186.24 ms  p95   191.43  n 64
+=== threads_smolvlax4: 4 policies, threads, modes ['eager', 'graph'], 15s per mode
+    loaded in 51s
+    eager done
+    graph done
+    eager w0 c0 smolvla   median  1499.32 ms  p95  1507.06  n 8
+    eager w0 c1 smolvla   median  1486.27 ms  p95  1600.30  n 8
+    eager w0 c2 smolvla   median  1476.12 ms  p95  1481.97  n 8
+    eager w0 c3 smolvla   median  1487.67 ms  p95  1495.65  n 8
+    graph w0 c0 smolvla   median   247.70 ms  p95   260.67  n 48
+    graph w0 c1 smolvla   median   246.76 ms  p95   257.64  n 48
+    graph w0 c2 smolvla   median   245.46 ms  p95   255.82  n 48
+    graph w0 c3 smolvla   median   244.87 ms  p95   254.69  n 49
+=== procs_act: 1 policies, procs, modes ['eager', 'graph'], 15s per mode
+    loaded in 14s
+    eager done
+    graph done
+    eager w0 c0 act       median    12.29 ms  p95    13.07  n 968
+    graph w0 c0 act       median     6.80 ms  p95     6.95  n 1758
+=== procs_actx2: 2 policies, procs, modes ['eager', 'graph'], 15s per mode
+    loaded in 11s
+    eager done
+    graph done
+    eager w0 c0 act       median    15.64 ms  p95    15.90  n 767
+    eager w1 c0 act       median    15.53 ms  p95    16.74  n 766
+    graph w0 c0 act       median    15.10 ms  p95    15.14  n 795
+    graph w1 c0 act       median    15.10 ms  p95    15.14  n 795
+=== procs_actx4: 4 policies, procs, modes ['eager', 'graph'], 15s per mode
+    loaded in 12s
+    eager done
+    graph done
+    eager w0 c0 act       median    30.66 ms  p95    30.70  n 392
+    eager w1 c0 act       median    30.65 ms  p95    30.70  n 392
+    eager w2 c0 act       median    30.65 ms  p95    30.72  n 392
+    eager w3 c0 act       median    30.66 ms  p95    30.71  n 392
+    graph w0 c0 act       median    30.19 ms  p95    30.25  n 397
+    graph w1 c0 act       median    30.19 ms  p95    30.25  n 397
+    graph w2 c0 act       median    30.19 ms  p95    30.25  n 397
+    graph w3 c0 act       median    30.19 ms  p95    30.25  n 397
+=== procs-mps_actx2: 2 policies, procs-mps, modes ['eager', 'graph'], 15s per mode
+    loaded in 11s
+    eager done
+    graph done
+    eager w0 c0 act       median    12.50 ms  p95    12.76  n 957
+    eager w1 c0 act       median    15.64 ms  p95    15.90  n 765
+    graph w0 c0 act       median    11.19 ms  p95    11.71  n 1071
+    graph w1 c0 act       median    11.21 ms  p95    11.68  n 1073
+=== procs-mps_actx4: 4 policies, procs-mps, modes ['eager', 'graph'], 15s per mode
+    loaded in 12s
+    eager done
+    graph done
+    eager w0 c0 act       median    20.36 ms  p95    21.07  n 590
+    eager w1 c0 act       median    20.38 ms  p95    21.35  n 589
+    eager w2 c0 act       median    20.36 ms  p95    21.03  n 590
+    eager w3 c0 act       median    20.38 ms  p95    21.50  n 589
+    graph w0 c0 act       median    19.66 ms  p95    20.60  n 611
+    graph w1 c0 act       median    19.81 ms  p95    20.66  n 606
+    graph w2 c0 act       median    19.66 ms  p95    20.47  n 611
+    graph w3 c0 act       median    19.73 ms  p95    20.56  n 608
+=== threads_actx2: 2 policies, threads, modes ['eager', 'graph'], 15s per mode
+    loaded in 12s
+    eager done
+    graph done
+    eager w0 c0 act       median    18.89 ms  p95    19.32  n 635
+    eager w0 c1 act       median    18.36 ms  p95    18.77  n 654
+    graph w0 c0 act       median    11.12 ms  p95    11.54  n 1079
+    graph w0 c1 act       median    11.13 ms  p95    11.59  n 1079
+=== threads_actx4: 4 policies, threads, modes ['eager', 'graph'], 15s per mode
+    loaded in 14s
+    eager done
+    graph done
+    eager w0 c0 act       median    46.99 ms  p95    49.09  n 255
+    eager w0 c1 act       median    46.86 ms  p95    52.46  n 254
+    eager w0 c2 act       median    47.18 ms  p95    53.90  n 248
+    eager w0 c3 act       median    46.99 ms  p95    48.51  n 255
+    graph w0 c0 act       median    19.50 ms  p95    20.43  n 615
+    graph w0 c1 act       median    19.51 ms  p95    20.39  n 616
+    graph w0 c2 act       median    19.48 ms  p95    20.32  n 616
+    graph w0 c3 act       median    19.44 ms  p95    20.22  n 617
+=== batch_smolvlax4_b4: 4 policies, batch, modes ['eager', 'graph'], 15s per mode
+    loaded in 20s
+    eager done
+    graph done
+    eager w0 c0 smolvla   median   579.63 ms  p95   590.26  n 20
+    graph w0 c0 smolvla   median   260.26 ms  p95   261.78  n 47
+=== procs_smolvla+act: 2 policies, procs, modes ['eager', 'graph'], 15s per mode
+    loaded in 22s
+    eager done
+    graph done
+    eager w0 c0 smolvla   median   553.01 ms  p95   556.36  n 22
+    eager w1 c0 act       median    12.90 ms  p95    15.94  n 901
+    graph w0 c0 smolvla   median   250.94 ms  p95   253.60  n 48
+    graph w1 c0 act       median    13.35 ms  p95    16.66  n 889
+=== procs-mps_smolvla+act: 2 policies, procs-mps, modes ['eager', 'graph'], 15s per mode
+    loaded in 21s
+    eager done
+    graph done
+    eager w0 c0 smolvla   median   491.20 ms  p95   492.64  n 24
+    eager w1 c0 act       median    15.58 ms  p95    15.71  n 769
+    graph w0 c0 smolvla   median   210.83 ms  p95   213.47  n 57
+    graph w1 c0 act       median     8.48 ms  p95    11.15  n 1362
+=== threads_smolvla+act: 2 policies, threads, modes ['eager', 'graph'], 15s per mode
+    loaded in 21s
+    eager done
+Traceback (most recent call last):
+  File "/home/sm12761/vla-gpu-latency/workloads/multipolicy.py", line 750, in <module>
+    main()
+  File "/home/sm12761/vla-gpu-latency/workloads/multipolicy.py", line 744, in main
+    host(args)
+  File "/home/sm12761/vla-gpu-latency/workloads/multipolicy.py", line 664, in host
+    wait_all(f"done_{mode}", args.warm_s + args.duration + 300, f"phase {mode}")
+  File "/home/sm12761/vla-gpu-latency/workloads/multipolicy.py", line 650, in wait_all
+    alive_or_fail(stage)
+  File "/home/sm12761/vla-gpu-latency/workloads/multipolicy.py", line 642, in alive_or_fail
+    raise RuntimeError(f"worker {wid} died during {stage} (rc {p.returncode}):\n"
+RuntimeError: worker 0 died during phase graph (rc -11):
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading  HuggingFaceTB/SmolVLM2-500M-Video-Instruct weights ...
+Reducing the number of VLM layers to 16 ...
+[w0] copy 0 smolvla ready in 17.4s: {"split_vs_stock_max_abs_diff": 0.0, "graph_vs_eager_max_abs_diff": 0.0}
+WARNING:root:Unexpected key(s) when loading model: ['normalize_inputs.buffer_observation_images_top.mean', 'normalize_inputs.buffer_observation_images_top.std', 'normalize_inputs.buffer_observation_state.mean', 'normalize_inputs.buffer_observation_state.std', 'normalize_targets.buffer_action.mean', 'normalize_targets.buffer_action.std', 'unnormalize_outputs.buffer_action.mean', 'unnormalize_outputs.buffer_action.std']
+[w0] copy 1 act ready in 1.2s: {"graph_vs_eager_max_abs_diff": 0.0}
+[w0] eager copy 0 smolvla      18 steps, median   846.77 ms
+[w0] eager copy 1 act         794 steps, median    18.87 ms
+FAILED: threads smolvla,act

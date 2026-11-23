@@ -1,0 +1,26 @@
+{
+  "worker": 2,
+  "pid": 3699500,
+  "policies": [
+    "smolvla"
+  ],
+  "batch": 1,
+  "copies": [
+    {
+      "hf_model": "lerobot/smolvla_base",
+      "dtype": "fp16",
+      "batch": 1,
+      "cameras": 3,
+      "num_steps": 10,
+      "chunk_size": 50,
+      "params": 450046176,
+      "kv_cache_bytes": 4935680,
+      "split_vs_stock_max_abs_diff": 0.0,
+      "graph_vs_eager_max_abs_diff": 0.0,
+      "graph_scope": "denoising loop (prefix eager)"
+    }
+  ],
+  "profile": {},
+  "torch_threads": 20,
+  "affinity_cpus": 20
+}

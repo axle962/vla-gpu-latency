@@ -1,0 +1,44 @@
+{
+  "worker": 0,
+  "pid": 3704357,
+  "policies": [
+    "act"
+  ],
+  "batch": 1,
+  "copies": [
+    {
+      "hf_model": "lerobot/act_aloha_sim_transfer_cube_human",
+      "dtype": "fp32",
+      "batch": 1,
+      "cameras": 1,
+      "image_input_hw": [
+        480,
+        640
+      ],
+      "chunk_size": 100,
+      "params": 51613582,
+      "graph_vs_eager_max_abs_diff": 0.0,
+      "graph_scope": "full step"
+    }
+  ],
+  "profile": {
+    "eager": {
+      "kernels_per_step": 356.0,
+      "memcpy_per_step": 3.0,
+      "gpu_busy_ms_per_step": 6.73481,
+      "gpu_busy_ms_per_step_corrected": 6.396610000000001,
+      "gpu_span_ms_per_step": 20.1956962890625,
+      "kernel_dur_us_median": 3.584
+    },
+    "graph": {
+      "kernels_per_step": 358.0,
+      "memcpy_per_step": 0.0,
+      "gpu_busy_ms_per_step": 6.807551999999999,
+      "gpu_busy_ms_per_step_corrected": 6.467452,
+      "gpu_span_ms_per_step": 7.0257900390625,
+      "kernel_dur_us_median": 4.1754999999999995
+    }
+  },
+  "torch_threads": 20,
+  "affinity_cpus": 20
+}

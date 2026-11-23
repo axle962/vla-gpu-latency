@@ -1,0 +1,42 @@
+{
+  "worker": 0,
+  "pid": 3707713,
+  "policies": [
+    "act",
+    "act"
+  ],
+  "batch": 1,
+  "copies": [
+    {
+      "hf_model": "lerobot/act_aloha_sim_transfer_cube_human",
+      "dtype": "fp32",
+      "batch": 1,
+      "cameras": 1,
+      "image_input_hw": [
+        480,
+        640
+      ],
+      "chunk_size": 100,
+      "params": 51613582,
+      "graph_vs_eager_max_abs_diff": 0.0,
+      "graph_scope": "full step"
+    },
+    {
+      "hf_model": "lerobot/act_aloha_sim_transfer_cube_human",
+      "dtype": "fp32",
+      "batch": 1,
+      "cameras": 1,
+      "image_input_hw": [
+        480,
+        640
+      ],
+      "chunk_size": 100,
+      "params": 51613582,
+      "graph_vs_eager_max_abs_diff": 0.0,
+      "graph_scope": "full step"
+    }
+  ],
+  "profile": {},
+  "torch_threads": 20,
+  "affinity_cpus": 20
+}
