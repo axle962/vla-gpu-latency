@@ -14,6 +14,7 @@ MAPE of the predicted speedup over runs and over situations (median over repeats
 | eps per GPU | 1 SmolVLA run per GPU | 1.8% | 1.0 to 2.8% | 1.8% | 25% |
 | leave policy out | other policies' runs, same GPU | 2.5% | 1.5 to 3.8% | 2.7% | 25% |
 | leave GPU out | other GPUs only | 12.7% | 8.6 to 17.1% | 13.7% | 38% |
+| eps from probe (2 GPUs, 66 runs) | eps_probe.py, no VLA | 5.2% | 3.5 to 7.2% | 5.6% | 17% |
 | T_e/D (no eps) | - | 7.1% | 4.6 to 9.7% | 7.7% | 30% |
 | 1/busy_frac | - | 16.9% | 11.0 to 23.7% | 18.4% | 62% |
 
@@ -23,50 +24,50 @@ eps = graph node cost minus the profiler's bias on each traced kernel, so it can
 
 | GPU | runs | eps per GPU (us) | eps leave-GPU-out | eps probe | C++ node cost (us) | MAPE one eps (1 run) | MAPE eps per GPU | MAPE leave policy out | MAPE leave GPU out |
 |---|---|---|---|---|---|---|---|---|---|
-| 2080 Ti | 32 | +0.52 | -0.35 | pending | 1.07 | 1.9% | 1.9% | 2.0% | 12.5% |
+| 2080 Ti | 32 | +0.52 | -0.35 | +0.11 | 1.07 | 1.9% | 1.9% | 2.0% | 12.5% |
 | A100 | 17 | -0.65 | +0.52 | pending | 0.29 | 14.6% | 2.7% | 4.3% | 14.6% |
-| RTX 4070 | 34 | -0.35 | +0.52 | pending | 0.28 | 12.6% | 1.8% | 2.8% | 12.6% |
+| RTX 4070 | 34 | -0.35 | +0.52 | -0.05 | 0.28 | 12.6% | 1.8% | 2.8% | 12.6% |
 | TITAN V | 31 | +0.80 | -0.35 | pending | 0.77 | 2.2% | 1.1% | 1.7% | 12.0% |
 
 ## By policy
 
 t = D/K, mean traced kernel time; c = T_e/K, eager time per kernel. S ~= c / (t + eps).
 
-| policy | runs | GPUs | S measured | t (us/kernel) | c (us/kernel) | one eps (1 run) | eps per GPU | leave policy out | leave GPU out | T_e/D (no eps) | 1/busy_frac |
-|---|---|---|---|---|---|---|---|---|---|---|---|
-| ACT | 12 | 4 | 1.63 to 6.77 | 13.0 | 31.5 | 3.5% | 2.6% | 2.4% | 7.3% | 4.4% | 4.4% |
-| Diffusion Policy | 36 | 4 | 0.99 to 1.20 | 40.8 | 43.7 | 0.9% | 0.4% | 0.4% | 1.8% | 0.9% | 1.1% |
-| OpenVLA | 2 | 1 | 2.80 to 2.87 | 9.4 | 25.7 | 8.7% | 3.5% | 3.6% | 8.7% | 3.6% | 13.1% |
-| SmolVLA | 41 | 4 | 1.52 to 24.26 | 3.7 | 34.2 | 14.1% | 2.3% | 4.6% | 24.5% | 14.2% | 30.8% |
-| SmolVLA compiled | 9 | 3 | 1.12 to 10.89 | 8.8 | 36.0 | 4.2% | 3.0% | 3.1% | 11.2% | 5.5% | 5.5% |
-| pi0 | 6 | 3 | 2.90 to 11.69 | 4.8 | 41.0 | 8.5% | 2.4% | 1.7% | 15.0% | 6.8% | 48.2% |
-| pi0-FAST | 4 | 3 | 1.73 to 3.49 | 13.4 | 39.8 | 4.7% | 2.1% | 2.1% | 6.7% | 3.5% | 3.5% |
-| pi0.5 | 4 | 3 | 3.17 to 10.93 | 5.1 | 41.0 | 7.7% | 1.7% | 1.0% | 15.1% | 7.1% | 49.1% |
+| policy | runs | GPUs | S measured | t (us/kernel) | c (us/kernel) | one eps (1 run) | eps per GPU | leave policy out | leave GPU out | eps from probe | T_e/D (no eps) | 1/busy_frac |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| ACT | 12 | 4 | 1.63 to 6.77 | 13.0 | 31.5 | 3.5% | 2.6% | 2.4% | 7.3% | 3.1% | 4.4% | 4.4% |
+| Diffusion Policy | 36 | 4 | 0.99 to 1.20 | 40.8 | 43.7 | 0.9% | 0.4% | 0.4% | 1.8% | 0.5% | 0.9% | 1.1% |
+| OpenVLA | 2 | 1 | 2.80 to 2.87 | 9.4 | 25.7 | 8.7% | 3.5% | 3.6% | 8.7% | nan% | 3.6% | 13.1% |
+| SmolVLA | 41 | 4 | 1.52 to 24.26 | 3.7 | 34.2 | 14.1% | 2.3% | 4.6% | 24.5% | 10.7% | 14.2% | 30.8% |
+| SmolVLA compiled | 9 | 3 | 1.12 to 10.89 | 8.8 | 36.0 | 4.2% | 3.0% | 3.1% | 11.2% | 3.5% | 5.5% | 5.5% |
+| pi0 | 6 | 3 | 2.90 to 11.69 | 4.8 | 41.0 | 8.5% | 2.4% | 1.7% | 15.0% | 5.1% | 6.8% | 48.2% |
+| pi0-FAST | 4 | 3 | 1.73 to 3.49 | 13.4 | 39.8 | 4.7% | 2.1% | 2.1% | 6.7% | 3.8% | 3.5% | 3.5% |
+| pi0.5 | 4 | 3 | 3.17 to 10.93 | 5.1 | 41.0 | 7.7% | 1.7% | 1.0% | 15.1% | 5.1% | 7.1% | 49.1% |
 
 ## Decisions: capture if predicted S >= threshold
 
 Accuracy over all runs / over the hard runs (measured speedup within a factor 1.25 of the threshold). 'Always capture' is right for the worth-it runs only.
 
-| threshold | worth it | hard (within 1.25x) | one eps (1 run) | eps per GPU | leave policy out | leave GPU out | T_e/D (no eps) | 1/busy_frac | always capture |
-|---|---|---|---|---|---|---|---|---|---|
-| 1.5x | 77/114 | 6 | 100% / 100% | 100% / 100% | 100% / 100% | 100% / 100% | 100% / 100% | 98% / 83% | 68% |
-| 2x | 72/114 | 12 | 100% / 100% | 100% / 100% | 100% / 100% | 100% / 100% | 100% / 100% | 97% / 83% | 63% |
-| 3x | 57/114 | 18 | 99% / 94% | 99% / 94% | 99% / 94% | 98% / 89% | 97% / 83% | 96% / 78% | 50% |
-| 5x | 39/114 | 11 | 99% / 91% | 100% / 100% | 99% / 91% | 95% / 45% | 96% / 55% | 91% / 82% | 34% |
-| 10x | 22/114 | 23 | 92% / 61% | 98% / 91% | 98% / 91% | 91% / 57% | 98% / 91% | 89% / 57% | 19% |
+| threshold | worth it | hard (within 1.25x) | one eps (1 run) | eps per GPU | leave policy out | leave GPU out | eps from probe | T_e/D (no eps) | 1/busy_frac | always capture |
+|---|---|---|---|---|---|---|---|---|---|---|
+| 1.5x | 77/114 | 6 | 100% / 100% | 100% / 100% | 100% / 100% | 100% / 100% | 100% / 100% | 100% / 100% | 98% / 83% | 68% |
+| 2x | 72/114 | 12 | 100% / 100% | 100% / 100% | 100% / 100% | 100% / 100% | 100% / 100% | 100% / 100% | 97% / 83% | 63% |
+| 3x | 57/114 | 18 | 99% / 94% | 99% / 94% | 99% / 94% | 98% / 89% | 100% / 100% | 97% / 83% | 96% / 78% | 50% |
+| 5x | 39/114 | 11 | 99% / 91% | 100% / 100% | 99% / 91% | 95% / 45% | 100% / 100% | 96% / 55% | 91% / 82% | 34% |
+| 10x | 22/114 | 23 | 92% / 61% | 98% / 91% | 98% / 91% | 91% / 57% | 98% / 94% | 98% / 91% | 89% / 57% | 19% |
 
-Lowest accuracy over 25 thresholds from 1.2x to 15x: one eps (1 run) 93%, eps per GPU 97%, leave policy out 94%, leave GPU out 90%, T_e/D (no eps) 92%, 1/busy_frac 82%.
+Lowest accuracy over 25 thresholds from 1.2x to 15x: one eps (1 run) 93%, eps per GPU 97%, leave policy out 94%, leave GPU out 90%, eps from probe 85%, T_e/D (no eps) 92%, 1/busy_frac 82%.
 
 ## Ranking
 
 Spearman correlation of predicted and measured speedup over the runs of each GPU.
 
-| GPU | runs | one eps (1 run) | eps per GPU | leave policy out | leave GPU out | T_e/D (no eps) | 1/busy_frac |
-|---|---|---|---|---|---|---|---|
-| 2080 Ti | 32 | 0.991 | 0.991 | 0.993 | 0.996 | 0.995 | 0.975 |
-| A100 | 17 | 0.988 | 0.988 | 0.988 | 0.988 | 0.988 | 0.968 |
-| RTX 4070 | 34 | 0.990 | 0.990 | 0.990 | 0.990 | 0.990 | 0.946 |
-| TITAN V | 31 | 0.973 | 0.973 | 0.973 | 0.973 | 0.973 | 0.946 |
+| GPU | runs | one eps (1 run) | eps per GPU | leave policy out | leave GPU out | eps from probe | T_e/D (no eps) | 1/busy_frac |
+|---|---|---|---|---|---|---|---|---|
+| 2080 Ti | 32 | 0.991 | 0.991 | 0.993 | 0.996 | 0.995 | 0.995 | 0.975 |
+| A100 | 17 | 0.988 | 0.988 | 0.988 | 0.988 | nan | 0.988 | 0.968 |
+| RTX 4070 | 34 | 0.990 | 0.990 | 0.990 | 0.990 | 0.990 | 0.990 | 0.946 |
+| TITAN V | 31 | 0.973 | 0.973 | 0.973 | 0.973 | nan | 0.973 | 0.946 |
 
 ## Largest errors (eps per GPU)
 

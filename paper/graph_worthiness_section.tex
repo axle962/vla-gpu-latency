@@ -108,9 +108,17 @@ including host work that contention slows in graph mode too.
 \paragraph{Limitations.}
 The decoder windows come from the stock dynamic-cache decoder, which launches about 3\% more
 kernels per token than the static-cache path that is graphed; OpenVLA has two runs on one GPU.
-$\varepsilon$ needs one calibration run per machine; a microbenchmark that measures it without
-any VLA (\texttt{workloads/eps\_probe.py}) is included, and its results are \pending{to be
-added}. The rule predicts the speedup of a region whose kernels stay the same under capture; it
+$\varepsilon$ needs one calibration run per machine. We also measured it without any policy,
+with a microbenchmark (\texttt{workloads/eps\_probe.py}: graph time per kernel minus the
+CUPTI-traced eager duration on chains of seven small op types at SmolVLA's shapes). On the 2080 Ti
+and RTX 4070 it gives $+0.11$ and $-0.05\,\mu$s against $+0.52$ and $-0.35\,\mu$s fitted from
+SmolVLA; over the 66 runs on those two GPUs the rule is then 5.2\% off (CI 3.5--7.2\%), better than
+no $\varepsilon$ (6.2\%) or one $\varepsilon$ for all GPUs (7.4\%) but well behind one calibration
+run of any policy (1.9\% per GPU, 2.4\% leave policy out). The gap differs in sign between the
+GPUs, so it is not a constant offset: kernels inside a real policy run with a different cache
+state and clock than hot microbenchmark chains, and the RTX 4070 probe ran under a different
+PyTorch build (2.8 vs.\ 2.10, so a different CUPTI) than its traces. We therefore recommend
+calibrating $\varepsilon$ on one run of a representative policy. The rule predicts the speedup of a region whose kernels stay the same under capture; it
 does not predict what fusion would achieve.
 
 \begin{figure}[t]

@@ -24,6 +24,7 @@ S = T_e / (D + K * eps)  ~=  c / (t + eps)
 | other GPUs only (leave GPU out) | 12.7% (8.6 to 17.1%) |
 | no eps, `T_e / D` | 7.1% |
 | `1 / gpu_busy_frac` | 16.9% |
+| microbenchmark only (2 GPUs, 66 runs) | 5.2% (3.5 to 7.2%) |
 
 The leave-policy-out version makes the right capture decision for at least 94% of the runs at every
 threshold from 1.2x to 15x, and 91% of the hard runs (measured speedup within a factor 1.25 of
@@ -37,8 +38,12 @@ the threshold) at 5x and 10x.
 2. **Profile on a quiet host**, and time `T_e` under deployment conditions. Under CPU contention
    the traced durations grow (t 3.0 to 4.1 us for SmolVLA) and the rule is 19 to 25% low; a
    profile from the quiet host fixes it (within +8%).
-3. Calibrate `eps` once per machine: on one representative workload, or with
-   `scripts/run_eps_probe.sh` (no VLA needed; results pending).
+3. Calibrate `eps` once per machine on one run of a representative policy. The VLA-free
+   microbenchmark (`scripts/run_eps_probe.sh`) is weaker: on the 2080 Ti and RTX 4070 (66 runs)
+   it gives 5.2% vs 1.9% with one SmolVLA run per GPU, 6.2% without eps and 20.7% for
+   `1 / gpu_busy_frac`. Its eps is 0.3 to 0.4 us off, in opposite directions on the two GPUs
+   (the RTX 4070 probe also ran under torch 2.8, the traces under 2.10). A100 and TITAN V
+   probes not run (TITAN V busy with another user's jobs on 2026-11-23).
 
 ## Running
 
