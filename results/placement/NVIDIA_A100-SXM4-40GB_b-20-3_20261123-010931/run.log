@@ -1,1 +1,39 @@
 building smolvla on cuda:0
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading  HuggingFaceTB/SmolVLM2-500M-Video-Instruct weights ...
+Reducing the number of VLM layers to 16 ...
+building smolvla on cuda:1
+Loading  HuggingFaceTB/SmolVLM2-500M-Video-Instruct weights ...
+Reducing the number of VLM layers to 16 ...
+[gpu] prefix         median    57.956 ms  (n=30)
+[gpu] denoise_eager  median   317.960 ms  (n=30)
+[gpu] e2e_eager      median   379.002 ms  (n=30)
+[gpu] denoise_graph  median    35.899 ms  (n=30)
+[gpu] e2e_hybrid     median    94.925 ms  (n=30)
+[gpu] pipe_interval  median    60.705 ms per request (20 requests x 5 windows), max |diff| vs sequential 0.0e+00
+[gpu-gpu] prefix         median    58.316 ms  (n=30)
+[gpu-gpu] denoise_eager  median   328.732 ms  (n=30)
+[gpu-gpu] e2e_eager      median   389.467 ms  (n=30)
+[gpu-gpu] handoff        median     1.056 ms  (n=30)
+[gpu-gpu] denoise_graph  median    35.825 ms  (n=30)
+[gpu-gpu] e2e_hybrid     median    94.966 ms  (n=30)
+[gpu-gpu] pipe_interval  median    60.940 ms per request (20 requests x 5 windows), max |diff| vs sequential 0.0e+00
+/scratch/aj4762/envs/smolvla/lib/python3.10/site-packages/torch/profiler/profiler.py:217: UserWarning: Warning: Profiler clears events at the end of each cycle.Only events from the current cycle will be reported.To keep events across cycles, set acc_events=True.
+  _warn_once(
+[gpu] e2e_eager_repeat median   380.304 ms (drift check)
+placement dev_prefix dev_denoise             mode  n  median_ms    mean_ms   std_ms     min_ms
+      gpu     cuda:0      cuda:0           prefix 30  57.955553  57.931458 0.415234  57.453729
+      gpu     cuda:0      cuda:0    denoise_eager 30 317.960249 318.058128 1.335404 315.214902
+      gpu     cuda:0      cuda:0        e2e_eager 30 379.001633 379.696016 3.690310 376.502896
+      gpu     cuda:0      cuda:0    denoise_graph 30  35.899210  35.916837 0.050364  35.878521
+      gpu     cuda:0      cuda:0       e2e_hybrid 30  94.924711  94.905005 0.280734  94.535443
+      gpu     cuda:0      cuda:0    pipe_interval  5  60.704875  60.761033 0.142416  60.621727
+  gpu-gpu     cuda:0      cuda:1           prefix 30  58.315741  58.313437 0.113464  58.126973
+  gpu-gpu     cuda:0      cuda:1    denoise_eager 30 328.731579 328.789774 0.602134 327.936291
+  gpu-gpu     cuda:0      cuda:1        e2e_eager 30 389.467286 389.226354 1.333943 386.260419
+  gpu-gpu     cuda:0      cuda:1          handoff 30   1.055963   1.057775 0.011770   1.038806
+  gpu-gpu     cuda:0      cuda:1    denoise_graph 30  35.825171  35.827398 0.011628  35.815966
+  gpu-gpu     cuda:0      cuda:1       e2e_hybrid 30  94.966236  95.125559 0.382996  94.691961
+  gpu-gpu     cuda:0      cuda:1    pipe_interval  5  60.939895  60.962101 0.187689  60.783875
+      gpu     cuda:0      cuda:0 e2e_eager_repeat 30 380.303685 380.540569 1.157110 378.771681
+wrote results/placement/NVIDIA_A100-SXM4-40GB_b-20-3_20261123-010931
