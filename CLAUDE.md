@@ -674,7 +674,7 @@ State:
   throughput (small grids leave SMs idle); 8 graphed SmolVLA copies under MPS reach 72 steps/s,
   within 11% of batch 8. Serialized model MAPE for processes without MPS: eager 16%, graph 21%
   (time-slicing costs more than serialization, growing with kernel count); MPS sits far below
-  the model (needs an SM-sharing term). CIMS runs pending.
+  the model (needs an SM-sharing term). CIMS runs pending. CIMS runs 2026-11-23 (quick matrix, `docs/multipolicy.md`): TITAN V (cuda3) and RTX 4070 (cuda5) confirm the picture; graphed SmolVLA x4 serializes without MPS (3.7x, 2.1x) and runs at 1.8x / 1.4x with it; model MAPE procs eager 6.7% / 3.2%, graph 12.5% / 16.0%. cuda2 not run (busy, scratch full).
 - **Next:**
   1. Paper and slides (deferred by the user until the teammates' work is merged): move the
      headline to `slot_drv` on four GPUs, add ACT/Diffusion (three regimes: dispatch bound,

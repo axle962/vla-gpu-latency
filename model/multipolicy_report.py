@@ -106,7 +106,7 @@ def main() -> None:
     lines = [
         "# Multi-policy hosting on one GPU",
         "",
-        f"GPU `{meta['gpu']}` (driver {meta['driver']}), host `{meta['host']}` ({meta['cpu']}, "
+        f"GPU `{meta['gpu'].splitlines()[0]}` (driver {meta['driver'].splitlines()[0]}), host `{meta['host']}` ({meta['cpu']}, "
         f"{meta['affinity_cpus']} CPUs in the affinity mask), torch {meta['torch']} cu"
         f"{meta['cuda_runtime']}. Policy settings: {json.dumps(meta['policy_args'])}. "
         "Closed loop (a new step as soon as the previous one returned), median of the middle "

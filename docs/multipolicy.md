@@ -176,5 +176,58 @@ What the full matrix adds:
    no-interference bound is at 51 to 64%). Under MPS and for graphed threads the measurements
    sit far below it (an SM-sharing term is the natural next step for the model).
 
-Not run yet: the CIMS GPUs (2080 Ti, TITAN V, RTX 4070: `scripts/run_multipolicy.sh quick`;
-N = 8 SmolVLA needs ~12 GB and will not fit the 11 to 12 GB cards).
+## Results: CIMS TITAN V (cuda3) and RTX 4070 (cuda5), 2026-11-23, quick matrix
+
+`results/multipolicy/NVIDIA_TITAN_V_cuda3_20261123-130336/` (Xeon Gold 5118 2.3 GHz, 24 cores
+pinned, driver 580) and `results/multipolicy/NVIDIA_GeForce_RTX_4070_cuda5_20261123-130736/`
+(Xeon E5-2650 v2 2.6 GHz, 8 cores pinned, driver 595); both torch 2.10.0+cu128, 15 s per mode,
+all 43 policy copies bit-exact on each. Run directly on the hosts (no Slurm) after the other
+users' jobs ended; the cuda5 run shared the card with an idle 154 MB process of another user
+(0% utilization, noted in gpus.csv), the cuda3 run had GPU 0 to itself. The threads
+SmolVLA+ACT mix failed on both as before.
+
+Alone (eager / graph ms, GPU share of the graph step): TITAN V SmolVLA 337 / 126 (75%), ACT
+8.8 / 6.0 (100%); RTX 4070 SmolVLA 607 / 118 (34%), ACT 15.7 / 3.8 (87%). The 4070's old host
+makes eager SmolVLA 1.8x slower than on the TITAN V while the graph step is faster; the TITAN
+V is GPU bound once graphed (95 ms of GPU work in a 126 ms step).
+
+Median step per copy (ms) and total steps/s, SmolVLA graph mode and ACT graph mode:
+
+| hosting | TITAN V SmolVLA | TITAN V ACT | RTX 4070 SmolVLA | RTX 4070 ACT |
+|---|---|---|---|---|
+| alone | 126 (8.0/s) | 6.0 (167/s) | 118 (8.5/s) | 3.8 (264/s) |
+| procs x2 | 238 (8.3/s) | 13.4 (150/s) | 154 (12.8/s) | 7.8 (256/s) |
+| procs x4 | 461 (8.7/s) | 26.7 (150/s) | 249 (16.0/s) | 15.6 (254/s) |
+| procs-mps x2 | 159 (12.6/s) | 9.8 (203/s) | 129 (15.5/s) | 6.9 (288/s) |
+| procs-mps x4 | 231 (17.3/s) | 17.1 (234/s) | 163 (24.7/s) | 13.5 (294/s) |
+| threads x4 | 227 (17.4/s) | 16.8 (239/s) | 660 (6.1/s) | 13.2 (302/s) |
+| batch 4 | 214 (18.7/s) | | 183 (21.7/s) | |
+
+Eager SmolVLA, four copies: TITAN V procs 476 ms (1.41x alone), MPS 366 (1.08x); RTX 4070 procs
+674 (1.11x), MPS 667 (1.10x). Mixed SmolVLA + ACT (graph, ms): TITAN V procs 269 / 12.0, MPS
+203 / 7.3; RTX 4070 procs 173 / 4.5, MPS 167 / 4.6.
+
+What the CIMS GPUs add:
+
+1. The hosting picture holds on three generations (Volta, Ada, Blackwell): eager copies share
+   a GPU almost for free, graphed copies serialize without MPS (4 copies: 3.7x on the TITAN
+   V, 2.1x on the 4070, 3.1x on the PRO 6000) and recover most of it with MPS (1.8x, 1.4x,
+   1.4x), and batching identical copies is the throughput ceiling that MPS approaches
+   (TITAN V 17.3 vs 18.7 steps/s, 4070 24.7 vs 21.7, where MPS even beats batch 4 because
+   the batched step is host bound on the slow 4070 CPU).
+2. How much MPS helps depends on how full the GPU already is. The TITAN V runs SmolVLA's graph
+   step at 75% GPU share, so four MPS copies get 2.2x the solo throughput; the PRO 6000 at
+   44% gets 2.8x; the 4070 at 34% gets 2.9x. ACT is 87 to 100% busy on every card and MPS
+   gives it 1.1 to 2.1x only.
+3. The host CPU sets the eager and threads results. On the 4070's 8-core Xeon E5-2650 v2
+   eager SmolVLA is 607 ms and four threads take 4.4 s per step (7.3x); four ACT threads
+   8.5x. The TITAN V host (24 cores at 2.3 GHz) collapses less (4.7x and 6.3x).
+4. The serialized model is at its best on these cards: procs eager 6.7% (TITAN V) and 3.2%
+   (4070) MAPE, procs graph 12.5% and 16.0%, against 59% and 42% for the no-interference
+   bound in graph mode.
+   Under MPS it stays within 8% on the 4070 (eager 4.8%, graph 8.1%), where the overlap is
+   small, and overpredicts by 19 to 37% on the TITAN V, where kernels of different processes
+   overlap more.
+
+Not run: cuda2 (RTX 2080 Ti) had both cards busy and under 10 GB of free scratch during this
+session; N = 8 SmolVLA needs ~12 GB and does not fit the 11 to 12 GB CIMS cards.

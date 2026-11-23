@@ -540,7 +540,8 @@ def cpu_model() -> str:
 
 def nvsmi(query: str) -> str:
     try:
-        return subprocess.run(["nvidia-smi", f"--query-gpu={query}", "--format=csv,noheader"],
+        return subprocess.run(["nvidia-smi", "-i", os.environ.get("CUDA_VISIBLE_DEVICES", "0").split(",")[0],
+                                f"--query-gpu={query}", "--format=csv,noheader"],
                               capture_output=True, text=True, timeout=20).stdout.strip()
     except (OSError, subprocess.TimeoutExpired):
         return ""
