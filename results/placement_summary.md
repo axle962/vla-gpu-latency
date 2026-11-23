@@ -140,6 +140,11 @@ with t0 and BW from the copy calibration and each device's own baseline
 
 ## Open items
 
+- **L4 (NYU HPC `g2-standard-12`): did not boot.** Jobs 40515 (22 Nov) and 41121 (23 Nov)
+  ended in NODE_FAIL / REQUEUED during node boot on b-31-1, b-31-4 and b-31-5 (about
+  25 GPU-minutes billed for boots), as Aditya's L4 jobs did in November. Dropped; the L4 is not
+  a measured target. Reported or to report to hpc@nyu.edu.
+
 - Optional: cuda3 rerun with the fixed script (a third machine; the A100 run already gives a
   second clean one).
 - Report cuda2 GPU 0 to helpdesk@cims.nyu.edu; after a reset, rerun the GPU-GPU placement on
