@@ -278,7 +278,9 @@ BUILDERS = {"smolvla": build_smolvla, "toy": build_toy}
 
 def capture_graph(half: Half, pad, kv):
     """Capture half.denoise on half.dev with static inputs. Returns (graph, static_pad,
-    static_kv, static_out) or raises."""
+    static_kv, static_out, static_x) or raises. The caller must keep every static tensor
+    alive while it replays the graph: a freed static input gets reused by later
+    allocations, and the replay then computes on garbage (timings stay valid)."""
     static_x = half.noise.clone()
     static_pad = pad.clone()
     static_kv = {i: {k: v.clone() for k, v in layer.items()} for i, layer in kv.items()}
@@ -296,7 +298,7 @@ def capture_graph(half: Half, pad, kv):
         cs = torch.cuda.Stream(device=half.dev)
         with torch.cuda.graph(g, stream=cs):
             static_out = half.denoise(static_pad, static_kv, static_x)
-    return g, static_pad, static_kv, static_out
+    return g, static_pad, static_kv, static_out, static_x
 
 
 def copy_calibration(pairs: set[tuple[str, str]], reps: int) -> list[dict]:
@@ -359,7 +361,8 @@ def run_placement(name: str, a: Half, b: Half, args, lat: list[dict]) -> dict:
     info["graph_ok"], info["graph_error"] = False, ""
     if b.dev.type == "cuda" and not args.no_graph:
         try:
-            g, s_pad, s_kv, s_out = capture_graph(b, pad_b, kv_b)
+            # s_x is a local of this function on purpose: it must outlive every replay below.
+            g, s_pad, s_kv, s_out, s_x = capture_graph(b, pad_b, kv_b)
             g.replay()
             sync(b.dev)
             diff = (s_out.float().cpu() - info["output"]).abs().max().item()
