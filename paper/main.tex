@@ -32,8 +32,8 @@ Across the six source/target pairs and seven configurations it predicts the eage
 loop with 16\%, versus 64\% for bandwidth-ratio scaling and 86 to 98\% for the VLA-Perf roofline, and it reproduces the ordering
 inversion where the TITAN V host is fastest in eager mode while its GPU is slowest under
 graphs. We also test the cache-aware half of our hypothesis: an L2 working-set sweep on four
-GPUs shows that inter-kernel L2 residency changes the graphed loop by only 3 to 13\%, because
-each denoising step streams about 250\,MB of weights, more than any L2 we measured. For these
+GPUs shows that inter-kernel L2 residency changes SmolVLA's graphed loop by only 1 to 13\%, because
+each denoising step streams about 250\,MB of weights, more than any L2 we measured. For such
 policies latency is launch bound, not cache bound; we identify where the cache term should
 matter and the experiment that would show it.
 \end{abstract}
@@ -295,7 +295,7 @@ orderings that spec ratios get wrong. Limitations: one host per GPU, SmolVLA onl
 cross-GPU validation, and an eager host model that does not transfer to a much slower host
 (the RTX 4070 on cuda5, Section~\ref{sec:rtx4070}), although the graph loop does. The largest
 L2 we could measure is 40\,MB, so the PRO 6000 (128\,MB) inversion remains untested; the
-cache term of our title is second order for every policy and GPU we measured.
+cache term of our title is second order for SmolVLA on every GPU we measured.
 Section~\ref{sec:l2} gives the experiment that would test the cache-bound case (ACT in FP16,
 about 104\,MB of weights, on a PRO 6000), which we plan as the next step.
 
