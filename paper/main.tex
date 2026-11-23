@@ -31,7 +31,11 @@ Across the six source/target pairs and seven configurations it predicts the eage
 7.5\% MAPE, the hybrid (eager prefix plus graphed loop) step with 5.2\%, and the CUDA-graph
 loop with 16\%, versus 64\% for bandwidth-ratio scaling and 86 to 98\% for the VLA-Perf roofline, and it reproduces the ordering
 inversion where the TITAN V host is fastest in eager mode while its GPU is slowest under
-graphs.
+graphs. We also test the cache-aware half of our hypothesis: an L2 working-set sweep on four
+GPUs shows that inter-kernel L2 residency changes the graphed loop by only 3 to 13\%, because
+each denoising step streams about 250\,MB of weights, more than any L2 we measured. For these
+policies latency is launch bound, not cache bound; we identify where the cache term should
+matter and the experiment that would show it.
 \end{abstract}
 
 \section{Introduction}
@@ -48,14 +52,18 @@ performance models target~\cite{hongkim,gpuperf}. Our measurements show that (i)
 is dominated by host-side dispatch, about 27\,$\mu$s of CPU per kernel; (ii) once the loop is
 captured as a CUDA graph, kernels are a few microseconds long and their time is set by kernel
 start-up and memory latency, not bandwidth; and (iii) consequently the benefit of CUDA graphs
-depends on the pairing of host CPU and GPU, not on the workload alone.
+depends on the pairing of host CPU and GPU, not on the workload alone. (iv) The L2 cache, the
+second term of our title, matters less than we expected: the weights a step touches exceed
+every L2 we measured, so the cache term is second order today, and we state when it would not be.
 
 \textbf{Contributions.} (1) Traces of two VLAs across three GPU generations in eager, graph and
 hybrid modes, all bit-exact against the stock models. (2) Standalone CUDA C++ kernels and a C++
 replay of the traced step that runs on the CIMS machines. (3) A launch-aware latency model that
 predicts eager, graph and hybrid latency and CUDA-graph speedup on a target GPU from a source
 trace plus target microbenchmarks. (4) An evaluation on six source/target pairs with
-percentage error per case, against spec-ratio and roofline baselines.
+percentage error per case, against spec-ratio and roofline baselines. (5) A measured test of
+the cache term, with the conditions and the experiment under which it would become first order
+(Section~\ref{sec:l2}).
 
 \section{Survey}
 \textbf{Analytical GPU models.} Hong and Kim~\cite{hongkim} model memory-level and
@@ -190,7 +198,7 @@ MAPE on the graph loop. Per-op-class slot ratios measured on the target capture 
 architecture and the clock it runs at, which is why they are our default; a target's
 sustained clock is a cheap extra feature when source and target share an SM design.
 
-\subsection{How much does L2 residency matter?}
+\subsection{How much does L2 residency matter?}\label{sec:l2}
 To isolate the cache term we rerun our C++ replay of the 10-step loop with all GEMM weights
 sharing a pool of $N$ MB, so the loop touches $N$ MB of distinct weights with unchanged shapes
 and kernels, and sweep $N$ from 3 to 256\,MB. On the A100 (40\,MB L2, about 20 to 27\,MB
@@ -206,6 +214,21 @@ bounds the saving at 6.3\%, 3.0\% and 9.1\% with cuBLAS (5.1\%, 1.0\% and 12.8\%
 GEMM). The RTX 4070, with the largest L2 relative to its bandwidth, gains most, but the real
 expert's 250\,MB of weights per step exceed every L2 we measured, so in the actual loop they
 stream from DRAM on all four GPUs.
+
+\paragraph{When would the cache term matter?} Two conditions must hold together: the weights a
+graphed step touches must fit in the GPU's \emph{effective} L2 (on the A100 20 to 27\,MB of
+the nominal 40\,MB, as measured above), and the loop must be long enough in DRAM time for the
+saving to show. A small policy on a GPU with a very large L2 meets both: ACT has 52M parameters,
+about 104\,MB in FP16, against the 128\,MB L2 of the RTX PRO 6000 (Blackwell; spec value). We
+plan three measurements there, using the same tools as above: (a) the bandwidth sweep, to find
+the PRO 6000's effective L2 capacity; (b) the weight-pool sweep of the C++ replay up to
+256\,MB, to locate its knee; and (c) a graphed ACT trace in FP16 on the PRO 6000 and on a GPU
+whose L2 it does not fit in (the A100 or an H200, 50\,MB). If the weights then stay in L2, the
+graph step becomes bound by L2 rather than DRAM bandwidth and our slot-transfer model, which
+has no cache term, should underpredict the PRO 6000's advantage; that gap is the test of the
+cache-aware model and of the PRO 6000 versus H200 inversion reported in public
+benchmarks~\cite{yotta}. Our team has access to a PRO 6000 through Empire AI, used for the
+multi-policy study, so this experiment is within reach.
 
 \subsection{Comparison with VLA-Perf}
 \begin{table}[t]\centering\small
@@ -271,7 +294,10 @@ microbenchmarks predicts eager and hybrid latency within about 5 to 8\%, and rep
 orderings that spec ratios get wrong. Limitations: one host per GPU, SmolVLA only for
 cross-GPU validation, and an eager host model that does not transfer to a much slower host
 (the RTX 4070 on cuda5, Section~\ref{sec:rtx4070}), although the graph loop does. The largest
-L2 we could measure is 40\,MB, so the PRO 6000 (128\,MB) inversion remains untested.
+L2 we could measure is 40\,MB, so the PRO 6000 (128\,MB) inversion remains untested; the
+cache term of our title is second order for every policy and GPU we measured.
+Section~\ref{sec:l2} gives the experiment that would test the cache-bound case (ACT in FP16,
+about 104\,MB of weights, on a PRO 6000), which we plan as the next step.
 
 \begin{thebibliography}{9}
 \bibitem{vlaperf} W.~Jiang, J.~Clemons, K.~Sankaralingam, C.~Kozyrakis. How Fast Can I Run My
