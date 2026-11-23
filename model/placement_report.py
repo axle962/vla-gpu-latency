@@ -200,6 +200,37 @@ def main() -> None:
         else:
             lines += ["No split placement with its colocated baselines in this run.", ""]
 
+    if "pipe_interval" in med.columns and med["pipe_interval"].notna().any():
+        lines += ["## Pipelined requests", ""]
+        rows = []
+        for p in med.index:
+            pi = get(p, "pipe_interval")
+            if pi is None:
+                continue
+            info = meta["placements"][p]
+            seq, pre, loop = get(p, "e2e_hybrid"), get(p, "prefix"), get(p, "denoise_graph")
+            hand = get(p, "handoff") or 0.0
+            bound = max(pre, hand + loop)  # two-stage pipeline: the slower stage sets the pace
+            diff = info.get("pipe_max_abs_diff_vs_sequential", float("nan"))
+            rows.append({
+                "placement": p,
+                "sequential (ms/request)": f"{seq:.1f}",
+                "pipelined (ms/request)": f"{pi:.1f}",
+                "throughput gain": f"{seq / pi:.2f}x",
+                "bound max(prefix, handoff+loop)": f"{bound:.1f}",
+                "measured vs bound": pct(pi, bound),
+                "max diff vs sequential": f"{diff:.1e}",
+            })
+        lines += [md(pd.DataFrame(rows)), ""]
+        lines += [
+            "The prefix of request t+1 runs while the graph loop of request t replays (same GPU: "
+            "its own stream; two GPUs: the second GPU). The bound assumes the stages do not slow "
+            "each other; on one GPU they share the SMs, so the measured interval sits above it by "
+            "the contention. Requests alternate between two observations and every output is "
+            "compared with the sequential one (0 means no race on the shared KV buffers).",
+            "",
+        ]
+
     lines += ["## Additivity inside each placement", ""]
     rows = []
     for p in med.index:

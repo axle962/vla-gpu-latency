@@ -7,13 +7,15 @@
 #   trace    SmolVLA sweep (7 configs, as on every other GPU) + a baseline repeat
 #   pi       pi0 and pi0.5 traces, FP16 and BF16 (needs envs/pi and the weights in $HF_HOME)
 #   place    hosting placements on this GPU and its host CPU (workloads/placement.py)
+#   pipe     pipelined requests on one GPU and across two (needs --gres=gpu:2): a toy-model
+#            check of the stream ordering first, then SmolVLA (placements gpu and gpu-gpu)
 # Stages are the arguments (default: calib dispatch bench trace). Example on NYU Torch:
 #   sbatch -A <account> -p <partition> --gres=gpu:1 scripts/cluster/target_gpu.sbatch
 #   sbatch -A <account> -p <partition> --gres=gpu:1 scripts/cluster/target_gpu.sbatch pi place
 # Build first on the login node (sm_80/89/90 for A100, L40S, H100/H200; CUDA >= 12.0):
 #   make -C bench ARCHS="80 89 90" BUILD=build-hpc
 # Cost estimate per GPU: calib 5 min, dispatch 5 min, bench 8 min, trace 35 min, pi 30 min,
-# place 25 min (CPU halves); default stages about 1 GPU-hour.
+# place 25 min (CPU halves), pipe 10 min on 2 GPUs; default stages about 1 GPU-hour.
 #SBATCH --job-name=target-gpu
 #SBATCH --cpus-per-task=16
 #SBATCH --mem=64G
@@ -88,6 +90,10 @@ for s in "${STAGES[@]}"; do
     # One GPU here, so gpu-gpu is skipped. The CPU halves use this job's cores. Slurm gives the
     # job its GPU exclusively, so the runner's shared-GPU checks are skipped (FORCE=1).
     run placement sh -c "WORK=$WORK FORCE=1 scripts/run_placement.sh run"
+    ;;
+  pipe)
+    run pipe-smoke sh -c "WORK=$WORK FORCE=1 scripts/run_placement.sh smoke --placements gpu,gpu-gpu --pipeline"
+    run pipe sh -c "WORK=$WORK FORCE=1 scripts/run_placement.sh run --placements gpu,gpu-gpu --pipeline"
     ;;
   *)
     echo "unknown stage $s"; fail=$((fail + 1))
