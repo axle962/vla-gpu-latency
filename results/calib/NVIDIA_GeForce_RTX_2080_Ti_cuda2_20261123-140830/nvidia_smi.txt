@@ -1,0 +1,2 @@
+name, pstate, clocks.current.sm [MHz], clocks.max.sm [MHz], driver_version
+NVIDIA GeForce RTX 2080 Ti, P8, 300 MHz, 2160 MHz, 595.104.02
