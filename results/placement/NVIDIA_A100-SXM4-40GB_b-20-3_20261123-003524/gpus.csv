@@ -1,0 +1,3 @@
+index, name, pci.bus_id, pstate, clocks.current.sm [MHz], clocks.max.sm [MHz], temperature.gpu, power.draw [W], utilization.gpu [%], memory.used [MiB]
+0, NVIDIA A100-SXM4-40GB, 00000000:00:04.0, P0, 210 MHz, 1410 MHz, 34, 58.01 W, 0 %, 0 MiB
+1, NVIDIA A100-SXM4-40GB, 00000000:00:05.0, P0, 210 MHz, 1410 MHz, 36, 56.89 W, 0 %, 0 MiB
