@@ -1,0 +1,78 @@
+% Hosting placement study (direction 4). Standalone subsection: \input{placement_section}
+% from main.tex where it fits (Experiments and Analysis). Numbers: results/placement_summary.md.
+\subsection{Hosting the two halves on different devices}
+\label{sec:placement}
+
+A flow-matching VLA step has two halves joined by one handoff: the prefix (vision tower and
+VLM, run once, filling the KV cache) and the action-expert loop (ten flow steps over that
+cache). We host each half on its own device and time the parts and the whole step for five
+placements: both halves on one GPU, prefix and loop on two GPUs, loop on the host CPU, prefix
+on the host CPU, and CPU only. GPUs run FP16 and the CPU FP32. We measure on two machines:
+cuda2 (RTX 2080 Ti, Xeon E5-2660 v3, 20 threads pinned to the GPU's NUMA node) and a cloud node
+with two A100 40\,GB GPUs linked peer to peer (Xeon at 2.2\,GHz, 12 threads). Re-timing the
+first placement after all others changed it by 0.8\% and 0.0\%
+(Figure~\ref{fig:placement}, Table~\ref{tab:placement}).
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{figures/placement_cuda2.pdf}
+  \caption{SmolVLA step time per placement on cuda2, split into prefix, KV handoff (1.5 to
+  3.2\,ms, too small to see) and action-expert loop. Left: eager PyTorch. Right: CUDA graph for
+  the loop when it runs on a GPU. All rows use the healthy GPU~1, except the two-GPU row, whose
+  prefix ran on GPU~0 while that GPU was stuck at a reduced clock (*, about 5\,ms slower).
+  The same figure for the A100 pair is \texttt{figures/placement\_a100.pdf}.}
+  \label{fig:placement}
+\end{figure}
+
+\begin{table}[t]
+  \centering
+  \caption{Best step per placement (ms, median; CUDA-graph loop when the loop is on a GPU) and
+  error of the prediction from single-device runs.}
+  \label{tab:placement}
+  \begin{tabular}{lrrrr}
+    \hline
+    & \multicolumn{2}{c}{RTX 2080 Ti} & \multicolumn{2}{c}{2x A100} \\
+    Placement & best & pred.\ err. & best & pred.\ err. \\
+    \hline
+    1 GPU & 114 & & 94.9 & \\
+    prefix GPU, loop GPU & 121* & +0.2\% & 96.1 & $-1.1$\% \\
+    prefix GPU, loop CPU & 735 & $-0.1$\% & 645 & +0.7\% \\
+    prefix CPU, loop GPU & 1,720 & $-0.6$\% & 916 & $-2.0$\% \\
+    CPU only & 2,348 & & 1,454 & \\
+    \hline
+  \end{tabular}
+\end{table}
+
+\paragraph{The handoff is cheap and the step is additive.} The KV cache is 4.9\,MB in 33
+tensors. Moving it costs 1.0 to 1.5\,ms GPU to GPU, 2.6 to 2.8\,ms GPU to CPU and 3.2 to
+4.2\,ms CPU to GPU (FP32 cache cast on the GPU). Splitting across the two A100s costs 1.2\%
+(96.1 vs 94.9\,ms). The link speed barely matters: the A100 pair copies at 267\,GB/s against
+5.9\,GB/s on cuda2 (no peer access), yet the handoff only drops from 1.5 to 1.0\,ms, because
+33 copies at about 27\,$\mu$s of fixed cost dominate a transfer that takes 0.02\,ms. The parts
+timed alone sum to the end-to-end step within 1.9\% in every placement, so a split placement
+can be predicted from single-device runs:
+$T(A,B) = T_\mathrm{prefix}(A) + n\,t_0 + S/\mathit{BW}_{A\to B} + T_\mathrm{loop}(B)$, with
+$t_0$ and $\mathit{BW}$ from a copy calibration and each device's own baseline. All six split
+placements are predicted within 0.1 to 2.5\% (Table~\ref{tab:placement}, eager mode within
+2.5\%). Splitting does not shorten one inference, since the halves run in sequence; it adds
+capacity, which hosting several policies on one GPU (Section~\ref{sec:multipolicy}) provides
+more cheaply.
+
+\paragraph{The CPU is not a useful host.} The prefix is 15 (A100 host) to 23 (cuda2) times
+slower on the CPU than on the GPU, and CPU-only inference is 15 to 21 times slower than the
+best single-GPU step. The action loop on the CPU takes 585 to 650\,ms, only 1.7 to 1.8 times
+the eager GPU loop: eager PyTorch is so dispatch bound that a CPU comes close to it. With a
+CUDA graph the GPU loop takes 36 to 40\,ms, 16 times faster than the CPU.
+
+\paragraph{Graph mode exposes a faulty GPU.} During the cuda2 experiments GPU~0 ran the graph
+loop in 54.1\,ms against 39.6\,ms on GPU~1, while the eager step was 482\,ms on both:
+host-bound eager execution hides the difference and graph mode exposes it. GPU~0 is not slower
+by design. A week earlier it held 1,950\,MHz under load and ran a C++ replay of the loop as
+fast as GPU~1; since then it idles stuck in the P0 power state at 1,350\,MHz with no clock
+event reason, and $1950/1350 = 1.44$ is close to the $1.37$ loop ratio. As with the TITAN V
+(Section~\ref{sec:crossgpu}), the clock a GPU actually runs at sets the graph-mode latency.
+Our runner now records every GPU's power state and clock and refuses a consumer GPU that idles
+in P0.
+% Needs \label{sec:crossgpu} on main.tex's "Cross-GPU accuracy" subsection (sustained-clock
+% finding) and \label{sec:multipolicy} on the multi-policy subsection (branch
+% shrikar/multipolicy-hosting); drop that clause if it is not in the paper.

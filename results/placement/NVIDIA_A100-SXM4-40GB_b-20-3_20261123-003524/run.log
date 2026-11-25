@@ -1,0 +1,64 @@
+building smolvla on cuda:0
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading  HuggingFaceTB/SmolVLM2-500M-Video-Instruct weights ...
+Reducing the number of VLM layers to 16 ...
+building smolvla on cuda:1
+Loading  HuggingFaceTB/SmolVLM2-500M-Video-Instruct weights ...
+Reducing the number of VLM layers to 16 ...
+building smolvla on cpu
+Loading  HuggingFaceTB/SmolVLM2-500M-Video-Instruct weights ...
+Reducing the number of VLM layers to 16 ...
+[gpu] prefix         median    58.388 ms  (n=30)
+[gpu] denoise_eager  median   323.588 ms  (n=30)
+[gpu] e2e_eager      median   380.539 ms  (n=30)
+[gpu] denoise_graph  median    35.730 ms  (n=30)
+[gpu] e2e_hybrid     median    94.925 ms  (n=30)
+[gpu-gpu] prefix         median    58.261 ms  (n=30)
+[gpu-gpu] denoise_eager  median   334.015 ms  (n=30)
+[gpu-gpu] e2e_eager      median   392.834 ms  (n=30)
+[gpu-gpu] handoff        median     1.046 ms  (n=30)
+[gpu-gpu] denoise_graph  median    35.858 ms  (n=30)
+[gpu-gpu] e2e_hybrid     median    96.055 ms  (n=30)
+[gpu-cpu] prefix         median    58.108 ms  (n=5)
+[gpu-cpu] denoise_eager  median   584.712 ms  (n=5)
+[gpu-cpu] e2e_eager      median   645.284 ms  (n=5)
+[gpu-cpu] handoff        median     2.556 ms  (n=5)
+[cpu-gpu] prefix         median   850.632 ms  (n=5)
+[cpu-gpu] denoise_eager  median   319.032 ms  (n=5)
+[cpu-gpu] e2e_eager      median  1196.698 ms  (n=5)
+[cpu-gpu] handoff        median     4.221 ms  (n=5)
+[cpu-gpu] denoise_graph  median    35.709 ms  (n=5)
+[cpu-gpu] e2e_hybrid     median   915.829 ms  (n=5)
+[cpu] prefix         median   859.071 ms  (n=5)
+[cpu] denoise_eager  median   589.090 ms  (n=5)
+[cpu] e2e_eager      median  1453.965 ms  (n=5)
+/scratch/aj4762/envs/smolvla/lib/python3.10/site-packages/torch/profiler/profiler.py:217: UserWarning: Warning: Profiler clears events at the end of each cycle.Only events from the current cycle will be reported.To keep events across cycles, set acc_events=True.
+  _warn_once(
+[gpu] e2e_eager_repeat median   380.551 ms (drift check)
+placement dev_prefix dev_denoise             mode  n   median_ms     mean_ms    std_ms      min_ms
+      gpu     cuda:0      cuda:0           prefix 30   58.388182   58.453784  0.391484   57.751266
+      gpu     cuda:0      cuda:0    denoise_eager 30  323.588181  323.293060  1.858536  319.879543
+      gpu     cuda:0      cuda:0        e2e_eager 30  380.538878  381.053169  1.887983  377.884928
+      gpu     cuda:0      cuda:0    denoise_graph 30   35.729962   35.740252  0.041598   35.703967
+      gpu     cuda:0      cuda:0       e2e_hybrid 30   94.925461   94.942588  0.525563   94.022041
+  gpu-gpu     cuda:0      cuda:1           prefix 30   58.261496   58.360648  0.367584   57.867402
+  gpu-gpu     cuda:0      cuda:1    denoise_eager 30  334.014965  333.878054  3.043195  326.665654
+  gpu-gpu     cuda:0      cuda:1        e2e_eager 30  392.834372  393.239957  2.428462  389.769109
+  gpu-gpu     cuda:0      cuda:1          handoff 30    1.045615    1.047492  0.008515    1.034943
+  gpu-gpu     cuda:0      cuda:1    denoise_graph 30   35.858457   36.061562  0.988406   35.808107
+  gpu-gpu     cuda:0      cuda:1       e2e_hybrid 30   96.055416   96.274793  0.907397   95.242909
+  gpu-cpu     cuda:0         cpu           prefix  5   58.108221   58.086260  0.115372   57.897017
+  gpu-cpu     cuda:0         cpu    denoise_eager  5  584.712143  585.574961  2.047664  583.588786
+  gpu-cpu     cuda:0         cpu        e2e_eager  5  645.283627  645.100149  0.675239  644.384652
+  gpu-cpu     cuda:0         cpu          handoff  5    2.556324    2.556889  0.003314    2.552764
+  cpu-gpu        cpu      cuda:0           prefix  5  850.631734  854.204127  5.766586  850.427036
+  cpu-gpu        cpu      cuda:0    denoise_eager  5  319.032145  319.559135  1.683202  317.837682
+  cpu-gpu        cpu      cuda:0        e2e_eager  5 1196.698195 1195.119930  4.038890 1189.897986
+  cpu-gpu        cpu      cuda:0          handoff  5    4.220526    4.227632  0.037964    4.187256
+  cpu-gpu        cpu      cuda:0    denoise_graph  5   35.708561   35.705811  0.032259   35.665179
+  cpu-gpu        cpu      cuda:0       e2e_hybrid  5  915.829205  916.570208  4.952828  910.939238
+      cpu        cpu         cpu           prefix  5  859.071234  860.060081  2.963567  856.691787
+      cpu        cpu         cpu    denoise_eager  5  589.090201  589.425352  1.482683  587.931870
+      cpu        cpu         cpu        e2e_eager  5 1453.964950 1457.627483 10.236130 1447.080198
+      gpu     cuda:0      cuda:0 e2e_eager_repeat 30  380.550919  380.287146  2.123374  374.486860
+wrote results/placement/NVIDIA_A100-SXM4-40GB_b-20-3_20261123-003524

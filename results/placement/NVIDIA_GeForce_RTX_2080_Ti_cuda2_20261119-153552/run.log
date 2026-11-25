@@ -1,0 +1,20 @@
+building smolvla on cuda:0
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading  HuggingFaceTB/SmolVLM2-500M-Video-Instruct weights ...
+Reducing the number of VLM layers to 16 ...
+[gpu] prefix         median    74.038 ms  (n=30)
+[gpu] denoise_eager  median   402.457 ms  (n=30)
+[gpu] e2e_eager      median   482.041 ms  (n=30)
+[gpu] denoise_graph  median    39.569 ms  (n=30)
+[gpu] e2e_hybrid     median   114.400 ms  (n=30)
+/scratch/aj4762/envs/smolvla/lib/python3.10/site-packages/torch/profiler/profiler.py:217: UserWarning: Warning: Profiler clears events at the end of each cycle.Only events from the current cycle will be reported.To keep events across cycles, set acc_events=True.
+  _warn_once(
+[gpu] e2e_eager_repeat median   480.428 ms (drift check)
+placement dev_prefix dev_denoise             mode  n  median_ms    mean_ms   std_ms     min_ms
+      gpu     cuda:0      cuda:0           prefix 30  74.037567  74.051029 0.093812  73.906732
+      gpu     cuda:0      cuda:0    denoise_eager 30 402.457052 402.378098 1.037749 400.684129
+      gpu     cuda:0      cuda:0        e2e_eager 30 482.041321 482.201097 1.129791 479.908335
+      gpu     cuda:0      cuda:0    denoise_graph 30  39.569254  39.576426 0.027373  39.555254
+      gpu     cuda:0      cuda:0       e2e_hybrid 30 114.400069 114.451413 0.174448 114.226140
+      gpu     cuda:0      cuda:0 e2e_eager_repeat 30 480.427534 480.597954 1.338328 478.250135
+wrote results/placement/NVIDIA_GeForce_RTX_2080_Ti_cuda2_20261119-153552

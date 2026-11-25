@@ -1,0 +1,64 @@
+building smolvla on cuda:0
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading  HuggingFaceTB/SmolVLM2-500M-Video-Instruct weights ...
+Reducing the number of VLM layers to 16 ...
+building smolvla on cuda:1
+Loading  HuggingFaceTB/SmolVLM2-500M-Video-Instruct weights ...
+Reducing the number of VLM layers to 16 ...
+building smolvla on cpu
+Loading  HuggingFaceTB/SmolVLM2-500M-Video-Instruct weights ...
+Reducing the number of VLM layers to 16 ...
+[gpu] prefix         median    59.172 ms  (n=30)
+[gpu] denoise_eager  median   280.369 ms  (n=30)
+[gpu] e2e_eager      median   340.631 ms  (n=30)
+[gpu] denoise_graph  median    66.529 ms  (n=30)
+[gpu] e2e_hybrid     median   126.150 ms  (n=30)
+/scratch/aj4762/envs/smolvla/lib/python3.10/site-packages/torch/profiler/profiler.py:217: UserWarning: Warning: Profiler clears events at the end of each cycle.Only events from the current cycle will be reported.To keep events across cycles, set acc_events=True.
+  _warn_once(
+[gpu-gpu] graph capture failed: AcceleratorError: CUDA error: operation failed due to a previous error during capture
+Search for `cudaErrorStreamCaptureInvalidated' in https://docs.nvidia.com/cuda/cuda-runtime-api/group__CUDART__TYPES.html for more information.
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing CUDA_LAUNCH_BLOCKING=1
+Compile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.
+
+[gpu-gpu] prefix         median    68.012 ms  (n=30)
+[gpu-gpu] denoise_eager  median   373.274 ms  (n=30)
+[gpu-gpu] e2e_eager      median   442.960 ms  (n=30)
+[gpu-gpu] handoff        median     1.356 ms  (n=30)
+[gpu-cpu] prefix         median    67.659 ms  (n=5)
+[gpu-cpu] denoise_eager  median   927.556 ms  (n=5)
+[gpu-cpu] e2e_eager      median  1056.289 ms  (n=5)
+[gpu-cpu] handoff        median     3.546 ms  (n=5)
+[cpu-gpu] prefix         median  2024.757 ms  (n=5)
+[cpu-gpu] denoise_eager  median   349.024 ms  (n=5)
+[cpu-gpu] e2e_eager      median  2431.053 ms  (n=5)
+[cpu-gpu] handoff        median     4.287 ms  (n=5)
+[cpu-gpu] denoise_graph  median    72.943 ms  (n=5)
+[cpu-gpu] e2e_hybrid     median  2111.843 ms  (n=5)
+[cpu] prefix         median  1996.775 ms  (n=5)
+[cpu] denoise_eager  median   944.412 ms  (n=5)
+[cpu] e2e_eager      median  2950.394 ms  (n=5)
+placement dev_prefix dev_denoise          mode  n   median_ms     mean_ms    std_ms      min_ms
+      gpu     cuda:0      cuda:0        prefix 30   59.171555   59.188299  0.097363   59.054063
+      gpu     cuda:0      cuda:0 denoise_eager 30  280.369318  280.460602  0.452928  279.815272
+      gpu     cuda:0      cuda:0     e2e_eager 30  340.631051  340.536990  0.371382  339.772091
+      gpu     cuda:0      cuda:0 denoise_graph 30   66.528866   66.528800  0.024273   66.483893
+      gpu     cuda:0      cuda:0    e2e_hybrid 30  126.150184  126.215905  0.201377  126.004156
+  gpu-gpu     cuda:0      cuda:1        prefix 30   68.012342   79.409989 62.336467   67.686800
+  gpu-gpu     cuda:0      cuda:1 denoise_eager 30  373.273515  373.310848  0.672401  372.235121
+  gpu-gpu     cuda:0      cuda:1     e2e_eager 30  442.960158  442.932580  0.274730  442.502136
+  gpu-gpu     cuda:0      cuda:1       handoff 30    1.356206    1.355983  0.004835    1.346713
+  gpu-cpu     cuda:0         cpu        prefix  5   67.659383   67.656614  0.029382   67.624663
+  gpu-cpu     cuda:0         cpu denoise_eager  5  927.555797  940.937597 22.168748  922.256739
+  gpu-cpu     cuda:0         cpu     e2e_eager  5 1056.288789 1059.424931 11.452467 1048.078855
+  gpu-cpu     cuda:0         cpu       handoff  5    3.546279    3.540516  0.012892    3.521230
+  cpu-gpu        cpu      cuda:0        prefix  5 2024.757020 2036.319815 76.657783 1969.699004
+  cpu-gpu        cpu      cuda:0 denoise_eager  5  349.024014  349.112447  0.152228  348.978603
+  cpu-gpu        cpu      cuda:0     e2e_eager  5 2431.052820 2408.704800 38.553916 2357.904772
+  cpu-gpu        cpu      cuda:0       handoff  5    4.286830    4.288854  0.013321    4.271706
+  cpu-gpu        cpu      cuda:0 denoise_graph  5   72.942994   72.944315  0.010485   72.932134
+  cpu-gpu        cpu      cuda:0    e2e_hybrid  5 2111.843376 2108.124513 37.638599 2069.381454
+      cpu        cpu         cpu        prefix  5 1996.775414 1996.159137  5.438992 1987.054167
+      cpu        cpu         cpu denoise_eager  5  944.412139  944.337439  0.751004  943.318229
+      cpu        cpu         cpu     e2e_eager  5 2950.393797 2948.162987  8.776275 2933.717703
+wrote results/placement/NVIDIA_TITAN_V_cuda3_20261118-011700

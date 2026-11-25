@@ -1,0 +1,79 @@
+{
+  "model": "smolvla",
+  "host": "cuda3.cims.nyu.edu",
+  "cpu": "Intel(R) Xeon(R) Gold 5118 CPU @ 2.30GHz",
+  "cpu_count": 48,
+  "torch_threads": 24,
+  "affinity_cpus": 24,
+  "gpus": [
+    "NVIDIA TITAN V",
+    "NVIDIA TITAN V"
+  ],
+  "cuda_visible_devices": "0,1",
+  "torch": "2.10.0+cu128",
+  "cuda_runtime": "12.8",
+  "cuda_module_loading": "EAGER",
+  "params": 450046176,
+  "dtype_by_device": {
+    "cuda:0": "torch.float16",
+    "cuda:1": "torch.float16",
+    "cpu": "torch.float32"
+  },
+  "cameras": 3,
+  "num_steps": 10,
+  "chunk_size": 50,
+  "placements": {
+    "gpu": {
+      "dev_prefix": "cuda:0",
+      "dev_denoise": "cuda:0",
+      "reps": 30,
+      "kv_bytes": 4935921,
+      "kv_tensors": 33,
+      "graph_ok": true,
+      "graph_error": "",
+      "graph_vs_eager_max_abs_diff": 0.0,
+      "max_abs_diff_vs_first": 0.0
+    },
+    "gpu-gpu": {
+      "dev_prefix": "cuda:0",
+      "dev_denoise": "cuda:1",
+      "reps": 30,
+      "kv_bytes": 4935921,
+      "kv_tensors": 33,
+      "graph_ok": false,
+      "graph_error": "AcceleratorError: CUDA error: operation failed due to a previous error during capture\nSearch for `cudaErrorStreamCaptureInvalidated' in https://docs.nvidia.com/cuda/cuda-runtime-api/group__CUDART__TYPES.html for more information.\nCUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.\nFor debugging consider passing CUDA_LAUNCH_BLOCKING=1\nCompile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.\n",
+      "max_abs_diff_vs_first": 0.0
+    },
+    "gpu-cpu": {
+      "dev_prefix": "cuda:0",
+      "dev_denoise": "cpu",
+      "reps": 5,
+      "kv_bytes": 4935921,
+      "kv_tensors": 33,
+      "graph_ok": false,
+      "graph_error": "",
+      "max_abs_diff_vs_first": 0.0007277727127075195
+    },
+    "cpu-gpu": {
+      "dev_prefix": "cpu",
+      "dev_denoise": "cuda:0",
+      "reps": 5,
+      "kv_bytes": 9871601,
+      "kv_tensors": 33,
+      "graph_ok": true,
+      "graph_error": "",
+      "graph_vs_eager_max_abs_diff": 0.0,
+      "max_abs_diff_vs_first": 0.38490957021713257
+    },
+    "cpu": {
+      "dev_prefix": "cpu",
+      "dev_denoise": "cpu",
+      "reps": 5,
+      "kv_bytes": 9871601,
+      "kv_tensors": 33,
+      "graph_ok": false,
+      "graph_error": "",
+      "max_abs_diff_vs_first": 0.3851073384284973
+    }
+  }
+}

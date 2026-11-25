@@ -28,3 +28,5 @@ traces/**/trace.json.gz
 traces/**/trace_graph.json.gz
 results/robotwin/sweep_*/videos/
 results/robotwin/*/videos/
+# placement profiler traces (workloads/placement.py --profile)
+results/placement/**/trace_*.json.gz
