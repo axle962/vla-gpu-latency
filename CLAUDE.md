@@ -696,6 +696,17 @@ State:
   within 11% of batch 8. Serialized model MAPE for processes without MPS: eager 16%, graph 21%
   (time-slicing costs more than serialization, growing with kernel count); MPS sits far below
   the model (needs an SM-sharing term). CIMS runs pending. CIMS runs 2026-11-23 (quick matrix, `docs/multipolicy.md`): 2080 Ti (cuda2), TITAN V (cuda3) and RTX 4070 (cuda5) confirm the picture; graphed SmolVLA x4 serializes without MPS (3.3x, 3.7x, 2.1x) and runs at 1.7x / 1.8x / 1.4x with it; MPS gain tracks the solo GPU share; model MAPE procs eager 5.5 / 6.7 / 3.2%, graph 15.4 / 12.5 / 16.0%.
+- **Integration check on cuda2, 2026-11-25** (`scripts/integration_check.sh cpp models smoke`,
+  branch `integration` at fbdbf99, GPU 1, clone in `/scratch/am16489/repro`): build, calibration,
+  C++ bench (0 failed checks, 10-step graph chain 39.41 ms), all 33 model/report scripts and every
+  smoke runner pass (graph-vs-eager max |diff| 0). Placement and eps-probe smoke first failed on
+  their P0 guard: a GPU stays in P0 for ~30 s after the previous step, so back-to-back runs trip
+  it; both pass when rerun once the GPU is in P8. The script runs `placement_report.py` without
+  `--device-baseline cuda:1=...20261119-153552`, so the committed 20261119-143150 report differs
+  under it (hybrid 120.8 vs 135.4 ms predicted); that diff was not committed. New 2080 Ti calib
+  and bench dirs committed with the outputs they change (C++ node cost 1.07 -> 1.09 us). The
+  rerun eps probe (+0.10 us vs +0.11 in the paper) is kept out of `results/` so the paper's
+  numbers stay reproducible; it is in `/scratch/am16489/tmp/eps_probe_cuda2_20261125-121324` on cuda2.
 - **Next:**
   1. Paper and slides (deferred by the user until the teammates' work is merged): move the
      headline to `slot_drv` on four GPUs, add ACT/Diffusion (three regimes: dispatch bound,

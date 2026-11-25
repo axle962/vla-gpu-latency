@@ -24,7 +24,7 @@ eps = graph node cost minus the profiler's bias on each traced kernel, so it can
 
 | GPU | runs | eps per GPU (us) | eps leave-GPU-out | eps probe | C++ node cost (us) | MAPE one eps (1 run) | MAPE eps per GPU | MAPE leave policy out | MAPE leave GPU out |
 |---|---|---|---|---|---|---|---|---|---|
-| 2080 Ti | 32 | +0.52 | -0.35 | +0.11 | 1.07 | 1.9% | 1.9% | 2.0% | 12.5% |
+| 2080 Ti | 32 | +0.52 | -0.35 | +0.11 | 1.09 | 1.9% | 1.9% | 2.0% | 12.5% |
 | A100 | 17 | -0.65 | +0.52 | pending | 0.29 | 14.6% | 2.7% | 4.3% | 14.6% |
 | RTX 4070 | 34 | -0.35 | +0.52 | -0.05 | 0.28 | 12.6% | 1.8% | 2.8% | 12.6% |
 | TITAN V | 31 | +0.80 | -0.35 | pending | 0.77 | 2.2% | 1.1% | 1.7% | 12.0% |

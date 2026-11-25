@@ -1,0 +1,5 @@
+host cuda2, GPU 1 (NVIDIA GeForce RTX 2080 Ti)
+spec: 2160 MHz, [Requested functionality has been deprecated] (max SM, application clock)
+SM clock under load: median 1920 MHz, min 1920, max 1920 (47 of 47 samples)
+chain 10 flow steps, cuBLAS, eager: 42.01 ms
+chain 10 flow steps, cuBLAS, graph: 39.40 ms

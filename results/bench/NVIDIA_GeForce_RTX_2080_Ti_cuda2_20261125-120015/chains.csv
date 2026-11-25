@@ -1,0 +1,25 @@
+gpu,bench,kernel,config,mode,timer,n_runs,mean_us,std_us,min_us,median_us,module_loading
+NVIDIA GeForce RTX 2080 Ti,chain,smolvla_flow,gemm=own;steps=1;rows=1194;launched=1194;traced_kernels=1148;traced_gpu_us=3447.2,eager,event,20,5971.0944,696.6300,4931.2639,6413.9681,EAGER
+NVIDIA GeForce RTX 2080 Ti,chain,smolvla_flow,gemm=own;steps=1;rows=1194;launched=1194;traced_kernels=1148;traced_gpu_us=3447.2,eager,host,20,4923.7226,15.0368,4901.7160,4933.5160,EAGER
+NVIDIA GeForce RTX 2080 Ti,chain,smolvla_flow,gemm=own;steps=1;rows=1194;launched=1192;traced_kernels=1148;traced_gpu_us=3447.2,graph,event,20,4884.4416,88.4697,4820.6401,4825.1040,EAGER
+NVIDIA GeForce RTX 2080 Ti,chain,smolvla_flow,gemm=own;steps=1;rows=1194;launched=1192;traced_kernels=1148;traced_gpu_us=3447.2,graph,host,20,4815.4846,5.5211,4808.6930,4813.3155,EAGER
+NVIDIA GeForce RTX 2080 Ti,chain,smolvla_flow,gemm=own;steps=10;rows=1194;launched=11940;traced_kernels=11480;traced_gpu_us=34471.7,eager,event,20,46718.8688,32.0402,46691.9022,46713.8577,EAGER
+NVIDIA GeForce RTX 2080 Ti,chain,smolvla_flow,gemm=own;steps=10;rows=1194;launched=11940;traced_kernels=11480;traced_gpu_us=34471.7,eager,host,20,46719.1061,9.5581,46704.1690,46718.0700,EAGER
+NVIDIA GeForce RTX 2080 Ti,chain,smolvla_flow,gemm=own;steps=10;rows=1194;launched=11920;traced_kernels=11480;traced_gpu_us=34471.7,graph,event,20,47978.1429,5.1243,47967.6819,47978.3688,EAGER
+NVIDIA GeForce RTX 2080 Ti,chain,smolvla_flow,gemm=own;steps=10;rows=1194;launched=11920;traced_kernels=11480;traced_gpu_us=34471.7,graph,host,20,47986.6292,5.1268,47978.0220,47986.8100,EAGER
+NVIDIA GeForce RTX 2080 Ti,chain,smolvla_full,gemm=own;steps=1;rows=13937;launched=13937;traced_kernels=13340;traced_gpu_us=63926.0,eager,event,10,144811.9904,632.5264,144170.2423,144747.9858,EAGER
+NVIDIA GeForce RTX 2080 Ti,chain,smolvla_full,gemm=own;steps=1;rows=13937;launched=13937;traced_kernels=13340;traced_gpu_us=63926.0,eager,host,10,145111.0167,20.2733,145082.4680,145112.3365,EAGER
+NVIDIA GeForce RTX 2080 Ti,chain,smolvla_full,gemm=own;steps=1;rows=13937;launched=13901;traced_kernels=13340;traced_gpu_us=63926.0,graph,event,10,146474.1089,24.3045,146417.7551,146477.0432,EAGER
+NVIDIA GeForce RTX 2080 Ti,chain,smolvla_full,gemm=own;steps=1;rows=13937;launched=13901;traced_kernels=13340;traced_gpu_us=63926.0,graph,host,10,146609.2659,289.7048,146438.4250,146490.0580,EAGER
+NVIDIA GeForce RTX 2080 Ti,chain,smolvla_flow,gemm=cublas;steps=1;rows=1194;launched=1194;traced_kernels=1148;traced_gpu_us=3447.2,eager,event,20,4350.8752,34.5074,4328.1598,4337.2159,EAGER
+NVIDIA GeForce RTX 2080 Ti,chain,smolvla_flow,gemm=cublas;steps=1;rows=1194;launched=1194;traced_kernels=1148;traced_gpu_us=3447.2,eager,host,20,4277.5702,5.5319,4266.4330,4278.3410,EAGER
+NVIDIA GeForce RTX 2080 Ti,chain,smolvla_flow,gemm=cublas;steps=1;rows=1194;launched=1192;traced_kernels=1148;traced_gpu_us=3447.2,graph,event,20,3942.6224,2.1811,3939.1999,3942.6560,EAGER
+NVIDIA GeForce RTX 2080 Ti,chain,smolvla_flow,gemm=cublas;steps=1;rows=1194;launched=1192;traced_kernels=1148;traced_gpu_us=3447.2,graph,host,20,3945.6584,3.1117,3941.0640,3945.6400,EAGER
+NVIDIA GeForce RTX 2080 Ti,chain,smolvla_flow,gemm=cublas;steps=10;rows=1194;launched=11940;traced_kernels=11480;traced_gpu_us=34471.7,eager,event,20,41046.5700,54.1543,40924.7055,41060.3199,EAGER
+NVIDIA GeForce RTX 2080 Ti,chain,smolvla_flow,gemm=cublas;steps=10;rows=1194;launched=11940;traced_kernels=11480;traced_gpu_us=34471.7,eager,host,20,41060.7461,270.8291,40865.9090,41011.5590,EAGER
+NVIDIA GeForce RTX 2080 Ti,chain,smolvla_flow,gemm=cublas;steps=10;rows=1194;launched=11920;traced_kernels=11480;traced_gpu_us=34471.7,graph,event,20,39408.1747,9.1006,39393.1198,39410.3851,EAGER
+NVIDIA GeForce RTX 2080 Ti,chain,smolvla_flow,gemm=cublas;steps=10;rows=1194;launched=11920;traced_kernels=11480;traced_gpu_us=34471.7,graph,host,20,39411.7881,6.3438,39400.3370,39411.8115,EAGER
+NVIDIA GeForce RTX 2080 Ti,chain,smolvla_full,gemm=cublas;steps=1;rows=13937;launched=13937;traced_kernels=13340;traced_gpu_us=63926.0,eager,event,10,73360.1341,43.7195,73314.2395,73346.8170,EAGER
+NVIDIA GeForce RTX 2080 Ti,chain,smolvla_full,gemm=cublas;steps=1;rows=13937;launched=13937;traced_kernels=13340;traced_gpu_us=63926.0,eager,host,10,73270.4041,32.5551,73212.5440,73270.4315,EAGER
+NVIDIA GeForce RTX 2080 Ti,chain,smolvla_full,gemm=cublas;steps=1;rows=13937;launched=13901;traced_kernels=13340;traced_gpu_us=63926.0,graph,event,10,73163.7482,10.1981,73146.3699,73165.7448,EAGER
+NVIDIA GeForce RTX 2080 Ti,chain,smolvla_full,gemm=cublas;steps=1;rows=13937;launched=13901;traced_kernels=13340;traced_gpu_us=63926.0,graph,host,10,73170.3481,13.2157,73140.2160,73172.2960,EAGER

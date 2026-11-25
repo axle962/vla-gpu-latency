@@ -62,10 +62,16 @@ Latency from the SmolVLA traces (3 cameras, 10 flow steps, chunk 50; the traced 
 | ('A100-SXM4-40GB (smolvla_robotwin)', 'prefix + graph loop') |         93.9 |             3 |                   63   |
 | ('RTX 2080 Ti', 'eager')                                     |        491.3 |            13 |                   70.9 |
 | ('RTX 2080 Ti', 'prefix + graph loop')                       |        116   |             3 |                   63   |
+| ('RTX 2080 Ti (smolvla_robotwin)', 'eager')                  |        471.9 |            12 |                   70.6 |
+| ('RTX 2080 Ti (smolvla_robotwin)', 'prefix + graph loop')    |        113.9 |             3 |                   63   |
 | ('RTX 4070', 'eager')                                        |        611.8 |            16 |                   71.8 |
 | ('RTX 4070', 'prefix + graph loop')                          |        116.9 |             3 |                   63   |
+| ('RTX 4070 (smolvla_robotwin)', 'eager')                     |        661.2 |            17 |                   72.1 |
+| ('RTX 4070 (smolvla_robotwin)', 'prefix + graph loop')       |        121.9 |             4 |                   64   |
 | ('TITAN V', 'eager')                                         |        343   |             9 |                   69   |
-| ('TITAN V', 'prefix + graph loop')                           |        119.3 |             3 |                   63   | 
+| ('TITAN V', 'prefix + graph loop')                           |        119.3 |             3 |                   63   |
+| ('TITAN V (smolvla_robotwin)', 'eager')                      |        342.4 |             9 |                   69   |
+| ('TITAN V (smolvla_robotwin)', 'prefix + graph loop')        |        126.4 |             4 |                   64   | 
 
 The in-eval policy call (`infer_ms_median` above, eager, includes lerobot pre/post-processing) is the A100's eager latency in the actual harness.
 
@@ -124,10 +130,16 @@ Latency from the SmolVLA traces (3 cameras, 10 flow steps, chunk 50; the traced 
 | ('A100-SXM4-40GB (smolvla_robotwin)', 'prefix + graph loop') |         93.9 |             3 |                   44.2 |
 | ('RTX 2080 Ti', 'eager')                                     |        491.3 |            13 |                   41.8 |
 | ('RTX 2080 Ti', 'prefix + graph loop')                       |        116   |             3 |                   44.2 |
+| ('RTX 2080 Ti (smolvla_robotwin)', 'eager')                  |        471.9 |            12 |                   42   |
+| ('RTX 2080 Ti (smolvla_robotwin)', 'prefix + graph loop')    |        113.9 |             3 |                   44.2 |
 | ('RTX 4070', 'eager')                                        |        611.8 |            16 |                   41   |
 | ('RTX 4070', 'prefix + graph loop')                          |        116.9 |             3 |                   44.2 |
+| ('RTX 4070 (smolvla_robotwin)', 'eager')                     |        661.2 |            17 |                   40.8 |
+| ('RTX 4070 (smolvla_robotwin)', 'prefix + graph loop')       |        121.9 |             4 |                   44   |
 | ('TITAN V', 'eager')                                         |        343   |             9 |                   42.8 |
-| ('TITAN V', 'prefix + graph loop')                           |        119.3 |             3 |                   44.2 | 
+| ('TITAN V', 'prefix + graph loop')                           |        119.3 |             3 |                   44.2 |
+| ('TITAN V (smolvla_robotwin)', 'eager')                      |        342.4 |             9 |                   42.8 |
+| ('TITAN V (smolvla_robotwin)', 'prefix + graph loop')        |        126.4 |             4 |                   44   | 
 
 The in-eval policy call (`infer_ms_median` above, eager, includes lerobot pre/post-processing) is the A100's eager latency in the actual harness.
 
