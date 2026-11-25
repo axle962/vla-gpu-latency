@@ -67,3 +67,31 @@ GPUs on cuda2 share NUMA node 1 and its cores, so run nothing else at the same t
 - GPU pairs of different models (for example prefix on a fast GPU, expert on a slow one):
   no CIMS host has two different GPUs.
 - Overlapped execution (prefix for observation t+1 while the expert finishes chunk t).
+
+## Pipelining (`--pipeline`, job stage `pipe`)
+
+One request at a time, a split placement only adds the handoff. Its possible value is
+throughput: while the graph loop of request t replays, the prefix of request t+1 can already
+run. `workloads/placement.py --pipeline` times this two-stage pipeline for the placements whose
+prefix is on a GPU and whose loop is a CUDA graph:
+
+- `gpu`: prefix on the default stream, loop replay on a second stream of the same GPU
+- `gpu-gpu`: prefix on GPU 0, loop replay on GPU 1
+
+`pipe_interval` is the steady-state time per request (20 requests x 5 windows). The KV copy into
+the graph's static buffers is ordered on the loop stream after the previous replay, so one set
+of buffers suffices. Requests alternate between two different observations and every pipelined
+output is compared with the sequential output for that observation, so a race on the shared
+buffers would show as a nonzero difference.
+
+`model/placement_report.py` compares the interval with the sequential best step (`e2e_hybrid`)
+and with the two-stage bound `max(prefix, handoff + graph loop)`. On one GPU both stages share
+the SMs, so the measured interval sits above the bound by their contention; the question is
+whether a second GPU buys more than a second stream.
+
+Run on the 2x A100 node (about 10 min, ~0.35 GPU-h; the toy check runs first):
+
+```bash
+sbatch -A csci_ga_3033_025-2026fa -p c24m170-a100-2 --gres=gpu:2 --cpus-per-task=24 --mem=150G \
+  --export=ALL,WORK=$WORK scripts/cluster/target_gpu.sbatch pipe
+```

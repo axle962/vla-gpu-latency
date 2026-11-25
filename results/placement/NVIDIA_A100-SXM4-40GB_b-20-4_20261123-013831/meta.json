@@ -1,0 +1,66 @@
+{
+  "model": "smolvla",
+  "host": "b-20-4",
+  "cpu": "Intel(R) Xeon(R) CPU @ 2.20GHz",
+  "cpu_count": 24,
+  "torch_threads": 12,
+  "affinity_cpus": 24,
+  "gpus": [
+    "NVIDIA A100-SXM4-40GB",
+    "NVIDIA A100-SXM4-40GB"
+  ],
+  "cuda_visible_devices": "0,1",
+  "torch": "2.10.0+cu128",
+  "cuda_runtime": "12.8",
+  "cuda_module_loading": "EAGER",
+  "params": 450046176,
+  "dtype_by_device": {
+    "cuda:0": "torch.float16",
+    "cuda:1": "torch.float16"
+  },
+  "cameras": 3,
+  "num_steps": 10,
+  "chunk_size": 50,
+  "placements": {
+    "gpu": {
+      "dev_prefix": "cuda:0",
+      "dev_denoise": "cuda:0",
+      "reps": 30,
+      "kv_bytes": 4935921,
+      "kv_tensors": 33,
+      "graph_ok": true,
+      "graph_error": "",
+      "graph_vs_eager_max_abs_diff": 0.0,
+      "hybrid_vs_eager_after_timing": 0.0,
+      "pipe_kv_diff": 3.5029296875,
+      "pipe_eager_out_diff": 0.7303038239479065,
+      "pipe_graph_out_diff": 0.7303038239479065,
+      "pipe_obs_differ": true,
+      "pipe_graph_vs_eager_per_obs": 0.0,
+      "pipe_requests": 20,
+      "pipe_windows": 5,
+      "pipe_max_abs_diff_vs_sequential": 0.0,
+      "max_abs_diff_vs_first": 0.0
+    },
+    "gpu-gpu": {
+      "dev_prefix": "cuda:0",
+      "dev_denoise": "cuda:1",
+      "reps": 30,
+      "kv_bytes": 4935921,
+      "kv_tensors": 33,
+      "graph_ok": true,
+      "graph_error": "",
+      "graph_vs_eager_max_abs_diff": 0.0,
+      "hybrid_vs_eager_after_timing": 0.0,
+      "pipe_kv_diff": 3.5029296875,
+      "pipe_eager_out_diff": 0.7303038239479065,
+      "pipe_graph_out_diff": 0.7303038239479065,
+      "pipe_obs_differ": true,
+      "pipe_graph_vs_eager_per_obs": 0.0,
+      "pipe_requests": 20,
+      "pipe_windows": 5,
+      "pipe_max_abs_diff_vs_sequential": 0.0,
+      "max_abs_diff_vs_first": 0.0
+    }
+  }
+}

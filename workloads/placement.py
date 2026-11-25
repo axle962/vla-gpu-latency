@@ -23,6 +23,15 @@ Timed modes per placement (wall clock, every CUDA device involved is synchronize
   e2e_eager       prefix + handoff + eager loop
   e2e_hybrid      prefix + handoff into the graph's static cache + graph replay (B is a GPU)
 
+Pipelining (--pipeline, placements whose prefix runs on a GPU and whose loop is a CUDA graph):
+  pipe_interval   steady-state time per request when the prefix of request t+1 runs while the
+                  graph loop of request t replays: on its own stream of the same GPU (`gpu`)
+                  or on the second GPU (`gpu-gpu`). Requests alternate between two different
+                  observations, and every pipelined output is checked against the sequential
+                  output for that observation (a race on the shared KV buffers would show).
+  Compare with e2e_hybrid (one request at a time); model/placement_report.py predicts the
+  interval as max(prefix, handoff + graph loop) for two GPUs.
+
 Also measured: a copy calibration for every device pair used (one tensor of 4 KB to 256 MB,
 giving a per-tensor fixed cost and a bandwidth), so the handoff can be predicted from the KV
 cache size instead of measured. model/placement_report.py turns the outputs into
@@ -75,8 +84,9 @@ INSTRUCTION = "Pick up the red cube and place it in the bowl."
 
 @dataclass
 class Half:
-    """One copy of the policy on one device. prefix() returns (pad, kv); denoise(pad, kv, x)
-    returns the action chunk. kv is {layer: {name: tensor}}."""
+    """One copy of the policy on one device. prefix(i=0) returns (pad, kv) for observation i
+    (two different observations, i % 2); denoise(pad, kv, x) returns the action chunk. kv is
+    {layer: {name: tensor}}."""
 
     dev: torch.device
     dtype: torch.dtype
@@ -154,14 +164,19 @@ def build_smolvla(dev: torch.device, args) -> Half:
     m.image_end_token = m.image_end_token.to(dev)
 
     # Inputs are drawn on the CPU so every device sees the same observation and noise.
-    gen = torch.Generator().manual_seed(0)
     img_keys = list(cfg.image_features)[: args.cameras]
-    batch = {}
-    for k in img_keys:
-        c, h, w = cfg.image_features[k].shape
-        batch[k] = torch.rand(1, c, h, w, generator=gen).to(dev)
     state_dim = cfg.robot_state_feature.shape[0]
-    batch[OBS_STATE] = torch.rand(1, state_dim, generator=gen).to(dev)
+
+    def observation(gen):
+        b = {}
+        for k in img_keys:
+            c, h, w = cfg.image_features[k].shape
+            b[k] = torch.rand(1, c, h, w, generator=gen).to(dev)
+        b[OBS_STATE] = torch.rand(1, state_dim, generator=gen).to(dev)
+        return b
+
+    gen = torch.Generator().manual_seed(0)
+    batches = [observation(gen)]
     enc = m.vlm_with_expert.processor.tokenizer(
         INSTRUCTION + "\n",
         padding="max_length",
@@ -171,9 +186,11 @@ def build_smolvla(dev: torch.device, args) -> Half:
     )
     lang, lang_mask = enc["input_ids"].to(dev), enc["attention_mask"].to(dev).bool()
     noise = torch.randn(1, cfg.chunk_size, cfg.max_action_dim, generator=gen).to(dev)
+    batches.append(observation(torch.Generator().manual_seed(1)))  # second observation
 
     @torch.no_grad()
-    def prefix():
+    def prefix(i=0):
+        batch = batches[i % 2]
         images, img_masks = policy.prepare_images(batch)
         state = policy.prepare_state(batch)
         embs, pad, att = m.embed_prefix(images, img_masks, lang, lang_mask, state=state)
@@ -243,12 +260,13 @@ def build_toy(dev: torch.device, args) -> Half:
     a_in = nn.Linear(adim, d).to(dev, dtype).eval()
     a_out = nn.Linear(d, adim).to(dev, dtype).eval()
     gen = torch.Generator().manual_seed(0)
-    obs = torch.randn(1, plen, d, generator=gen).to(dev, dtype)
+    obs = [torch.randn(1, plen, d, generator=gen).to(dev, dtype)]
     noise = torch.randn(1, args.chunk_size, adim, generator=gen).to(dev)
+    obs.append(torch.randn(1, plen, d, generator=torch.Generator().manual_seed(1)).to(dev, dtype))
 
     @torch.no_grad()
-    def prefix():
-        x, kv = obs, {}
+    def prefix(i=0):
+        x, kv = obs[i % 2], {}
         for i, layer in enumerate(vlm):
             x, kv[i] = layer(x)
         return torch.ones(1, plen, dtype=torch.bool, device=dev), kv
@@ -279,8 +297,9 @@ BUILDERS = {"smolvla": build_smolvla, "toy": build_toy}
 def capture_graph(half: Half, pad, kv):
     """Capture half.denoise on half.dev with static inputs. Returns (graph, static_pad,
     static_kv, static_out, static_x) or raises. The caller must keep every static tensor
-    alive while it replays the graph: a freed static input gets reused by later
-    allocations, and the replay then computes on garbage (timings stay valid)."""
+    alive as long as it replays the graph: the graph reads their addresses, and a freed
+    static input (static_x was, until 2026-11-22) gets reused by later allocations, after
+    which the replay computes on garbage. Timings stay valid (same kernels), outputs do not."""
     static_x = half.noise.clone()
     static_pad = pad.clone()
     static_kv = {i: {k: v.clone() for k, v in layer.items()} for i, layer in kv.items()}
@@ -299,6 +318,39 @@ def capture_graph(half: Half, pad, kv):
         with torch.cuda.graph(g, stream=cs):
             static_out = half.denoise(static_pad, static_kv, static_x)
     return g, static_pad, static_kv, static_out, static_x
+
+
+def run_pipelined(a: Half, g, s_pad, s_kv, s_out, loop_stream, n: int) -> list[torch.Tensor]:
+    """n requests, request t on observation t % 2. The graph loop of request t replays on
+    loop_stream while the host runs the prefix of request t+1 on device a; the KV copy into the
+    static buffers waits on the GPU for the replay of t (single buffer set, two-stage
+    pipeline). Returns the n outputs (still on the loop device)."""
+    prefix_stream = torch.cuda.current_stream(a.dev) if a.dev.type == "cuda" else None
+    same = a.dev == loop_stream.device
+
+    def load(i):
+        pad, kv = a.prefix(i)
+        with torch.cuda.stream(loop_stream):
+            if prefix_stream is not None:
+                loop_stream.wait_stream(prefix_stream)  # prefix results are ready
+            if same:  # the allocator must not hand these to the next prefix while we copy
+                pad.record_stream(loop_stream)
+                for layer in kv.values():
+                    for v in layer.values():
+                        v.record_stream(loop_stream)
+            # Same stream as the replay, so it starts after replay t has read the buffers. A
+            # cross-device copy_ also makes the source stream wait for it (PyTorch's barrier).
+            copy_into(pad, kv, s_pad, s_kv)
+
+    outs = []
+    load(0)
+    for t in range(n):
+        with torch.cuda.stream(loop_stream):
+            g.replay()
+            outs.append(s_out.clone())
+        if t + 1 < n:
+            load(t + 1)
+    return outs
 
 
 def copy_calibration(pairs: set[tuple[str, str]], reps: int) -> list[dict]:
@@ -387,8 +439,82 @@ def run_placement(name: str, a: Half, b: Half, args, lat: list[dict]) -> dict:
         ]
         print(f"[{name}] {mode:14s} median {statistics.median(t):9.3f} ms  (n={reps})", flush=True)
 
+    if info["graph_ok"]:
+        # After all the timing: does the hybrid path (prefix, copy, replay) still give the
+        # eager output? Catches stale or freed static buffers.
+        pad, kv = a.prefix()
+        copy_into(pad, kv, s_pad, s_kv)
+        g.replay()
+        sync(*devs)
+        diff = (s_out.float().cpu() - info["output"]).abs().max().item()
+        info["hybrid_vs_eager_after_timing"] = diff
+        print(f"[{name}] hybrid vs eager after timing: max |diff| {diff:.1e}", flush=True)
+        if diff > 1e-2:
+            print(f"[{name}] WARNING: the graph path disagrees with eager", flush=True)
+
+    if args.pipeline and info["graph_ok"] and a.dev.type == "cuda":
+        measure_pipeline(name, a, b, g, s_pad, s_kv, s_out, args, lat, info)
+
     info["e2e_eager_fn"] = e2e_eager
     return info
+
+
+def measure_pipeline(name, a, b, g, s_pad, s_kv, s_out, args, lat, info) -> None:
+    """Steady-state interval per request with the prefix of t+1 overlapping the loop of t."""
+    devs = (a.dev, b.dev)
+    loop_stream = torch.cuda.Stream(device=b.dev)
+    # Where do the two observations diverge? KV cache, eager loop output, graph output. If the
+    # KV differs but the graph outputs do not, the replay does not read the copied KV.
+    kvs = [a.prefix(i) for i in range(2)]
+    sync(*devs)
+    info["pipe_kv_diff"] = max(
+        (kvs[0][1][li][k].float() - kvs[1][1][li][k].float()).abs().max().item()
+        for li in kvs[0][1] for k in kvs[0][1][li]
+    )
+    eager = []
+    for pad, kv in kvs:
+        if a.dev != b.dev:
+            pad, kv = move(pad, kv, b.dev, b.dtype)
+        eager.append(b.denoise(pad, kv, b.noise).float().cpu())
+    info["pipe_eager_out_diff"] = (eager[0] - eager[1]).abs().max().item()
+    del kvs
+    # Sequential reference output per observation (prefix, copy, replay, one at a time).
+    refs = []
+    for i in range(2):
+        pad, kv = a.prefix(i)
+        copy_into(pad, kv, s_pad, s_kv)
+        g.replay()
+        sync(*devs)
+        refs.append(s_out.float().cpu().clone())
+    info["pipe_graph_out_diff"] = (refs[0] - refs[1]).abs().max().item()
+    info["pipe_obs_differ"] = bool(info["pipe_graph_out_diff"] > 0)
+    info["pipe_graph_vs_eager_per_obs"] = max(
+        (refs[i] - eager[i]).abs().max().item() for i in range(2))
+    print(f"[{name}] observations differ by: KV {info['pipe_kv_diff']:.3e}, eager output "
+          f"{info['pipe_eager_out_diff']:.3e}, graph output {info['pipe_graph_out_diff']:.3e}; "
+          f"graph vs eager per observation {info['pipe_graph_vs_eager_per_obs']:.3e}", flush=True)
+    n, windows = args.pipe_requests, args.pipe_windows
+    run_pipelined(a, g, s_pad, s_kv, s_out, loop_stream, 4)  # warm-up
+    sync(*devs)
+    worst = 0.0
+    for w in range(windows):
+        sync(*devs)
+        t0 = time.perf_counter()
+        outs = run_pipelined(a, g, s_pad, s_kv, s_out, loop_stream, n)
+        sync(*devs)
+        dt = (time.perf_counter() - t0) * 1e3 / n
+        lat.append({"placement": name, "mode": "pipe_interval", "step": w, "wall_ms": dt})
+        for t, o in enumerate(outs):
+            worst = max(worst, (o.float().cpu() - refs[t % 2]).abs().max().item())
+    info["pipe_requests"], info["pipe_windows"] = n, windows
+    info["pipe_max_abs_diff_vs_sequential"] = worst
+    med = statistics.median(r["wall_ms"] for r in lat
+                            if r["placement"] == name and r["mode"] == "pipe_interval")
+    print(f"[{name}] pipe_interval  median {med:9.3f} ms per request "
+          f"({n} requests x {windows} windows), max |diff| vs sequential {worst:.1e}",
+          flush=True)
+    if worst > 0:
+        print(f"[{name}] WARNING: pipelined outputs differ from sequential ones", flush=True)
 
 
 def profile_placement(name: str, fn: Callable[[], object], devs: tuple, out: Path) -> None:
@@ -434,6 +560,10 @@ def main() -> None:
     ap.add_argument("--reps-cpu", type=int, default=5, help="reps when a half runs on the CPU")
     ap.add_argument("--cpu-threads", type=int, default=0, help="torch threads, 0 = default")
     ap.add_argument("--no-graph", action="store_true")
+    ap.add_argument("--pipeline", action="store_true",
+                    help="also time pipelined requests (prefix of t+1 overlaps loop of t)")
+    ap.add_argument("--pipe-requests", type=int, default=20, help="requests per window")
+    ap.add_argument("--pipe-windows", type=int, default=5, help="timed windows")
     ap.add_argument("--profile", action="store_true", help="save a profiler trace per placement")
     ap.add_argument("--out", default=None)
     args = ap.parse_args()

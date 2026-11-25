@@ -84,7 +84,7 @@ one() {  # out_dir, then extra args
 
 case "$MODE" in
 smoke)
-  one "${TMPDIR:-/tmp}/placement_smoke_$STAMP" --model toy --reps 5 --reps-cpu 3
+  one "${TMPDIR:-/tmp}/placement_smoke_$STAMP" --model toy --reps 5 --reps-cpu 3 "${@:2}"
   ;;
 run)
   # Extra arguments go to workloads/placement.py, e.g. `run --placements gpu` for a quick
