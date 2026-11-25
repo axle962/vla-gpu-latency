@@ -29,7 +29,7 @@ first placement after all others changed it by 0.8\% and 0.0\%
   \caption{Best step per placement (ms, median; CUDA-graph loop when the loop is on a GPU) and
   error of the prediction from single-device runs.}
   \label{tab:placement}
-  \begin{tabular}{lrrrr}
+  \resizebox{\columnwidth}{!}{\begin{tabular}{lrrrr}
     \hline
     & \multicolumn{2}{c}{RTX 2080 Ti} & \multicolumn{2}{c}{2x A100} \\
     Placement & best & pred.\ err. & best & pred.\ err. \\
@@ -40,7 +40,7 @@ first placement after all others changed it by 0.8\% and 0.0\%
     prefix CPU, loop GPU & 1,720 & $-0.6$\% & 916 & $-2.0$\% \\
     CPU only & 2,348 & & 1,454 & \\
     \hline
-  \end{tabular}
+  \end{tabular}}
 \end{table}
 
 \paragraph{The handoff is cheap and the step is additive.} The KV cache is 4.9\,MB in 33

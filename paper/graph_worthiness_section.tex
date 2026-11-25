@@ -37,7 +37,7 @@ intervals from a bootstrap that resamples configurations. We compare five ways t
 $\varepsilon$ that use progressively less information about the predicted run, and two baselines
 that need no $\varepsilon$ (Table~\ref{tab:graphworthiness}).
 
-\begin{table}[t]
+\begin{table*}[t]
 \centering
 \caption{Error of the predicted CUDA-graph speedup (MAPE over 114 held-out runs, 95\% bootstrap
 CI over configurations) and decision accuracy at a 10$\times$ threshold, overall and on the 23
@@ -57,7 +57,7 @@ $T_e/D$ (no $\varepsilon$) & none                   & 7.1\%  & 4.6--9.7   & 98\%
 $1/\text{GPU busy}$      & none (utilization)       & 16.9\% & 11.0--23.7 & 89\% / 57\% \\
 \bottomrule
 \end{tabular}
-\end{table}
+\end{table*}
 
 \paragraph{Results.}
 With $\varepsilon$ calibrated once per GPU the rule predicts the speedup within 1.8\% on average

@@ -1,15 +1,14 @@
 % Launch-Bound and Cache-Aware: Predicting VLA Inference Latency and CUDA-Graph Speedup
 % Across GPU Generations. Course project, GPU Architecture and Programming, NYU, Fall 2026.
-% DRAFT 2026-11-13. Numbers marked \pending{} wait for runs listed in CLAUDE.md section 0.1.
+% Final version 2026-11-25. Numbers come from results/*.md (see readme.txt for the scripts).
 % Style rule for this paper: no em dashes.
 \documentclass[10pt,twocolumn]{article}
 \usepackage[margin=0.8in]{geometry}
 \usepackage{graphicx,booktabs,amsmath,hyperref,xcolor}
-\newcommand{\pending}[1]{\textcolor{orange}{[#1]}}
 
 \title{Launch-Bound and Cache-Aware: Predicting VLA Inference Latency\\
 and CUDA-Graph Speedup Across GPU Generations}
-\author{Aditya Maddur Guruprakash\\New York University}
+\author{Aditya Maddur Guruprakash \quad Archana Jayakumar \quad Shrikar Madhu\\New York University}
 \date{}
 
 \begin{document}
@@ -18,52 +17,57 @@ and CUDA-Graph Speedup Across GPU Generations}
 \begin{abstract}
 Vision-language-action (VLA) robot policies run at batch size 1 and issue thousands of short
 GPU kernels per control step. We ask the Project 2 question (flavor B): given a kernel trace of
-such a workload on one GPU, can we predict its latency on another GPU? We trace SmolVLA
-(450M) on three GPUs from three architecture generations (RTX 2080 Ti, TITAN V, A100) and
-OpenVLA-7B on the A100, in eager PyTorch and with the denoising or decoding loop captured as a
-CUDA graph. 78\% of SmolVLA's kernels run for less than 5\,$\mu$s, and in eager mode 85 to
-90\% of the step is host-side framework dispatch. The graph-mode loop is bound by per-kernel
-latency, not bandwidth: the A100 runs it only 11\% faster than the 2080 Ti despite 2.5$\times$
-the DRAM bandwidth, and the TITAN V, with more bandwidth than the 2080 Ti, is 54\% slower. We
-build a two-timeline model (host dispatch and GPU execution) whose kernel term transfers each
-kernel's \emph{graph slot} with ratios measured by small PyTorch microbenchmarks on the target.
-Across the six source/target pairs and seven configurations it predicts the eager step with
-7.5\% MAPE, the hybrid (eager prefix plus graphed loop) step with 5.2\%, and the CUDA-graph
-loop with 16\%, versus 64\% for bandwidth-ratio scaling and 86 to 98\% for the VLA-Perf roofline, and it reproduces the ordering
-inversion where the TITAN V host is fastest in eager mode while its GPU is slowest under
-graphs. We also test the cache-aware half of our hypothesis: an L2 working-set sweep on four
-GPUs shows that inter-kernel L2 residency changes SmolVLA's graphed loop by only 1 to 13\%, because
-each denoising step streams about 250\,MB of weights, more than any L2 we measured. For such
-policies latency is launch bound, not cache bound; we identify where the cache term should
-matter and the experiment that would show it.
+such a workload on one GPU, can we predict its latency on another GPU? We trace seven policies
+(SmolVLA, $\pi_0$, $\pi_{0.5}$, $\pi_0$-FAST, OpenVLA-7B, ACT and Diffusion Policy) on four GPUs
+from four architecture generations (RTX 2080 Ti, TITAN V, A100, RTX 4070), in eager PyTorch and
+with the denoising or decoding loop captured as a CUDA graph. In eager mode the GPU is busy only
+15\% of a SmolVLA step: 85 to 90\% is host-side framework dispatch, and CUDA graphs speed the
+loop up 4.6 to 22.5$\times$ depending on the host-GPU pair. Graphed small kernels are bound by
+per-kernel latency, not bandwidth or L2: the A100 runs SmolVLA's graphed loop only 11\% faster
+than the 2080 Ti despite 2.5$\times$ the DRAM bandwidth, and inter-kernel L2 residency changes it
+by only 1 to 13\%. We build a two-timeline model (host dispatch and GPU execution) that transfers
+each kernel's \emph{graph slot} with ratios from small PyTorch microbenchmarks on the target.
+Over all cross-GPU pairs it predicts SmolVLA's graphed loop with 15\% MAPE (bandwidth scaling:
+96\%, the VLA-Perf roofline: 93\%), the hybrid step with 13\% and the eager step with 20\%
+(6.6\% among the three GPUs with comparable hosts), ranks the GPUs exactly in 65\% of cases
+(bandwidth: 26\%), and reproduces the inversion where the slowest eager GPU is the fastest under
+graphs. It breaks where the library changes the algorithm per architecture (cuDNN convolutions).
+We add a rule that predicts the graph speedup from eager mode alone (1.8\% MAPE), models for
+splitting a policy across devices (within 2.5\%) and for hosting several policies on one GPU, and
+show on LIBERO that the latency cut from CUDA graphs is worth up to 30 points of task success.
 \end{abstract}
 
 \section{Introduction}
-Robot policies built on vision-language models (OpenVLA, $\pi_0$, SmolVLA, GR00T) are now
-deployed on a wide range of GPUs, and practitioners want to know how fast a policy will run on
-hardware they do not have. Public benchmarks show orderings that spec sheets do not explain:
-H200 slower than H100 on OpenVLA and GR00T, an RTX PRO 6000 beating an H200 at small action
-chunks, and OpenVLA plateauing near the same latency on Hopper and Ada~\cite{yotta}. The
-recent analytical model VLA-Perf~\cite{vlaperf} is a per-operator roofline over spec-sheet
-peaks and explicitly leaves kernel launch and runtime overheads unmodeled.
+Robot policies built on vision-language models (OpenVLA~\cite{openvla}, $\pi_0$~\cite{pi0},
+SmolVLA~\cite{smolvla}, GR00T) are now deployed on a wide range of GPUs, and practitioners want
+to know how fast a policy will run on hardware they do not have. Public benchmarks show orderings
+that spec sheets do not explain: H200 slower than H100 on OpenVLA and GR00T, an RTX PRO 6000
+beating an H200 at small action chunks, and OpenVLA plateauing near the same latency on Hopper
+and Ada~\cite{yotta}. The recent analytical model VLA-Perf~\cite{vlaperf} is a per-operator
+roofline over spec-sheet peaks and explicitly leaves kernel launch and runtime overheads
+unmodeled.
 
 Batch-1 VLA inference sits in the opposite regime from the throughput kernels classic GPU
 performance models target~\cite{hongkim,gpuperf}. Our measurements show that (i) the eager step
 is dominated by host-side dispatch, about 27\,$\mu$s of CPU per kernel; (ii) once the loop is
 captured as a CUDA graph, kernels are a few microseconds long and their time is set by kernel
-start-up and memory latency, not bandwidth; and (iii) consequently the benefit of CUDA graphs
-depends on the pairing of host CPU and GPU, not on the workload alone. (iv) The L2 cache, the
-second term of our title, matters less than we expected: the weights a step touches exceed
-every L2 we measured, so the cache term is second order today, and we state when it would not be.
+start-up, memory latency and the clock the GPU sustains, not by bandwidth; and (iii)
+consequently the benefit of CUDA graphs depends on the pairing of host CPU and GPU, not on the
+workload alone. (iv) The L2 cache, the second term of our title, matters less than we expected:
+the weights a step touches exceed every L2 we measured, so the cache term is second order today,
+and we state when it would not be.
 
-\textbf{Contributions.} (1) Traces of two VLAs across three GPU generations in eager, graph and
-hybrid modes, all bit-exact against the stock models. (2) Standalone CUDA C++ kernels and a C++
-replay of the traced step that runs on the CIMS machines. (3) A launch-aware latency model that
-predicts eager, graph and hybrid latency and CUDA-graph speedup on a target GPU from a source
-trace plus target microbenchmarks. (4) An evaluation on six source/target pairs with
-percentage error per case, against spec-ratio and roofline baselines. (5) A measured test of
-the cache term, with the conditions and the experiment under which it would become first order
-(Section~\ref{sec:l2}).
+\textbf{Contributions.} (1) Traces of seven policies on four GPU generations in eager, graph
+and hybrid modes, every graph output bit-exact against the stock model. (2) Standalone CUDA C++
+kernels and a C++ replay of the traced step that build and run on the CIMS machines. (3) A
+launch-aware model that predicts eager, graph and hybrid latency and the CUDA-graph speedup on a
+target GPU from a source trace plus target microbenchmarks, evaluated with percentage error per
+(workload, source, target) case against spec-ratio and roofline baselines, including VLA-Perf.
+(4) Three regimes (dispatch bound, mixed, GPU bound) and the cases where kernel-level transfer
+fails. (5) A measured test of the cache term. (6) A rule that predicts the graph speedup before
+capturing (Section~\ref{sec:graphworthiness}), and models for split-device and multi-policy
+hosting (Sections~\ref{sec:placement} and~\ref{sec:multipolicy}). (7) The effect of the measured
+latencies on task success in simulation (Section~\ref{sec:success}).
 
 \section{Survey}
 \textbf{Analytical GPU models.} Hong and Kim~\cite{hongkim} model memory-level and
@@ -91,6 +95,8 @@ $T_o = \max(\mathrm{FLOPs}_o/P, \mathrm{Bytes}_o/B)$ per operator, validated on 
 kernels once and replay it with one launch, removing per-kernel CPU launch cost; PyTorch
 exposes them for static-shape regions~\cite{ptgraphs}. Their benefit depends on how much of
 the step is CPU-side launch and framework overhead, which we measure and model directly.
+\textbf{Sharing a GPU.} For several policies on one GPU we use a closed queueing network solved
+by approximate mean value analysis~\cite{mva,schweitzer}.
 
 \section{Problem Definition and Challenges}
 Given a profiled step on a source GPU $S$ (per-kernel durations, launching ops, sync points)
@@ -98,8 +104,9 @@ and a description of a target GPU $T$, predict on $T$: the eager step latency, t
 the loop captured as a CUDA graph, the hybrid step (eager prefix plus graphed loop), and the
 graph speedups. Challenges: (a) the eager step is host bound, so the host CPU of $T$ matters;
 (b) profiling inflates each kernel by about 1\,$\mu$s, comparable to the kernels themselves;
-(c) small-kernel time does not follow bandwidth or FLOP ratios; (d) different GPUs run
-different cuBLAS kernels (kernel counts per step differ by about 1\%).
+(c) small-kernel time does not follow bandwidth or FLOP ratios; (d) libraries choose different
+kernels per GPU (cuBLAS kernel counts per step differ by about 1\%; cuDNN can change the
+convolution algorithm entirely).
 
 \section{Proposed Idea}
 \textbf{Two-timeline replay.} For eager mode we replay the traced kernel sequence on a CPU and
@@ -113,42 +120,60 @@ $T_{\mathrm{graph}} = L_{\mathrm{graph}} + \sum_k (t_k + \delta_{\mathrm{node}})
 
 \textbf{Two fitted parameters, on the source only.} The profiler bias $b$ (subtracted from
 traced durations) and $p$ are fitted on one baseline run of the source and held fixed for all
-other configurations and all targets.
+other configurations and all targets. $p$ turns out to be a property of the host, not the
+model: on the 2080 Ti host it fits to 20.5 to 23.1\,$\mu$s and on the TITAN V host to 12.7 to
+13.8\,$\mu$s across SmolVLA, $\pi_0$, $\pi_{0.5}$ and $\pi_0$-FAST.
 
 \textbf{Kernel transfer by graph slots.} We transfer the slot $u_k = t_k + \delta_S$ rather
 than the duration: $u_k^T = r_c \min(u_k, \tau_c) + r_{\mathrm{bw}}\max(u_k - \tau_c, 0)$,
 where $r_c$ is the ratio of target to source slot time of a PyTorch microbenchmark op of the
-same class (elementwise, allocating op, GEMM, attention) replayed as a CUDA graph, $\tau_c$
-the source slot of that op, and $r_{\mathrm{bw}}$ the measured DRAM bandwidth ratio
-(variant \emph{slot}; \emph{slot per op class} omits the tail term). Host costs on $T$ come
-from $T$'s dispatch table; $p_T = p_S \cdot h$ with $h$ the host speed ratio.
+same class (elementwise, allocating op, GEMM, attention, convolution) replayed as a CUDA graph,
+$\tau_c$ the source slot of that op, and $r_{\mathrm{bw}}$ the measured DRAM bandwidth ratio
+(variant \emph{slot}; \emph{slot\_class} omits the tail term).
+
+\textbf{Host transfer (final model, \emph{slot\_drv}).} Host costs on $T$ come from $T$'s
+dispatch table. For $p$ we tried scaling by the dispatch-table ratio (\emph{slot\_class}) and by
+pure Python speed (\emph{slot\_cold\_py}); the final variant scales $p$ by the ratio of the
+dispatch tables \emph{after} subtracting the host's bare C++ \texttt{cudaLaunchKernel} cost per
+kernel, the part of dispatch that is framework code rather than driver. Kernels are transferred
+as in \emph{slot\_class}.
+
 \textbf{Hypotheses we tested and rejected.} (i) Small kernels on cold data: in the real loop
 the GEMMs stream about 250\,MB of weights per step, so we measured small PyTorch ops over a
 512\,MB tensor pool. Cold data costs about 30\% more per kernel, but almost equally on every
-GPU, so cold-cache slot ratios do not improve the transfer (graph loop MAPE 22\% vs 16\%).
+GPU, so cold-cache slot ratios do not improve the transfer (graph loop MAPE 18 vs 15\%).
 (ii) Host Python speed: pure-Python and \texttt{nn.Module} call benchmarks run at the same
-speed on all three hosts (within 10\%), so $p$ does not scale with Python speed; the hosts
-differ in the aten/C++ dispatch path, which is what $h$ measures.
+speed on three of the hosts (within 10\%), so $p$ does not follow Python speed there; the hosts
+differ in the aten/C++ dispatch path.
 
 \section{Experimental Setup}
 \begin{table}[t]\centering\small
-\begin{tabular}{lrrrr}\toprule
+\resizebox{\columnwidth}{!}{\begin{tabular}{lrrrr}\toprule
 GPU & SMs & L2 & DRAM BW & host CPU\\\midrule
 RTX 2080 Ti (cuda2) & 68 & 5.5\,MB & 582\,GB/s & Xeon E5-2660 v3\\
 TITAN V (cuda3) & 80 & 4.5\,MB & 648\,GB/s & Xeon Gold 5118\\
-A100-SXM4-40GB & 108 & 40\,MB & 1479\,GB/s & cloud Xeon 2.2\,GHz\\
-RTX 4070 (cuda5) & 46 & 36\,MB & 475\,GB/s & Xeon E5-2650 v2\\\bottomrule
-\end{tabular}
-\caption{GPUs. Bandwidth measured with our sweep (bench/calib). The RTX 4070 was added after
-the main analysis (Section~\ref{sec:rtx4070}); headline cross-GPU numbers use the first three.}\label{tab:gpus}
+RTX 4070 (cuda5) & 46 & 36\,MB & 475\,GB/s & Xeon E5-2650 v2\\
+A100-SXM4-40GB & 108 & 40\,MB & 1479\,GB/s & cloud Xeon 2.2\,GHz\\\bottomrule
+\end{tabular}}
+\caption{GPUs of the cross-GPU study. Bandwidth measured with our sweep (bench/calib). The
+first three are CIMS machines. Also used: a GTX TITAN X (cuda4, C++ calibration only), a node
+with two A100s (placement study) and an RTX PRO 6000 Blackwell (Empire AI, multi-policy
+study).}\label{tab:gpus}
 \end{table}
-GPUs in Table~\ref{tab:gpus}; GTX TITAN X (Maxwell) was calibrated only. Software: PyTorch
-2.10/CUDA 12.8 for SmolVLA (same build on all hosts), PyTorch 2.2/CUDA 12.1 for OpenVLA; our
-CUDA code builds with nvcc 12.4. Workloads: SmolVLA in FP16, 1 to 3 cameras, 5/10/20 flow
-steps, action chunk 25/50/100; OpenVLA-7B in FP16 with one image and 7 action tokens.
-Timing: CUDA events or host timers after warm-up, \texttt{CUDA\_MODULE\_LOADING=EAGER},
-medians of 20 or more repetitions, idle GPUs (checked before every stage on the shared CIMS
-machines). Traces use the PyTorch profiler (CUPTI).
+GPUs in Table~\ref{tab:gpus}. Software: PyTorch 2.10/CUDA 12.8 for every policy except OpenVLA
+(PyTorch 2.2/CUDA 12.1), the same build on every host; our CUDA code builds with nvcc 12.4 for
+sm\_75 and runs on every CIMS GPU. Policies (LeRobot~\cite{lerobot} implementations):
+SmolVLA~\cite{smolvla} (450M, FP16; 1 to 3 cameras, 5/10/20 flow steps, chunk 25/50/100, batch
+1 to 16), $\pi_0$~\cite{pi0} and $\pi_{0.5}$~\cite{pi05} (10 flow steps), $\pi_0$-FAST~\cite{fast}
+(256 decoded tokens), OpenVLA-7B~\cite{openvla} (A100 only; 7 action tokens), ACT~\cite{act}
+(52M, FP32, whole step graphed) and Diffusion Policy~\cite{diffusionpolicy} (263M, FP32, DDPM
+loop graphed). $\pi$ models run in FP16 on Turing and Volta; we checked activations stay below
+the FP16 range for $\pi_0$ and $\pi_{0.5}$ (not for $\pi_0$-FAST, whose FP16 runs are
+timing only). Timing: CUDA events or host timers after warm-up,
+\texttt{CUDA\_MODULE\_LOADING=EAGER}, medians of 20 or more repetitions, idle GPUs (checked
+before every stage on the shared CIMS machines), eager timings pinned to the GPU's NUMA node.
+Traces use the PyTorch profiler (CUPTI); kernel counters come from Nsight Compute on cuda2 and
+cuda5. Task success uses LIBERO~\cite{libero} and RoboTwin 2.0~\cite{robotwin}.
 
 \section{Experiments and Analysis}
 \subsection{Where the time goes}
@@ -158,45 +183,108 @@ from 316 to 35.8\,ms (8.8$\times$), and the step from 377 to 94\,ms (4.0$\times$
 decode is 40\,ms per token eager, 14.2\,ms as a graph (62\% of the weight-streaming bound),
 2.0$\times$ end to end. Our C++ replay of SmolVLA's loop runs eager in 44.7\,ms on the 2080
 Ti versus 407\,ms in PyTorch, so about 89\% of eager time is framework dispatch.
+Figure~\ref{fig:timeline} shows the two modes on one timeline.
+
+\begin{figure}[t]\centering
+\includegraphics[width=\columnwidth]{figures/timeline_loop.pdf}
+\caption{Kernel timeline of SmolVLA's denoising loop on the 2080 Ti under Nsight Systems,
+eager vs CUDA graph (both about 1.4$\times$ slower under the tool than unprofiled).}
+\label{fig:timeline}
+\end{figure}
+
+\textbf{Three regimes.} The other policies span the range. $\pi_0$ and $\pi_{0.5}$ behave like
+SmolVLA (FP16, loop graph speedup 2.9$\times$ on the TITAN V to 11.7$\times$ on the RTX 4070;
+$\pi_0$ eager / graph loop / hybrid 507 / 54.6 / 211\,ms on the 2080 Ti). ACT is mixed: 12.6
+vs 5.3\,ms on the 2080 Ti (2.4$\times$). Diffusion Policy is GPU bound: busy 97 to 100\% of the
+step and no graph speedup (1.00 to 1.03$\times$), because its FP32 Conv1d kernels are long.
+$\pi_0$-FAST decodes 256 tokens in 3.0 to 3.2\,s as a graph on every CIMS GPU (70 to 80\% of
+the weight-streaming bound, about 5.4\,GB per token), against 5.6 to 10.6\,s eager.
 
 \subsection{Small kernels are latency bound}
 Matching identical PyTorch kernels across GPUs, kernels below 6\,$\mu$s take the same time on
 the A100 and the 2080 Ti (ratio 0.98 to 1.02) and 1.3 to 1.5$\times$ longer on the TITAN V.
 Profiling adds the same 11.3\,ms (about 0.95\,$\mu$s per kernel) to a graph replay on all
 three GPUs. Real graph slots per kernel are 3.0, 3.4 and 5.2\,$\mu$s on the A100, 2080 Ti
-and TITAN V.
+and TITAN V. Nsight Compute on cuda2 puts 70\% of the real step's kernels under 5\,$\mu$s at a
+median achieved occupancy of 13.5\%.
 
 \subsection{Same-GPU accuracy}
-Fitted on one A100 run per model, held-out MAPE: SmolVLA eager 1.8\%, graph loop 0.7\%,
-hybrid 2.8\%; OpenVLA eager 0.7\%, graph decode 0.3\%. Summing kernel times (what a roofline
-model predicts at best) errs by 84\% on the eager step and 24\% on the graph loop.
+Fitted on one baseline run per GPU, held-out MAPE for SmolVLA is 1.3 to 4.5\% (eager) and 0.2 to
+1.7\% (graph loop) on the four GPUs; OpenVLA on the A100: eager 0.7\%, graph decode 0.3\%.
+Diffusion Policy on the A100 is within 1.2\% for every quantity. Summing kernel times (what a
+roofline model predicts at best) errs by 84\% on the eager step and 24\% on the graph loop.
 
-\subsection{Cross-GPU accuracy}
+\subsection{Cross-GPU accuracy}\label{sec:crossgpu}
 \begin{figure*}[t]\centering
 \includegraphics[width=0.62\textwidth]{figures/pred_vs_meas.pdf}
-\caption{Predicted vs measured latency on the target GPU (6 pairs $\times$ 7 configs).}
+\caption{SmolVLA, predicted vs measured latency on the target GPU (12 source/target pairs
+$\times$ 7 configurations, four GPUs), bandwidth scaling vs our model (\emph{slot\_drv}).}
 \label{fig:pvm}
 \end{figure*}
 \begin{figure*}[t]\centering
 \includegraphics[width=\textwidth]{figures/mape_variants.pdf}
-\caption{Cross-GPU MAPE by kernel-transfer variant.}\label{fig:mape}
+\caption{SmolVLA cross-GPU MAPE by model variant, four GPUs.}\label{fig:mape}
 \end{figure*}
-Figures~\ref{fig:pvm} and~\ref{fig:mape}. With slot ratios per op class the MAPE is 7.5\%
-(eager), 5.2\% (hybrid), 16\% (graph loop) and 22\% (loop graph speedup); bandwidth-ratio
-scaling gives 64\% on the graph loop. Between the 2080 Ti and the A100 every quantity is within
-6\%. Pairs with the TITAN V are worst (graph loop 17 to 29\%): the hot-cache microbenchmarks
-see a 1.2 to 1.5$\times$ slot ratio where the real loop has 1.54$\times$.
-The missing factor is the \emph{sustained} SM clock. Sampling \texttt{nvidia-smi} while
-the C++ replay of the loop runs shows the TITAN V holding 1335\,MHz (spec maximum 1912) and
-the 2080 Ti 1950\,MHz; the ratio, 1.46, matches the real per-kernel ratio of 1.54. Scaling all
-slots by the sustained-clock ratio predicts the graph loop between these two GPUs within 6 to
-7\% in both directions (versus 17 to 22\% with slot ratios), so latency-bound kernels scale
-with the clock the GPU actually runs at, not its spec boost clock. The clock alone does not
-transfer across architectures, though: the A100 sustains only 1410\,MHz, below the 2080 Ti,
-yet runs small kernels in the same time, and clock-only scaling over all six pairs gives 33\%
-MAPE on the graph loop. Per-op-class slot ratios measured on the target capture both the
-architecture and the clock it runs at, which is why they are our default; a target's
-sustained clock is a cheap extra feature when source and target share an SM design.
+\begin{table}[t]\centering\small
+\resizebox{\columnwidth}{!}{\begin{tabular}{lrrrr}\toprule
+Workload (GPUs) & eager & graph & hybrid & speedup\\\midrule
+SmolVLA (4) & 20.2 & 15.3 & 13.0 & 22.0\\
+SmolVLA (3) & 6.6 & 16.2 & 5.5 & 21.7\\
+$\pi_0$ (3) & 17.8 & 12.8 & 11.2 & 31.0\\
+$\pi_{0.5}$ (3) & 11.9 & 10.4 & 17.8 & 30.8\\
+$\pi_0$-FAST (3) & 19.2 & 9.3 & 7.1 & 13.1\\
+ACT (4) & 28.0 & 12.2 & & 21.2\\
+Diffusion, default (4) & 39.8 & 41.9 & 41.3 & 3.6\\
+Diffusion, autotuned (4) & 36.8 & 25.5 & 25.5 & 13.9\\\midrule
+SmolVLA (4), bandwidth & 25.5 & 96.4 & 44.6 & 64.0\\\bottomrule
+\end{tabular}}
+\caption{Cross-GPU MAPE (\%) of \emph{slot\_drv} over all source $\neq$ target pairs and
+configurations. ``graph'' is the graphed loop (the whole step for ACT), ``speedup'' the loop's
+graph speedup (end to end for ACT). (3): the three CIMS GPUs, where the $\pi$ models were
+traced; SmolVLA (3) is 2080 Ti, TITAN V and A100. Last row: spec bandwidth-ratio
+scaling.}\label{tab:cross}
+\end{table}
+Table~\ref{tab:cross}, Figures~\ref{fig:pvm} and~\ref{fig:mape}. Over all twelve SmolVLA pairs
+the graphed loop is predicted with 15.3\% MAPE, against 96\% for spec bandwidth-ratio scaling;
+between the 2080 Ti and the A100 every quantity is within about 10\%. The model ranks the four GPUs
+exactly in 65\% of (source, configuration, quantity) cases (mean Kendall $\tau$ 0.83), against
+26\% for bandwidth scaling. The graph loop transfers with 9 to 13\% MAPE for $\pi_0$,
+$\pi_{0.5}$ and $\pi_0$-FAST as well (58 to 69\% with bandwidth scaling for the first two).
+
+\textbf{The TITAN V and the sustained clock.} Pairs with the TITAN V are the worst for the graph
+loop (17 to 32\%): the hot-cache microbenchmarks see a 1.2 to 1.5$\times$ slot ratio where the
+real loop has 1.54$\times$. The missing factor is the \emph{sustained} SM clock. Sampling
+\texttt{nvidia-smi} while the C++ replay of the loop runs shows the TITAN V holding 1335\,MHz
+(spec maximum 1912) and the 2080 Ti 1950\,MHz; the ratio, 1.46, matches the real per-kernel
+ratio of 1.54, and clock scaling predicts the loop between these two GPUs within 6 to 7\% in
+both directions. The clock alone does not transfer across architectures, though: the A100
+sustains only 1410\,MHz yet runs small kernels as fast as the 2080 Ti, and clock-only scaling
+over all pairs gives 28\% MAPE. Per-op-class slot ratios measured on the target capture both
+architecture and clock, which is why they are our default.
+
+\textbf{The host is the open problem.} Among the three GPUs with comparable hosts the eager
+step is within 6.6\% and the hybrid within 5.5\%. The RTX 4070 sits on cuda5, a 2013 Xeon
+E5-2650 v2 whose C++ launch call costs 8.7\,$\mu$s (1.9 to 2.6\,$\mu$s elsewhere) and whose
+PyTorch dispatch microbenchmarks are 2.3 to 2.5$\times$ slower than the other hosts; in situ,
+its eager step is only 1.6 to 1.8$\times$ slower. Predictions of the eager step into or out of
+the 4070 are 20 to 44\% off, which is what raises the four-GPU eager MAPE to 20\%. The graph
+loop into the 4070 is still within 9 to 10\% from the 2080 Ti and the A100. Microbenchmarks overstate an old host's slowdown
+and Python probes understate it; no single index fits all four hosts, so transferring the Python
+share between very different hosts remains open. A controlled experiment on the 2080 Ti
+reproduces this: sharing the core with a CPU hog slows the eager step 1.65 to 1.93$\times$
+while the graph loop stays within 1 to 8\%, so graphs make latency nearly host independent.
+
+\subsection{When the library changes the algorithm}
+Kernel-level transfer assumes the target runs the same kernels. For Diffusion Policy with
+cuDNN's default heuristic (\texttt{cudnn.benchmark=False}) each architecture gets a different
+convolution algorithm: implicit-GEMM \texttt{scudnn} kernels on Turing, an NHWC variant with
+layout transposes on Volta, \texttt{implicit\_convolve\_sgemm} on Ampere and FFT convolution on
+Ada. The RTX 4070 is therefore 2.3$\times$ slower than the 2080 Ti (10 DDPM steps: 346 vs
+152\,ms), and every pair with the 4070 fails (Table~\ref{tab:cross}, 42\% graph loop MAPE).
+Autotuning removes the 4070 penalty (346 to 132\,ms; 2080 Ti 152 to 106\,ms) but makes the
+choice irreproducible across processes (27.6k to 32.4k kernels per step on the same GPU), and on
+the A100 cuDNN 9.10.2's autotuner crashed in 20 of 24 processes. A cross-GPU model must either
+assume autotuned algorithms or predict the library's heuristic.
 
 \subsection{How much does L2 residency matter?}\label{sec:l2}
 To isolate the cache term we rerun our C++ replay of the 10-step loop with all GEMM weights
@@ -207,41 +295,39 @@ effective in our bandwidth sweep) the graphed loop takes 31.2\,ms when the weigh
 GEMM (12\%), with the knee between 16 and 24\,MB. The saving is bounded by the DRAM time of the
 weights: 250\,MB per denoising step at 1.48\,TB/s is about 1.7\,ms of a 32\,ms loop, while the
 rest is per-kernel latency. On the 2080 Ti, flushing L2 before every kernel costs 18\% (Nsight
-Compute). So for small VLAs the cache term is second order next to launch and per-kernel
-latency, which is why our model does without one. The same sweep on the CIMS GPUs puts each
-knee at that GPU's L2 (4 to 8\,MB on the 2080 Ti and TITAN V, 24 to 48\,MB on the RTX 4070) and
-bounds the saving at 6.3\%, 3.0\% and 9.1\% with cuBLAS (5.1\%, 1.0\% and 12.8\% with our
-GEMM). The RTX 4070, with the largest L2 relative to its bandwidth, gains most, but the real
-expert's 250\,MB of weights per step exceed every L2 we measured, so in the actual loop they
-stream from DRAM on all four GPUs.
+Compute; 28\% on the RTX 4070, whose warm-cache DRAM traffic per flow step is 271 vs 408\,MB). So
+for small VLAs the cache term is second order next to launch and per-kernel latency, which is
+why our model does without one. The same sweep on the CIMS GPUs puts each knee at that GPU's L2
+(4 to 8\,MB on the 2080 Ti and TITAN V, 24 to 48\,MB on the RTX 4070) and bounds the saving at
+6.3\%, 3.0\% and 9.1\% with cuBLAS (5.1\%, 1.0\% and 12.8\% with our GEMM). The real expert's
+250\,MB of weights per step exceed every L2 we measured, so in the actual loop they stream from
+DRAM on all four GPUs.
 
 \paragraph{When would the cache term matter?} Two conditions must hold together: the weights a
 graphed step touches must fit in the GPU's \emph{effective} L2 (on the A100 20 to 27\,MB of
 the nominal 40\,MB, as measured above), and the loop must be long enough in DRAM time for the
 saving to show. A small policy on a GPU with a very large L2 meets both: ACT has 52M parameters,
-about 104\,MB in FP16, against the 128\,MB L2 of the RTX PRO 6000 (Blackwell; spec value). We
-plan three measurements there, using the same tools as above: (a) the bandwidth sweep, to find
-the PRO 6000's effective L2 capacity; (b) the weight-pool sweep of the C++ replay up to
-256\,MB, to locate its knee; and (c) a graphed ACT trace in FP16 on the PRO 6000 and on a GPU
-whose L2 it does not fit in (the A100 or an H200, 50\,MB). If the weights then stay in L2, the
-graph step becomes bound by L2 rather than DRAM bandwidth and our slot-transfer model, which
-has no cache term, should underpredict the PRO 6000's advantage; that gap is the test of the
-cache-aware model and of the PRO 6000 versus H200 inversion reported in public
-benchmarks~\cite{yotta}. Our team has access to a PRO 6000 through Empire AI, used for the
-multi-policy study, so this experiment is within reach.
+about 104\,MB in FP16, against the 128\,MB L2 of the RTX PRO 6000 (Blackwell; spec value). The
+test is (a) the bandwidth sweep, to find the PRO 6000's effective L2 capacity; (b) the
+weight-pool sweep of the C++ replay up to 256\,MB, to locate its knee; and (c) a graphed ACT
+trace in FP16 on the PRO 6000 and on a GPU whose L2 it does not fit in. If the weights then stay
+in L2, our slot-transfer model, which has no cache term, should underpredict the PRO 6000's
+advantage; that gap would test the cache-aware model and the PRO 6000 versus H200 inversion
+reported in public benchmarks~\cite{yotta}.
 
 \subsection{Comparison with VLA-Perf}
 \begin{table}[t]\centering\small
 \begin{tabular}{lrr}\toprule
 Quantity (SmolVLA) & VLA-Perf & Ours (cross-GPU)\\\midrule
-Eager step & 97.7 & 7.5\\
-Eager prefix & 90.1 & 8.6\\
+Eager step & 97.7 & 6.6\\
+Eager prefix & 90.1 & 7.0\\
 Graph loop & 93.2 & 16.2\\
-Hybrid step & 91.5 & 5.2\\
-Graph speedup (loop) & 85.8 & 22.3\\\bottomrule
+Hybrid step & 91.5 & 5.5\\
+Graph speedup (loop) & 85.8 & 21.7\\\bottomrule
 \end{tabular}
-\caption{MAPE (\%) of VLA-Perf, run on the same models and GPUs, vs our model. VLA-Perf uses
-spec sheets only; ours uses a source trace plus target microbenchmarks.}\label{tab:vlaperf}
+\caption{MAPE (\%) of VLA-Perf, run on the same models and GPUs (2080 Ti, TITAN V, A100), vs
+our model (\emph{slot\_drv}). VLA-Perf uses spec sheets only; ours uses a source trace plus
+target microbenchmarks.}\label{tab:vlaperf}
 \end{table}
 We ran VLA-Perf's code~\cite{vlaperf} on our workloads: SmolVLA component configurations
 matching \texttt{smolvla\_base} as traced (vision prefill per camera, VLM prefill over the
@@ -260,46 +346,108 @@ that for small batch-1 VLAs the gap between that bound and reality is one to two
 magnitude, and that the gap is launch, dispatch and per-kernel latency, which it does not model.
 
 \subsection{Ordering inversion}
-Measured eager step: TITAN V 340\,ms $<$ A100 383 $<$ 2080 Ti 484; graph loop: A100 35.6 $<$
-2080 Ti 39.8 $<$ TITAN V 61.4. The model reproduces both orderings from every source GPU;
-bandwidth scaling never does. Graph speedup is therefore a property of the host-GPU pair:
-10.2$\times$ on cuda2, 9.0$\times$ on the A100 node and 4.6$\times$ on cuda3.
+Measured SmolVLA eager step: TITAN V 341\,ms $<$ A100 383 $<$ 2080 Ti 484 $<$ RTX 4070 607;
+graph loop: RTX 4070 22.8 $<$ A100 35.6 $<$ 2080 Ti 39.8 $<$ TITAN V 61.4. The slowest eager GPU
+is the fastest under graphs, and the fastest eager host has the slowest graphed GPU. The model
+predicts this inversion from every source GPU; bandwidth scaling never does. Graph speedup of
+the loop is therefore a property of the host-GPU pair: 22.5$\times$ on cuda5, 10.2$\times$ on
+cuda2, 9.0$\times$ on the A100 node and 4.6$\times$ on cuda3. The same inversion holds for ACT,
+$\pi_0$ and $\pi_{0.5}$.
 
-\subsection{A fourth GPU: RTX 4070 behind an older host}\label{sec:rtx4070}
-The RTX 4070 (Ada, 36\,MB L2, 475\,GB/s measured, 2760\,MHz sustained under the workload)
-sits on cuda5, whose 2013 Xeon E5-2650 v2 dispatches PyTorch ops 1.5 to 2.7$\times$ slower than
-the other hosts (an eager add costs 17.4 vs 7.0 to 8.2\,$\mu$s) and runs Python 1.2 to
-1.4$\times$ slower. It gives the most extreme inversion we measured: the slowest eager step of
-the four GPUs (607\,ms) and the fastest graph loop (22.8\,ms, faster than the A100's
-35.6\,ms), so its loop graph speedup is 22.5$\times$ versus 4.6 to 10.2$\times$ elsewhere.
-Nsight Compute on the C++ flow step shows the larger L2 at work: warm-cache DRAM traffic per
-flow step is 271\,MB versus 408\,MB on the 2080 Ti, and flushing L2 before every kernel costs
-28\% versus 18\%.
+\subsection{Batch size, torch.compile and energy}
+\textbf{Batch.} The eager loop is flat in batch (host bound) while the graph loop grows, so the
+loop's graph speedup falls below 2$\times$ at batch 10 on the TITAN V and 16 on the 2080 Ti.
+With $b$ and $p$ fitted at batch 1 the same-GPU predictions stay within 5\% at every batch;
+cross-GPU the graph loop is within 6 to 18\% up to batch 8 and 27\% at batch 16, where larger
+GEMMs make tensor-core throughput, absent from our slot ratios, matter.
+\textbf{torch.compile.} Inductor fuses the 10-step loop from about 11.5k to 3.2k kernels;
+compiled plus CUDA graphs runs about 2$\times$ faster than our manual graph (2080 Ti 20.8 vs
+40.1\,ms, TITAN V 30.9 vs 61.4, RTX 4070 13.8 vs 22.8). Our model, applied to the source's
+compiled trace, predicts the compiled graph with 12\% MAPE at batch 1.
+\textbf{Energy.} Measured with NVML, graphs cut GPU board energy per inference 1.6 to
+2.7$\times$ at batch 1 (RTX 4070: 31 to 11.5\,J; eager mode idles at high clocks) and 1.1 to
+1.5$\times$ at batch 8.
 
-With the 4070 as an unseen target, the graph loop transfers well (\texttt{slot\_class}: 10\%
-from the 2080 Ti, 9\% from the A100, and 5 to 6\% in the other direction), but the eager step
-does not: predictions into the 4070 are 41 to 60\% too high. The model scales all host time by
-the target's aten dispatch ratio (2.0 to 2.6$\times$ here), while the measured eager step is
-only 1.25 to 1.8$\times$ slower than on the other hosts; the Python share of the step scales
-more like host Python speed (scaling it that way gives $-2$ to $+21\%$ for the 4070, but is
-worse among the first three GPUs). Over all four GPUs, \texttt{slot\_class} gives 24\%
-(eager), 15\% (graph loop) and 15\% (hybrid) MAPE. How to transfer the Python share between
-very different hosts is the main open problem the fourth GPU exposes.
+\input{graph_worthiness_section}
+
+\input{placement_section}
+
+\subsection{Hosting several policies on one GPU}\label{sec:multipolicy}
+An eager policy leaves its GPU idle about 85\% of the step, while a graphed one is a dense
+chain of kernels. We host $N$ copies of SmolVLA, ACT and Diffusion Policy on one GPU as
+separate processes (one CUDA context each), as processes under MPS, as threads of one process
+with one stream each, or as one batched policy, and time every copy closed loop. Each copy is a
+client of a closed queueing network with a host station (time $T_\mathrm{solo} - D$) and a GPU
+station ($D$, the GPU busy time per step), solved with Bard-Schweitzer mean value
+analysis~\cite{mva,schweitzer}; nothing measured under contention enters the prediction. We ran
+it on an RTX PRO 6000 Blackwell (up to $N = 8$, all three policies) and on the three CIMS GPUs
+($N \le 4$).
+
+\textbf{Eager policies share a GPU almost for free.} On the PRO 6000 two eager SmolVLA processes
+keep the solo latency (181\,ms) at twice the throughput, and eight under MPS still run at
+155\,ms (8.8$\times$ the throughput). On the CIMS GPUs four eager copies are 1.02 to
+1.41$\times$ slower than one.
+\textbf{Graphed policies need MPS.} Without MPS graphed copies serialize, and context
+time-slicing costs more than serialization: four graphed SmolVLA copies are 3.1$\times$ slower
+each on the PRO 6000 (3.3, 3.7 and 2.1$\times$ on the 2080 Ti, TITAN V and RTX 4070). Under MPS
+the loop's tiny kernels from different processes overlap: four copies are only 1.4 to
+1.8$\times$ slower, and eight graphed SmolVLA copies on the PRO 6000 deliver 72 steps/s, within
+11\% of batch 8, with no change to the policy code. MPS helps more the emptier the solo GPU is
+(2.2$\times$ throughput on the TITAN V, solo GPU share 75\%, to 2.9$\times$ on the RTX 4070,
+34\%). Even Diffusion Policy, busy 95\% of its step, gains 4.9$\times$ throughput from eight MPS
+copies: at batch 1 ``GPU bound'' means bound by time, not by SMs.
+\textbf{Threads are the wrong way to host eager policies}: the GIL serializes dispatch (four
+eager SmolVLA threads 8.3$\times$ slower on the PRO 6000), while a fully graphed policy (ACT) in
+threads matches MPS, since a replay is one C++ call.
+\textbf{Model accuracy.} For processes without MPS the queueing model has 3 to 16\% MAPE for
+eager copies and 12 to 24\% for graphed ones (the no-interference bound: 42 to 64\%). Under MPS
+the measurements sit below it (it overpredicts by 14 to 37\% on the 2080 Ti and TITAN V, within
+8\% on the RTX 4070); an SM-sharing term is the natural next step.
+
+\subsection{Does latency matter for task success?}\label{sec:success}
+We simulate an inference delay of $d$ control steps (the robot keeps executing the previous
+chunk while the next is computed, which then starts at index $d$) and measure task success,
+with identical scenes and noise for every $d$. On LIBERO-Long with the published protocol
+(replanning every 10 actions; our harness reproduces 94 to 95\% for $\pi_{0.5}$ against 96\%
+published), 100 episodes per point, success at $d = 0$, 4, 8, 10 and 15 steps (0 to 750\,ms) is
+69, 68, 64, 55 and 43\% for SmolVLA, 44, 46, 42, 39 and 26\% for $\pi_0$, and 91, 95, 88, 84
+and 64\% for $\pi_{0.5}$: flat up to about 300\,ms, then a drop once the delay approaches the
+replanning interval (paired McNemar test significant at $d = 15$ for all three). Mapping our
+measured latencies to $d$, CUDA graphs put every policy at $d = 2$ to 5 on every GPU and eager
+execution at $d = 7$ to 15; on the RTX 4070, graphs are worth +30 points of success for
+$\pi_{0.5}$ and +18 for SmolVLA. On two RoboTwin 2.0 tasks with SmolVLA (beat\_block\_hammer
+and lift\_pot, 100 paired episodes per point on the A100), delays up to 800\,ms cost nothing
+(63 vs 73\% and 45 vs 40\% at $d = 0$ vs 20, not significant), and a replanning control without
+delay matches the delayed runs. How much latency matters depends on the task: graphs matter for
+success where the policy is delay sensitive.
+
+\subsection{Sanity check on classic kernels}
+On eight Rodinia~\cite{rodinia} benchmarks the VLA transfer rules fail on throughput kernels
+(about 100\% MAPE; lavaMD is FP64, where the TITAN V is 20$\times$ faster than the consumer
+GPUs), while bandwidth-bound streamcluster is within 2.5\%. Our model is built for the
+latency-bound regime and complements rooflines rather than replacing them.
 
 \section{Conclusions}
 For batch-1 VLA inference, latency prediction across GPUs is a launch and latency problem
 before it is a bandwidth or FLOP problem. A model that replays the host and GPU timelines,
 corrects profiler bias, and transfers per-kernel graph slots with a handful of target
-microbenchmarks predicts eager and hybrid latency within about 5 to 8\%, and reproduces
-orderings that spec ratios get wrong. Limitations: one host per GPU, SmolVLA only for
-cross-GPU validation, and an eager host model that does not transfer to a much slower host
-(the RTX 4070 on cuda5, Section~\ref{sec:rtx4070}), although the graph loop does. The largest
-L2 we could measure is 40\,MB, so the PRO 6000 (128\,MB) inversion remains untested; the
-cache term of our title is second order for SmolVLA on every GPU we measured.
-Section~\ref{sec:l2} gives the experiment that would test the cache-bound case (ACT in FP16,
-about 104\,MB of weights, on a PRO 6000), which we plan as the next step.
+microbenchmarks predicts the graphed loop within 9 to 16\% and the hybrid step within 5 to
+18\% across four GPU generations and six policies (all but Diffusion Policy), where spec
+bandwidth scaling is off by 58 to 96\% for SmolVLA, $\pi_0$, $\pi_{0.5}$ and ACT, and it reproduces orderings that spec ratios get wrong. CUDA-graph speedup
+is a property of the host-GPU pair and is predictable from eager mode alone within 2\%. Running a
+policy's halves on separate devices is additive and predictable but buys no latency; one GPU
+used well (a second stream, or MPS for several policies) already provides the capacity. Faster
+inference matters for success on delay-sensitive tasks.
 
-\begin{thebibliography}{9}
+\textbf{Limitations.} One host per GPU, and the eager host model does not transfer to a much
+slower host (the RTX 4070 on cuda5). Kernel-level transfer fails when libraries change
+algorithms per architecture (cuDNN convolutions). OpenVLA was traced on the A100 only, and no
+datacenter GPU beyond the A100 was available as a measured target (the L4 partition never
+booted). The largest L2 we could measure is 40\,MB, so the cache term of our title is second
+order on every GPU we measured, and the PRO 6000 (128\,MB) inversion remains untested;
+Section~\ref{sec:l2} gives the experiment that would test it.
+
+\begin{thebibliography}{99}
 \bibitem{vlaperf} W.~Jiang, J.~Clemons, K.~Sankaralingam, C.~Kozyrakis. How Fast Can I Run My
 VLA? Demystifying VLA Inference Performance with VLA-Perf. arXiv:2602.18397, 2026.
 \bibitem{yotta} Yotta Labs. VLA inference GPU benchmarks, 2026.
@@ -309,9 +457,8 @@ Memory-level and Thread-level Parallelism Awareness. ISCA 2009.
 \bibitem{gpuperf} J.~Sim, A.~Dasgupta, H.~Kim, R.~Vuduc. A Performance Analysis Framework for
 Identifying Potential Benefits in GPGPU Applications. PPoPP 2012.
 \bibitem{wang} Q.~Wang, C.~Liu, X.~Chu. GPGPU Performance Estimation for Frequency Scaling
-Using Cross-Benchmarking.
-\bibitem{realtime} Ma et al. Running VLAs at Real-time Speed. 2025.
-% TODO verify bibliographic details of the entries below before submission.
+Using Cross-Benchmarking. Workshop on General Purpose Processing Using GPUs (GPGPU), 2020.
+\bibitem{realtime} Ma et al. Running VLAs at Real-time Speed. arXiv, 2025.
 \bibitem{alavani} G.~Alavani, K.~Varma, S.~Sarkar. Predicting Execution Time of CUDA Kernel
 Using Static Analysis. IEEE ISPA/IUCC/BDCloud 2018. doi:10.1109/BDCloud.2018.00139
 \bibitem{muller} S.~K.~Muller, J.~Hoffmann. Modeling and Analyzing Evaluation Cost of CUDA
@@ -325,5 +472,31 @@ Simulation Framework for Validated GPU Modeling. ISCA 2020.
 \bibitem{cudagraphs} A.~Gray. Getting Started with CUDA Graphs. NVIDIA Technical Blog, 2019.
 \bibitem{ptgraphs} PyTorch team and NVIDIA. Accelerating PyTorch with CUDA Graphs. PyTorch
 Blog, 2021.
+\bibitem{mva} M.~Reiser, S.~S.~Lavenberg. Mean-Value Analysis of Closed Multichain Queuing
+Networks. Journal of the ACM 27(2), 1980.
+\bibitem{schweitzer} P.~J.~Schweitzer. Approximate Analysis of Multiclass Closed Networks of
+Queues. Proc. International Conference on Stochastic Control and Optimization, 1979.
+\bibitem{smolvla} M.~Shukor et al. SmolVLA: A Vision-Language-Action Model for Affordable and
+Efficient Robotics. arXiv:2506.01844, 2025.
+\bibitem{pi0} K.~Black et al. $\pi_0$: A Vision-Language-Action Flow Model for General Robot
+Control. arXiv:2410.24164, 2024.
+\bibitem{pi05} Physical Intelligence. $\pi_{0.5}$: a Vision-Language-Action Model with
+Open-World Generalization. arXiv:2504.16054, 2025.
+\bibitem{fast} K.~Pertsch et al. FAST: Efficient Action Tokenization for Vision-Language-Action
+Models. arXiv:2501.09747, 2025.
+\bibitem{openvla} M.~J.~Kim et al. OpenVLA: An Open-Source Vision-Language-Action Model.
+arXiv:2406.09246, 2024.
+\bibitem{act} T.~Z.~Zhao, V.~Kumar, S.~Levine, C.~Finn. Learning Fine-Grained Bimanual
+Manipulation with Low-Cost Hardware. RSS 2023.
+\bibitem{diffusionpolicy} C.~Chi et al. Diffusion Policy: Visuomotor Policy Learning via Action
+Diffusion. RSS 2023.
+\bibitem{lerobot} R.~Cadene et al. LeRobot: State-of-the-art Machine Learning for Real-World
+Robotics in PyTorch. \url{https://github.com/huggingface/lerobot}, 2024.
+\bibitem{libero} B.~Liu et al. LIBERO: Benchmarking Knowledge Transfer for Lifelong Robot
+Learning. NeurIPS Datasets and Benchmarks, 2023.
+\bibitem{robotwin} T.~Chen et al. RoboTwin 2.0: A Scalable Data Generator and Benchmark with
+Strong Domain Randomization for Robust Bimanual Robotic Manipulation. arXiv, 2025.
+\bibitem{rodinia} S.~Che et al. Rodinia: A Benchmark Suite for Heterogeneous Computing. IISWC
+2009.
 \end{thebibliography}
 \end{document}
