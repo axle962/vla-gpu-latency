@@ -1,0 +1,2 @@
+name, pstate, clocks.current.sm [MHz], clocks.max.sm [MHz], driver_version
+NVIDIA GeForce RTX 4070, P8, 210 MHz, 3105 MHz, 595.104.02
