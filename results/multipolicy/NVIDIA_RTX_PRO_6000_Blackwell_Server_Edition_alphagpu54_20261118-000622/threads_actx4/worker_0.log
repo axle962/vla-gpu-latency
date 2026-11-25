@@ -1,0 +1,16 @@
+WARNING:root:Unexpected key(s) when loading model: ['normalize_inputs.buffer_observation_images_top.mean', 'normalize_inputs.buffer_observation_images_top.std', 'normalize_inputs.buffer_observation_state.mean', 'normalize_inputs.buffer_observation_state.std', 'normalize_targets.buffer_action.mean', 'normalize_targets.buffer_action.std', 'unnormalize_outputs.buffer_action.mean', 'unnormalize_outputs.buffer_action.std']
+[w0] copy 0 act ready in 33.4s: {"graph_vs_eager_max_abs_diff": 0.0}
+WARNING:root:Unexpected key(s) when loading model: ['normalize_inputs.buffer_observation_images_top.mean', 'normalize_inputs.buffer_observation_images_top.std', 'normalize_inputs.buffer_observation_state.mean', 'normalize_inputs.buffer_observation_state.std', 'normalize_targets.buffer_action.mean', 'normalize_targets.buffer_action.std', 'unnormalize_outputs.buffer_action.mean', 'unnormalize_outputs.buffer_action.std']
+[w0] copy 1 act ready in 0.7s: {"graph_vs_eager_max_abs_diff": 0.0}
+WARNING:root:Unexpected key(s) when loading model: ['normalize_inputs.buffer_observation_images_top.mean', 'normalize_inputs.buffer_observation_images_top.std', 'normalize_inputs.buffer_observation_state.mean', 'normalize_inputs.buffer_observation_state.std', 'normalize_targets.buffer_action.mean', 'normalize_targets.buffer_action.std', 'unnormalize_outputs.buffer_action.mean', 'unnormalize_outputs.buffer_action.std']
+[w0] copy 2 act ready in 0.6s: {"graph_vs_eager_max_abs_diff": 0.0}
+WARNING:root:Unexpected key(s) when loading model: ['normalize_inputs.buffer_observation_images_top.mean', 'normalize_inputs.buffer_observation_images_top.std', 'normalize_inputs.buffer_observation_state.mean', 'normalize_inputs.buffer_observation_state.std', 'normalize_targets.buffer_action.mean', 'normalize_targets.buffer_action.std', 'unnormalize_outputs.buffer_action.mean', 'unnormalize_outputs.buffer_action.std']
+[w0] copy 3 act ready in 0.7s: {"graph_vs_eager_max_abs_diff": 0.0}
+[w0] eager copy 0 act         358 steps, median    39.74 ms
+[w0] eager copy 1 act         362 steps, median    39.28 ms
+[w0] eager copy 2 act         341 steps, median    40.76 ms
+[w0] eager copy 3 act         352 steps, median    40.16 ms
+[w0] graph copy 0 act        1935 steps, median     7.76 ms
+[w0] graph copy 1 act        1935 steps, median     7.75 ms
+[w0] graph copy 2 act        1935 steps, median     7.75 ms
+[w0] graph copy 3 act        1935 steps, median     7.75 ms

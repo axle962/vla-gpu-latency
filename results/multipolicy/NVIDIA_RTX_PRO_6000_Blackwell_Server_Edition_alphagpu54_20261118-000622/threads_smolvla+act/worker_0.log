@@ -1,0 +1,56 @@
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading  HuggingFaceTB/SmolVLM2-500M-Video-Instruct weights ...
+Reducing the number of VLM layers to 16 ...
+[w0] copy 0 smolvla ready in 40.1s: {"split_vs_stock_max_abs_diff": 0.0, "graph_vs_eager_max_abs_diff": 0.0}
+WARNING:root:Unexpected key(s) when loading model: ['normalize_inputs.buffer_observation_images_top.mean', 'normalize_inputs.buffer_observation_images_top.std', 'normalize_inputs.buffer_observation_state.mean', 'normalize_inputs.buffer_observation_state.std', 'normalize_targets.buffer_action.mean', 'normalize_targets.buffer_action.std', 'unnormalize_outputs.buffer_action.mean', 'unnormalize_outputs.buffer_action.std']
+[w0] copy 1 act ready in 0.8s: {"graph_vs_eager_max_abs_diff": 0.0}
+[w0] eager copy 0 smolvla      38 steps, median   360.75 ms
+[w0] eager copy 1 act        1413 steps, median     9.75 ms
+Exception in thread copy0:
+Traceback (most recent call last):
+  File "/mnt/home/awg4562/vla/.uv-python/cpython-3.10-linux-x86_64-gnu/lib/python3.10/threading.py", line 1016, in _bootstrap_inner
+Exception in thread copy1:
+Traceback (most recent call last):
+  File "/mnt/home/awg4562/vla/.uv-python/cpython-3.10-linux-x86_64-gnu/lib/python3.10/threading.py", line 1016, in _bootstrap_inner
+    self.run()
+  File "/mnt/home/awg4562/vla/.uv-python/cpython-3.10-linux-x86_64-gnu/lib/python3.10/threading.py", line 953, in run
+    self.run()
+  File "/mnt/home/awg4562/vla/.uv-python/cpython-3.10-linux-x86_64-gnu/lib/python3.10/threading.py", line 953, in run
+    self._target(*self._args, **self._kwargs)
+  File "/mnt/home/awg4562/vla/repo/workloads/multipolicy.py", line 415, in run
+    out[i] = closed_loop(copies[i], mode, start, end)
+  File "/mnt/home/awg4562/vla/repo/workloads/multipolicy.py", line 394, in closed_loop
+    sync(copy.stream)
+  File "/mnt/home/awg4562/vla/repo/workloads/multipolicy.py", line 97, in sync
+    stream.synchronize()
+  File "/mnt/home/awg4562/vla/envs/smolvla/lib/python3.10/site-packages/torch/cuda/streams.py", line 106, in synchronize
+    super().synchronize()
+torch.AcceleratorError: CUDA error: an illegal memory access was encountered
+Search for `cudaErrorIllegalAddress' in https://docs.nvidia.com/cuda/cuda-runtime-api/group__CUDART__TYPES.html for more information.
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing CUDA_LAUNCH_BLOCKING=1
+Compile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.
+
+    self._target(*self._args, **self._kwargs)
+  File "/mnt/home/awg4562/vla/repo/workloads/multipolicy.py", line 415, in run
+    out[i] = closed_loop(copies[i], mode, start, end)
+  File "/mnt/home/awg4562/vla/repo/workloads/multipolicy.py", line 394, in closed_loop
+    sync(copy.stream)
+  File "/mnt/home/awg4562/vla/repo/workloads/multipolicy.py", line 97, in sync
+    stream.synchronize()
+  File "/mnt/home/awg4562/vla/envs/smolvla/lib/python3.10/site-packages/torch/cuda/streams.py", line 106, in synchronize
+    super().synchronize()
+torch.AcceleratorError: CUDA error: an illegal memory access was encountered
+Search for `cudaErrorIllegalAddress' in https://docs.nvidia.com/cuda/cuda-runtime-api/group__CUDART__TYPES.html for more information.
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing CUDA_LAUNCH_BLOCKING=1
+Compile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.
+
+Traceback (most recent call last):
+  File "/mnt/home/awg4562/vla/repo/workloads/multipolicy.py", line 743, in <module>
+    main()
+  File "/mnt/home/awg4562/vla/repo/workloads/multipolicy.py", line 739, in main
+    worker(args)
+  File "/mnt/home/awg4562/vla/repo/workloads/multipolicy.py", line 494, in worker
+    "t_s": round(t, 4), "wall_ms": round(ms, 4)} for k, (t, ms) in enumerate(r)]
+TypeError: 'NoneType' object is not iterable

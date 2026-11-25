@@ -1,0 +1,20 @@
+WARNING:root:Unexpected key(s) when loading model: ['normalize_inputs.buffer_observation_image.mean', 'normalize_inputs.buffer_observation_image.std', 'normalize_inputs.buffer_observation_state.max', 'normalize_inputs.buffer_observation_state.min', 'normalize_targets.buffer_action.max', 'normalize_targets.buffer_action.min', 'unnormalize_outputs.buffer_action.max', 'unnormalize_outputs.buffer_action.min']
+[w0] copy 0 diffusion ready in 37.0s: {"split_vs_stock_max_abs_diff": 0.0, "graph_vs_eager_max_abs_diff": 0.0}
+WARNING:root:Unexpected key(s) when loading model: ['normalize_inputs.buffer_observation_image.mean', 'normalize_inputs.buffer_observation_image.std', 'normalize_inputs.buffer_observation_state.max', 'normalize_inputs.buffer_observation_state.min', 'normalize_targets.buffer_action.max', 'normalize_targets.buffer_action.min', 'unnormalize_outputs.buffer_action.max', 'unnormalize_outputs.buffer_action.min']
+[w0] copy 1 diffusion ready in 2.6s: {"split_vs_stock_max_abs_diff": 0.0, "graph_vs_eager_max_abs_diff": 0.0}
+WARNING:root:Unexpected key(s) when loading model: ['normalize_inputs.buffer_observation_image.mean', 'normalize_inputs.buffer_observation_image.std', 'normalize_inputs.buffer_observation_state.max', 'normalize_inputs.buffer_observation_state.min', 'normalize_targets.buffer_action.max', 'normalize_targets.buffer_action.min', 'unnormalize_outputs.buffer_action.max', 'unnormalize_outputs.buffer_action.min']
+[w0] copy 2 diffusion ready in 2.5s: {"split_vs_stock_max_abs_diff": 0.0, "graph_vs_eager_max_abs_diff": 0.0}
+WARNING:root:Unexpected key(s) when loading model: ['normalize_inputs.buffer_observation_image.mean', 'normalize_inputs.buffer_observation_image.std', 'normalize_inputs.buffer_observation_state.max', 'normalize_inputs.buffer_observation_state.min', 'normalize_targets.buffer_action.max', 'normalize_targets.buffer_action.min', 'unnormalize_outputs.buffer_action.max', 'unnormalize_outputs.buffer_action.min']
+[w0] copy 3 diffusion ready in 2.4s: {"split_vs_stock_max_abs_diff": 0.0, "graph_vs_eager_max_abs_diff": 0.0}
+[w0] eager copy 0 diffusion    38 steps, median   254.19 ms
+[w0] eager copy 1 diffusion    37 steps, median   263.19 ms
+[w0] eager copy 2 diffusion    38 steps, median   256.46 ms
+[w0] eager copy 3 diffusion    39 steps, median   248.13 ms
+[w0] graph copy 0 diffusion    65 steps, median   153.86 ms
+[w0] graph copy 1 diffusion    65 steps, median   152.59 ms
+[w0] graph copy 2 diffusion    65 steps, median   152.60 ms
+[w0] graph copy 3 diffusion    65 steps, median   153.84 ms
+[w0] loop  copy 0 diffusion    67 steps, median   149.49 ms
+[w0] loop  copy 1 diffusion    67 steps, median   149.44 ms
+[w0] loop  copy 2 diffusion    67 steps, median   149.49 ms
+[w0] loop  copy 3 diffusion    67 steps, median   149.46 ms

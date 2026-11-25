@@ -1,0 +1,8 @@
+WARNING:root:Unexpected key(s) when loading model: ['normalize_inputs.buffer_observation_images_top.mean', 'normalize_inputs.buffer_observation_images_top.std', 'normalize_inputs.buffer_observation_state.mean', 'normalize_inputs.buffer_observation_state.std', 'normalize_targets.buffer_action.mean', 'normalize_targets.buffer_action.std', 'unnormalize_outputs.buffer_action.mean', 'unnormalize_outputs.buffer_action.std']
+[w0] copy 0 act ready in 34.7s: {"graph_vs_eager_max_abs_diff": 0.0}
+[w0] eager copy 0 act        3003 steps, median     4.98 ms
+[w0] graph copy 0 act        3563 steps, median     4.18 ms
+/mnt/home/awg4562/vla/envs/smolvla/lib/python3.10/site-packages/torch/profiler/profiler.py:217: UserWarning: Warning: Profiler clears events at the end of each cycle.Only events from the current cycle will be reported.To keep events across cycles, set acc_events=True.
+  _warn_once(
+[w0] profile eager: {"kernels_per_step": 373.0, "memcpy_per_step": 3.0, "gpu_busy_ms_per_step": 5.291026, "gpu_busy_ms_per_step_corrected": 4.936675999999999, "gpu_span_ms_per_step": 7.43892578125, "kernel_dur_us_median": 1.696}
+[w0] profile graph: {"kernels_per_step": 375.0, "memcpy_per_step": 0.0, "gpu_busy_ms_per_step": 5.317247999999999, "gpu_busy_ms_per_step_corrected": 4.960997999999999, "gpu_span_ms_per_step": 4.34712109375, "kernel_dur_us_median": 1.632}

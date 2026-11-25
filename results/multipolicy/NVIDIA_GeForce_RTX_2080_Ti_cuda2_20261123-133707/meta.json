@@ -1,0 +1,25 @@
+{
+  "host": "cuda2.cims.nyu.edu",
+  "cpu": "Intel(R) Xeon(R) CPU E5-2660 v3 @ 2.60GHz",
+  "cpu_count": 40,
+  "affinity_cpus": 20,
+  "gpu": "NVIDIA GeForce RTX 2080 Ti",
+  "driver": "595.104.02",
+  "gpu_memory_total": "11264 MiB",
+  "cuda_visible_devices": "0",
+  "torch": "2.10.0+cu128",
+  "cuda_runtime": "12.8",
+  "cuda_module_loading": "EAGER",
+  "slurm_job_id": "",
+  "profiler_bias_us": 0.95,
+  "policy_args": {
+    "cameras": 3,
+    "num_steps": 10,
+    "chunk_size": 50,
+    "diffusion_steps": 10,
+    "act_hw": [
+      480,
+      640
+    ]
+  }
+}

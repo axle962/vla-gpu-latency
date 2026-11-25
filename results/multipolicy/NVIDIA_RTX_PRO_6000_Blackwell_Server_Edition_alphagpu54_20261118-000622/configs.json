@@ -1,0 +1,1431 @@
+[
+  {
+    "config": "procs_smolvla",
+    "hosting": "procs",
+    "policies": [
+      "smolvla"
+    ],
+    "batch": 1,
+    "modes": [
+      "eager",
+      "graph"
+    ],
+    "duration_s": 15.0,
+    "warm_s": 5.0,
+    "mps": "",
+    "gpu_memory_used_after": "0 MiB",
+    "workers": {
+      "0": {
+        "worker": 0,
+        "pid": 3059863,
+        "policies": [
+          "smolvla"
+        ],
+        "batch": 1,
+        "copies": [
+          {
+            "hf_model": "lerobot/smolvla_base",
+            "dtype": "fp16",
+            "batch": 1,
+            "cameras": 3,
+            "num_steps": 10,
+            "chunk_size": 50,
+            "params": 450046176,
+            "kv_cache_bytes": 4935680,
+            "split_vs_stock_max_abs_diff": 0.0,
+            "graph_vs_eager_max_abs_diff": 0.0,
+            "graph_scope": "denoising loop (prefix eager)"
+          }
+        ],
+        "profile": {
+          "eager": {
+            "kernels_per_step": 13542.0,
+            "memcpy_per_step": 529.0,
+            "gpu_busy_ms_per_step": 40.954195,
+            "gpu_busy_ms_per_step_corrected": 28.089295,
+            "gpu_span_ms_per_step": 311.361111328125,
+            "kernel_dur_us_median": 1.44
+          },
+          "graph": {
+            "kernels_per_step": 13962.0,
+            "memcpy_per_step": 122.0,
+            "gpu_busy_ms_per_step": 40.617142,
+            "gpu_busy_ms_per_step_corrected": 27.353242,
+            "gpu_span_ms_per_step": 80.88605810546875,
+            "kernel_dur_us_median": 1.376
+          }
+        },
+        "torch_threads": 16,
+        "affinity_cpus": 16
+      }
+    },
+    "time": "2026-11-18 00:08:31"
+  },
+  {
+    "config": "procs_smolvlax2",
+    "hosting": "procs",
+    "policies": [
+      "smolvla",
+      "smolvla"
+    ],
+    "batch": 1,
+    "modes": [
+      "eager",
+      "graph"
+    ],
+    "duration_s": 15.0,
+    "warm_s": 5.0,
+    "mps": "",
+    "gpu_memory_used_after": "0 MiB",
+    "workers": {
+      "0": {
+        "worker": 0,
+        "pid": 3061482,
+        "policies": [
+          "smolvla"
+        ],
+        "batch": 1,
+        "copies": [
+          {
+            "hf_model": "lerobot/smolvla_base",
+            "dtype": "fp16",
+            "batch": 1,
+            "cameras": 3,
+            "num_steps": 10,
+            "chunk_size": 50,
+            "params": 450046176,
+            "kv_cache_bytes": 4935680,
+            "split_vs_stock_max_abs_diff": 0.0,
+            "graph_vs_eager_max_abs_diff": 0.0,
+            "graph_scope": "denoising loop (prefix eager)"
+          }
+        ],
+        "profile": {},
+        "torch_threads": 16,
+        "affinity_cpus": 16
+      },
+      "1": {
+        "worker": 1,
+        "pid": 3061483,
+        "policies": [
+          "smolvla"
+        ],
+        "batch": 1,
+        "copies": [
+          {
+            "hf_model": "lerobot/smolvla_base",
+            "dtype": "fp16",
+            "batch": 1,
+            "cameras": 3,
+            "num_steps": 10,
+            "chunk_size": 50,
+            "params": 450046176,
+            "kv_cache_bytes": 4935680,
+            "split_vs_stock_max_abs_diff": 0.0,
+            "graph_vs_eager_max_abs_diff": 0.0,
+            "graph_scope": "denoising loop (prefix eager)"
+          }
+        ],
+        "profile": {},
+        "torch_threads": 16,
+        "affinity_cpus": 16
+      }
+    },
+    "time": "2026-11-18 00:10:12"
+  },
+  {
+    "config": "procs_smolvlax4",
+    "hosting": "procs",
+    "policies": [
+      "smolvla",
+      "smolvla",
+      "smolvla",
+      "smolvla"
+    ],
+    "batch": 1,
+    "modes": [
+      "eager",
+      "graph"
+    ],
+    "duration_s": 15.0,
+    "warm_s": 5.0,
+    "mps": "",
+    "gpu_memory_used_after": "0 MiB",
+    "workers": {
+      "0": {
+        "worker": 0,
+        "pid": 3062534,
+        "policies": [
+          "smolvla"
+        ],
+        "batch": 1,
+        "copies": [
+          {
+            "hf_model": "lerobot/smolvla_base",
+            "dtype": "fp16",
+            "batch": 1,
+            "cameras": 3,
+            "num_steps": 10,
+            "chunk_size": 50,
+            "params": 450046176,
+            "kv_cache_bytes": 4935680,
+            "split_vs_stock_max_abs_diff": 0.0,
+            "graph_vs_eager_max_abs_diff": 0.0,
+            "graph_scope": "denoising loop (prefix eager)"
+          }
+        ],
+        "profile": {},
+        "torch_threads": 16,
+        "affinity_cpus": 16
+      },
+      "1": {
+        "worker": 1,
+        "pid": 3062535,
+        "policies": [
+          "smolvla"
+        ],
+        "batch": 1,
+        "copies": [
+          {
+            "hf_model": "lerobot/smolvla_base",
+            "dtype": "fp16",
+            "batch": 1,
+            "cameras": 3,
+            "num_steps": 10,
+            "chunk_size": 50,
+            "params": 450046176,
+            "kv_cache_bytes": 4935680,
+            "split_vs_stock_max_abs_diff": 0.0,
+            "graph_vs_eager_max_abs_diff": 0.0,
+            "graph_scope": "denoising loop (prefix eager)"
+          }
+        ],
+        "profile": {},
+        "torch_threads": 16,
+        "affinity_cpus": 16
+      },
+      "2": {
+        "worker": 2,
+        "pid": 3062536,
+        "policies": [
+          "smolvla"
+        ],
+        "batch": 1,
+        "copies": [
+          {
+            "hf_model": "lerobot/smolvla_base",
+            "dtype": "fp16",
+            "batch": 1,
+            "cameras": 3,
+            "num_steps": 10,
+            "chunk_size": 50,
+            "params": 450046176,
+            "kv_cache_bytes": 4935680,
+            "split_vs_stock_max_abs_diff": 0.0,
+            "graph_vs_eager_max_abs_diff": 0.0,
+            "graph_scope": "denoising loop (prefix eager)"
+          }
+        ],
+        "profile": {},
+        "torch_threads": 16,
+        "affinity_cpus": 16
+      },
+      "3": {
+        "worker": 3,
+        "pid": 3062537,
+        "policies": [
+          "smolvla"
+        ],
+        "batch": 1,
+        "copies": [
+          {
+            "hf_model": "lerobot/smolvla_base",
+            "dtype": "fp16",
+            "batch": 1,
+            "cameras": 3,
+            "num_steps": 10,
+            "chunk_size": 50,
+            "params": 450046176,
+            "kv_cache_bytes": 4935680,
+            "split_vs_stock_max_abs_diff": 0.0,
+            "graph_vs_eager_max_abs_diff": 0.0,
+            "graph_scope": "denoising loop (prefix eager)"
+          }
+        ],
+        "profile": {},
+        "torch_threads": 16,
+        "affinity_cpus": 16
+      }
+    },
+    "time": "2026-11-18 00:12:07"
+  },
+  {
+    "config": "procs-mps_smolvlax2",
+    "hosting": "procs-mps",
+    "policies": [
+      "smolvla",
+      "smolvla"
+    ],
+    "batch": 1,
+    "modes": [
+      "eager",
+      "graph"
+    ],
+    "duration_s": 15.0,
+    "warm_s": 5.0,
+    "mps": "daemon up, servers: 3064250",
+    "gpu_memory_used_after": "66 MiB",
+    "workers": {
+      "0": {
+        "worker": 0,
+        "pid": 3064213,
+        "policies": [
+          "smolvla"
+        ],
+        "batch": 1,
+        "copies": [
+          {
+            "hf_model": "lerobot/smolvla_base",
+            "dtype": "fp16",
+            "batch": 1,
+            "cameras": 3,
+            "num_steps": 10,
+            "chunk_size": 50,
+            "params": 450046176,
+            "kv_cache_bytes": 4935680,
+            "split_vs_stock_max_abs_diff": 0.0,
+            "graph_vs_eager_max_abs_diff": 0.0,
+            "graph_scope": "denoising loop (prefix eager)"
+          }
+        ],
+        "profile": {},
+        "torch_threads": 16,
+        "affinity_cpus": 16
+      },
+      "1": {
+        "worker": 1,
+        "pid": 3064214,
+        "policies": [
+          "smolvla"
+        ],
+        "batch": 1,
+        "copies": [
+          {
+            "hf_model": "lerobot/smolvla_base",
+            "dtype": "fp16",
+            "batch": 1,
+            "cameras": 3,
+            "num_steps": 10,
+            "chunk_size": 50,
+            "params": 450046176,
+            "kv_cache_bytes": 4935680,
+            "split_vs_stock_max_abs_diff": 0.0,
+            "graph_vs_eager_max_abs_diff": 0.0,
+            "graph_scope": "denoising loop (prefix eager)"
+          }
+        ],
+        "profile": {},
+        "torch_threads": 16,
+        "affinity_cpus": 16
+      }
+    },
+    "time": "2026-11-18 00:13:47"
+  },
+  {
+    "config": "procs-mps_smolvlax4",
+    "hosting": "procs-mps",
+    "policies": [
+      "smolvla",
+      "smolvla",
+      "smolvla",
+      "smolvla"
+    ],
+    "batch": 1,
+    "modes": [
+      "eager",
+      "graph"
+    ],
+    "duration_s": 15.0,
+    "warm_s": 5.0,
+    "mps": "daemon up, servers: 3064250",
+    "gpu_memory_used_after": "66 MiB",
+    "workers": {
+      "0": {
+        "worker": 0,
+        "pid": 3065829,
+        "policies": [
+          "smolvla"
+        ],
+        "batch": 1,
+        "copies": [
+          {
+            "hf_model": "lerobot/smolvla_base",
+            "dtype": "fp16",
+            "batch": 1,
+            "cameras": 3,
+            "num_steps": 10,
+            "chunk_size": 50,
+            "params": 450046176,
+            "kv_cache_bytes": 4935680,
+            "split_vs_stock_max_abs_diff": 0.0,
+            "graph_vs_eager_max_abs_diff": 0.0,
+            "graph_scope": "denoising loop (prefix eager)"
+          }
+        ],
+        "profile": {},
+        "torch_threads": 16,
+        "affinity_cpus": 16
+      },
+      "1": {
+        "worker": 1,
+        "pid": 3065830,
+        "policies": [
+          "smolvla"
+        ],
+        "batch": 1,
+        "copies": [
+          {
+            "hf_model": "lerobot/smolvla_base",
+            "dtype": "fp16",
+            "batch": 1,
+            "cameras": 3,
+            "num_steps": 10,
+            "chunk_size": 50,
+            "params": 450046176,
+            "kv_cache_bytes": 4935680,
+            "split_vs_stock_max_abs_diff": 0.0,
+            "graph_vs_eager_max_abs_diff": 0.0,
+            "graph_scope": "denoising loop (prefix eager)"
+          }
+        ],
+        "profile": {},
+        "torch_threads": 16,
+        "affinity_cpus": 16
+      },
+      "2": {
+        "worker": 2,
+        "pid": 3065831,
+        "policies": [
+          "smolvla"
+        ],
+        "batch": 1,
+        "copies": [
+          {
+            "hf_model": "lerobot/smolvla_base",
+            "dtype": "fp16",
+            "batch": 1,
+            "cameras": 3,
+            "num_steps": 10,
+            "chunk_size": 50,
+            "params": 450046176,
+            "kv_cache_bytes": 4935680,
+            "split_vs_stock_max_abs_diff": 0.0,
+            "graph_vs_eager_max_abs_diff": 0.0,
+            "graph_scope": "denoising loop (prefix eager)"
+          }
+        ],
+        "profile": {},
+        "torch_threads": 16,
+        "affinity_cpus": 16
+      },
+      "3": {
+        "worker": 3,
+        "pid": 3065832,
+        "policies": [
+          "smolvla"
+        ],
+        "batch": 1,
+        "copies": [
+          {
+            "hf_model": "lerobot/smolvla_base",
+            "dtype": "fp16",
+            "batch": 1,
+            "cameras": 3,
+            "num_steps": 10,
+            "chunk_size": 50,
+            "params": 450046176,
+            "kv_cache_bytes": 4935680,
+            "split_vs_stock_max_abs_diff": 0.0,
+            "graph_vs_eager_max_abs_diff": 0.0,
+            "graph_scope": "denoising loop (prefix eager)"
+          }
+        ],
+        "profile": {},
+        "torch_threads": 16,
+        "affinity_cpus": 16
+      }
+    },
+    "time": "2026-11-18 00:15:33"
+  },
+  {
+    "config": "threads_smolvlax2",
+    "hosting": "threads",
+    "policies": [
+      "smolvla",
+      "smolvla"
+    ],
+    "batch": 1,
+    "modes": [
+      "eager",
+      "graph"
+    ],
+    "duration_s": 15.0,
+    "warm_s": 5.0,
+    "mps": "",
+    "gpu_memory_used_after": "0 MiB",
+    "workers": {
+      "0": {
+        "worker": 0,
+        "pid": 3066979,
+        "policies": [
+          "smolvla",
+          "smolvla"
+        ],
+        "batch": 1,
+        "copies": [
+          {
+            "hf_model": "lerobot/smolvla_base",
+            "dtype": "fp16",
+            "batch": 1,
+            "cameras": 3,
+            "num_steps": 10,
+            "chunk_size": 50,
+            "params": 450046176,
+            "kv_cache_bytes": 4935680,
+            "split_vs_stock_max_abs_diff": 0.0,
+            "graph_vs_eager_max_abs_diff": 0.0,
+            "graph_scope": "denoising loop (prefix eager)"
+          },
+          {
+            "hf_model": "lerobot/smolvla_base",
+            "dtype": "fp16",
+            "batch": 1,
+            "cameras": 3,
+            "num_steps": 10,
+            "chunk_size": 50,
+            "params": 450046176,
+            "kv_cache_bytes": 4935680,
+            "split_vs_stock_max_abs_diff": 0.0,
+            "graph_vs_eager_max_abs_diff": 0.0,
+            "graph_scope": "denoising loop (prefix eager)"
+          }
+        ],
+        "profile": {},
+        "torch_threads": 16,
+        "affinity_cpus": 16
+      }
+    },
+    "time": "2026-11-18 00:17:21"
+  },
+  {
+    "config": "threads_smolvlax4",
+    "hosting": "threads",
+    "policies": [
+      "smolvla",
+      "smolvla",
+      "smolvla",
+      "smolvla"
+    ],
+    "batch": 1,
+    "modes": [
+      "eager",
+      "graph"
+    ],
+    "duration_s": 15.0,
+    "warm_s": 5.0,
+    "mps": "",
+    "gpu_memory_used_after": "0 MiB",
+    "workers": {
+      "0": {
+        "worker": 0,
+        "pid": 3068241,
+        "policies": [
+          "smolvla",
+          "smolvla",
+          "smolvla",
+          "smolvla"
+        ],
+        "batch": 1,
+        "copies": [
+          {
+            "hf_model": "lerobot/smolvla_base",
+            "dtype": "fp16",
+            "batch": 1,
+            "cameras": 3,
+            "num_steps": 10,
+            "chunk_size": 50,
+            "params": 450046176,
+            "kv_cache_bytes": 4935680,
+            "split_vs_stock_max_abs_diff": 0.0,
+            "graph_vs_eager_max_abs_diff": 0.0,
+            "graph_scope": "denoising loop (prefix eager)"
+          },
+          {
+            "hf_model": "lerobot/smolvla_base",
+            "dtype": "fp16",
+            "batch": 1,
+            "cameras": 3,
+            "num_steps": 10,
+            "chunk_size": 50,
+            "params": 450046176,
+            "kv_cache_bytes": 4935680,
+            "split_vs_stock_max_abs_diff": 0.0,
+            "graph_vs_eager_max_abs_diff": 0.0,
+            "graph_scope": "denoising loop (prefix eager)"
+          },
+          {
+            "hf_model": "lerobot/smolvla_base",
+            "dtype": "fp16",
+            "batch": 1,
+            "cameras": 3,
+            "num_steps": 10,
+            "chunk_size": 50,
+            "params": 450046176,
+            "kv_cache_bytes": 4935680,
+            "split_vs_stock_max_abs_diff": 0.0,
+            "graph_vs_eager_max_abs_diff": 0.0,
+            "graph_scope": "denoising loop (prefix eager)"
+          },
+          {
+            "hf_model": "lerobot/smolvla_base",
+            "dtype": "fp16",
+            "batch": 1,
+            "cameras": 3,
+            "num_steps": 10,
+            "chunk_size": 50,
+            "params": 450046176,
+            "kv_cache_bytes": 4935680,
+            "split_vs_stock_max_abs_diff": 0.0,
+            "graph_vs_eager_max_abs_diff": 0.0,
+            "graph_scope": "denoising loop (prefix eager)"
+          }
+        ],
+        "profile": {},
+        "torch_threads": 16,
+        "affinity_cpus": 16
+      }
+    },
+    "time": "2026-11-18 00:19:18"
+  },
+  {
+    "config": "procs_act",
+    "hosting": "procs",
+    "policies": [
+      "act"
+    ],
+    "batch": 1,
+    "modes": [
+      "eager",
+      "graph"
+    ],
+    "duration_s": 15.0,
+    "warm_s": 5.0,
+    "mps": "",
+    "gpu_memory_used_after": "0 MiB",
+    "workers": {
+      "0": {
+        "worker": 0,
+        "pid": 3069758,
+        "policies": [
+          "act"
+        ],
+        "batch": 1,
+        "copies": [
+          {
+            "hf_model": "lerobot/act_aloha_sim_transfer_cube_human",
+            "dtype": "fp32",
+            "batch": 1,
+            "cameras": 1,
+            "image_input_hw": [
+              480,
+              640
+            ],
+            "chunk_size": 100,
+            "params": 51613582,
+            "graph_vs_eager_max_abs_diff": 0.0,
+            "graph_scope": "full step"
+          }
+        ],
+        "profile": {
+          "eager": {
+            "kernels_per_step": 373.0,
+            "memcpy_per_step": 3.0,
+            "gpu_busy_ms_per_step": 5.291026,
+            "gpu_busy_ms_per_step_corrected": 4.936675999999999,
+            "gpu_span_ms_per_step": 7.43892578125,
+            "kernel_dur_us_median": 1.696
+          },
+          "graph": {
+            "kernels_per_step": 375.0,
+            "memcpy_per_step": 0.0,
+            "gpu_busy_ms_per_step": 5.317247999999999,
+            "gpu_busy_ms_per_step_corrected": 4.960997999999999,
+            "gpu_span_ms_per_step": 4.34712109375,
+            "kernel_dur_us_median": 1.632
+          }
+        },
+        "torch_threads": 16,
+        "affinity_cpus": 16
+      }
+    },
+    "time": "2026-11-18 00:20:52"
+  },
+  {
+    "config": "procs_actx2",
+    "hosting": "procs",
+    "policies": [
+      "act",
+      "act"
+    ],
+    "batch": 1,
+    "modes": [
+      "eager",
+      "graph"
+    ],
+    "duration_s": 15.0,
+    "warm_s": 5.0,
+    "mps": "",
+    "gpu_memory_used_after": "0 MiB",
+    "workers": {
+      "0": {
+        "worker": 0,
+        "pid": 3071091,
+        "policies": [
+          "act"
+        ],
+        "batch": 1,
+        "copies": [
+          {
+            "hf_model": "lerobot/act_aloha_sim_transfer_cube_human",
+            "dtype": "fp32",
+            "batch": 1,
+            "cameras": 1,
+            "image_input_hw": [
+              480,
+              640
+            ],
+            "chunk_size": 100,
+            "params": 51613582,
+            "graph_vs_eager_max_abs_diff": 0.0,
+            "graph_scope": "full step"
+          }
+        ],
+        "profile": {},
+        "torch_threads": 16,
+        "affinity_cpus": 16
+      },
+      "1": {
+        "worker": 1,
+        "pid": 3071092,
+        "policies": [
+          "act"
+        ],
+        "batch": 1,
+        "copies": [
+          {
+            "hf_model": "lerobot/act_aloha_sim_transfer_cube_human",
+            "dtype": "fp32",
+            "batch": 1,
+            "cameras": 1,
+            "image_input_hw": [
+              480,
+              640
+            ],
+            "chunk_size": 100,
+            "params": 51613582,
+            "graph_vs_eager_max_abs_diff": 0.0,
+            "graph_scope": "full step"
+          }
+        ],
+        "profile": {},
+        "torch_threads": 16,
+        "affinity_cpus": 16
+      }
+    },
+    "time": "2026-11-18 00:22:24"
+  },
+  {
+    "config": "procs_actx4",
+    "hosting": "procs",
+    "policies": [
+      "act",
+      "act",
+      "act",
+      "act"
+    ],
+    "batch": 1,
+    "modes": [
+      "eager",
+      "graph"
+    ],
+    "duration_s": 15.0,
+    "warm_s": 5.0,
+    "mps": "",
+    "gpu_memory_used_after": "0 MiB",
+    "workers": {
+      "0": {
+        "worker": 0,
+        "pid": 3072658,
+        "policies": [
+          "act"
+        ],
+        "batch": 1,
+        "copies": [
+          {
+            "hf_model": "lerobot/act_aloha_sim_transfer_cube_human",
+            "dtype": "fp32",
+            "batch": 1,
+            "cameras": 1,
+            "image_input_hw": [
+              480,
+              640
+            ],
+            "chunk_size": 100,
+            "params": 51613582,
+            "graph_vs_eager_max_abs_diff": 0.0,
+            "graph_scope": "full step"
+          }
+        ],
+        "profile": {},
+        "torch_threads": 16,
+        "affinity_cpus": 16
+      },
+      "1": {
+        "worker": 1,
+        "pid": 3072659,
+        "policies": [
+          "act"
+        ],
+        "batch": 1,
+        "copies": [
+          {
+            "hf_model": "lerobot/act_aloha_sim_transfer_cube_human",
+            "dtype": "fp32",
+            "batch": 1,
+            "cameras": 1,
+            "image_input_hw": [
+              480,
+              640
+            ],
+            "chunk_size": 100,
+            "params": 51613582,
+            "graph_vs_eager_max_abs_diff": 0.0,
+            "graph_scope": "full step"
+          }
+        ],
+        "profile": {},
+        "torch_threads": 16,
+        "affinity_cpus": 16
+      },
+      "2": {
+        "worker": 2,
+        "pid": 3072660,
+        "policies": [
+          "act"
+        ],
+        "batch": 1,
+        "copies": [
+          {
+            "hf_model": "lerobot/act_aloha_sim_transfer_cube_human",
+            "dtype": "fp32",
+            "batch": 1,
+            "cameras": 1,
+            "image_input_hw": [
+              480,
+              640
+            ],
+            "chunk_size": 100,
+            "params": 51613582,
+            "graph_vs_eager_max_abs_diff": 0.0,
+            "graph_scope": "full step"
+          }
+        ],
+        "profile": {},
+        "torch_threads": 16,
+        "affinity_cpus": 16
+      },
+      "3": {
+        "worker": 3,
+        "pid": 3072661,
+        "policies": [
+          "act"
+        ],
+        "batch": 1,
+        "copies": [
+          {
+            "hf_model": "lerobot/act_aloha_sim_transfer_cube_human",
+            "dtype": "fp32",
+            "batch": 1,
+            "cameras": 1,
+            "image_input_hw": [
+              480,
+              640
+            ],
+            "chunk_size": 100,
+            "params": 51613582,
+            "graph_vs_eager_max_abs_diff": 0.0,
+            "graph_scope": "full step"
+          }
+        ],
+        "profile": {},
+        "torch_threads": 16,
+        "affinity_cpus": 16
+      }
+    },
+    "time": "2026-11-18 00:23:56"
+  },
+  {
+    "config": "procs-mps_actx2",
+    "hosting": "procs-mps",
+    "policies": [
+      "act",
+      "act"
+    ],
+    "batch": 1,
+    "modes": [
+      "eager",
+      "graph"
+    ],
+    "duration_s": 15.0,
+    "warm_s": 5.0,
+    "mps": "daemon up, servers: 3073866",
+    "gpu_memory_used_after": "66 MiB",
+    "workers": {
+      "0": {
+        "worker": 0,
+        "pid": 3073686,
+        "policies": [
+          "act"
+        ],
+        "batch": 1,
+        "copies": [
+          {
+            "hf_model": "lerobot/act_aloha_sim_transfer_cube_human",
+            "dtype": "fp32",
+            "batch": 1,
+            "cameras": 1,
+            "image_input_hw": [
+              480,
+              640
+            ],
+            "chunk_size": 100,
+            "params": 51613582,
+            "graph_vs_eager_max_abs_diff": 0.0,
+            "graph_scope": "full step"
+          }
+        ],
+        "profile": {},
+        "torch_threads": 16,
+        "affinity_cpus": 16
+      },
+      "1": {
+        "worker": 1,
+        "pid": 3073687,
+        "policies": [
+          "act"
+        ],
+        "batch": 1,
+        "copies": [
+          {
+            "hf_model": "lerobot/act_aloha_sim_transfer_cube_human",
+            "dtype": "fp32",
+            "batch": 1,
+            "cameras": 1,
+            "image_input_hw": [
+              480,
+              640
+            ],
+            "chunk_size": 100,
+            "params": 51613582,
+            "graph_vs_eager_max_abs_diff": 0.0,
+            "graph_scope": "full step"
+          }
+        ],
+        "profile": {},
+        "torch_threads": 16,
+        "affinity_cpus": 16
+      }
+    },
+    "time": "2026-11-18 00:25:30"
+  },
+  {
+    "config": "procs-mps_actx4",
+    "hosting": "procs-mps",
+    "policies": [
+      "act",
+      "act",
+      "act",
+      "act"
+    ],
+    "batch": 1,
+    "modes": [
+      "eager",
+      "graph"
+    ],
+    "duration_s": 15.0,
+    "warm_s": 5.0,
+    "mps": "daemon up, servers: 3073866",
+    "gpu_memory_used_after": "66 MiB",
+    "workers": {
+      "0": {
+        "worker": 0,
+        "pid": 3074653,
+        "policies": [
+          "act"
+        ],
+        "batch": 1,
+        "copies": [
+          {
+            "hf_model": "lerobot/act_aloha_sim_transfer_cube_human",
+            "dtype": "fp32",
+            "batch": 1,
+            "cameras": 1,
+            "image_input_hw": [
+              480,
+              640
+            ],
+            "chunk_size": 100,
+            "params": 51613582,
+            "graph_vs_eager_max_abs_diff": 0.0,
+            "graph_scope": "full step"
+          }
+        ],
+        "profile": {},
+        "torch_threads": 16,
+        "affinity_cpus": 16
+      },
+      "1": {
+        "worker": 1,
+        "pid": 3074654,
+        "policies": [
+          "act"
+        ],
+        "batch": 1,
+        "copies": [
+          {
+            "hf_model": "lerobot/act_aloha_sim_transfer_cube_human",
+            "dtype": "fp32",
+            "batch": 1,
+            "cameras": 1,
+            "image_input_hw": [
+              480,
+              640
+            ],
+            "chunk_size": 100,
+            "params": 51613582,
+            "graph_vs_eager_max_abs_diff": 0.0,
+            "graph_scope": "full step"
+          }
+        ],
+        "profile": {},
+        "torch_threads": 16,
+        "affinity_cpus": 16
+      },
+      "2": {
+        "worker": 2,
+        "pid": 3074655,
+        "policies": [
+          "act"
+        ],
+        "batch": 1,
+        "copies": [
+          {
+            "hf_model": "lerobot/act_aloha_sim_transfer_cube_human",
+            "dtype": "fp32",
+            "batch": 1,
+            "cameras": 1,
+            "image_input_hw": [
+              480,
+              640
+            ],
+            "chunk_size": 100,
+            "params": 51613582,
+            "graph_vs_eager_max_abs_diff": 0.0,
+            "graph_scope": "full step"
+          }
+        ],
+        "profile": {},
+        "torch_threads": 16,
+        "affinity_cpus": 16
+      },
+      "3": {
+        "worker": 3,
+        "pid": 3074656,
+        "policies": [
+          "act"
+        ],
+        "batch": 1,
+        "copies": [
+          {
+            "hf_model": "lerobot/act_aloha_sim_transfer_cube_human",
+            "dtype": "fp32",
+            "batch": 1,
+            "cameras": 1,
+            "image_input_hw": [
+              480,
+              640
+            ],
+            "chunk_size": 100,
+            "params": 51613582,
+            "graph_vs_eager_max_abs_diff": 0.0,
+            "graph_scope": "full step"
+          }
+        ],
+        "profile": {},
+        "torch_threads": 16,
+        "affinity_cpus": 16
+      }
+    },
+    "time": "2026-11-18 00:27:04"
+  },
+  {
+    "config": "threads_actx2",
+    "hosting": "threads",
+    "policies": [
+      "act",
+      "act"
+    ],
+    "batch": 1,
+    "modes": [
+      "eager",
+      "graph"
+    ],
+    "duration_s": 15.0,
+    "warm_s": 5.0,
+    "mps": "",
+    "gpu_memory_used_after": "0 MiB",
+    "workers": {
+      "0": {
+        "worker": 0,
+        "pid": 3075793,
+        "policies": [
+          "act",
+          "act"
+        ],
+        "batch": 1,
+        "copies": [
+          {
+            "hf_model": "lerobot/act_aloha_sim_transfer_cube_human",
+            "dtype": "fp32",
+            "batch": 1,
+            "cameras": 1,
+            "image_input_hw": [
+              480,
+              640
+            ],
+            "chunk_size": 100,
+            "params": 51613582,
+            "graph_vs_eager_max_abs_diff": 0.0,
+            "graph_scope": "full step"
+          },
+          {
+            "hf_model": "lerobot/act_aloha_sim_transfer_cube_human",
+            "dtype": "fp32",
+            "batch": 1,
+            "cameras": 1,
+            "image_input_hw": [
+              480,
+              640
+            ],
+            "chunk_size": 100,
+            "params": 51613582,
+            "graph_vs_eager_max_abs_diff": 0.0,
+            "graph_scope": "full step"
+          }
+        ],
+        "profile": {},
+        "torch_threads": 16,
+        "affinity_cpus": 16
+      }
+    },
+    "time": "2026-11-18 00:28:42"
+  },
+  {
+    "config": "threads_actx4",
+    "hosting": "threads",
+    "policies": [
+      "act",
+      "act",
+      "act",
+      "act"
+    ],
+    "batch": 1,
+    "modes": [
+      "eager",
+      "graph"
+    ],
+    "duration_s": 15.0,
+    "warm_s": 5.0,
+    "mps": "",
+    "gpu_memory_used_after": "0 MiB",
+    "workers": {
+      "0": {
+        "worker": 0,
+        "pid": 3076439,
+        "policies": [
+          "act",
+          "act",
+          "act",
+          "act"
+        ],
+        "batch": 1,
+        "copies": [
+          {
+            "hf_model": "lerobot/act_aloha_sim_transfer_cube_human",
+            "dtype": "fp32",
+            "batch": 1,
+            "cameras": 1,
+            "image_input_hw": [
+              480,
+              640
+            ],
+            "chunk_size": 100,
+            "params": 51613582,
+            "graph_vs_eager_max_abs_diff": 0.0,
+            "graph_scope": "full step"
+          },
+          {
+            "hf_model": "lerobot/act_aloha_sim_transfer_cube_human",
+            "dtype": "fp32",
+            "batch": 1,
+            "cameras": 1,
+            "image_input_hw": [
+              480,
+              640
+            ],
+            "chunk_size": 100,
+            "params": 51613582,
+            "graph_vs_eager_max_abs_diff": 0.0,
+            "graph_scope": "full step"
+          },
+          {
+            "hf_model": "lerobot/act_aloha_sim_transfer_cube_human",
+            "dtype": "fp32",
+            "batch": 1,
+            "cameras": 1,
+            "image_input_hw": [
+              480,
+              640
+            ],
+            "chunk_size": 100,
+            "params": 51613582,
+            "graph_vs_eager_max_abs_diff": 0.0,
+            "graph_scope": "full step"
+          },
+          {
+            "hf_model": "lerobot/act_aloha_sim_transfer_cube_human",
+            "dtype": "fp32",
+            "batch": 1,
+            "cameras": 1,
+            "image_input_hw": [
+              480,
+              640
+            ],
+            "chunk_size": 100,
+            "params": 51613582,
+            "graph_vs_eager_max_abs_diff": 0.0,
+            "graph_scope": "full step"
+          }
+        ],
+        "profile": {},
+        "torch_threads": 16,
+        "affinity_cpus": 16
+      }
+    },
+    "time": "2026-11-18 00:30:17"
+  },
+  {
+    "config": "batch_smolvlax4_b4",
+    "hosting": "batch",
+    "policies": [
+      "smolvla",
+      "smolvla",
+      "smolvla",
+      "smolvla"
+    ],
+    "batch": 4,
+    "modes": [
+      "eager",
+      "graph"
+    ],
+    "duration_s": 15.0,
+    "warm_s": 5.0,
+    "mps": "",
+    "gpu_memory_used_after": "0 MiB",
+    "workers": {
+      "0": {
+        "worker": 0,
+        "pid": 3077070,
+        "policies": [
+          "smolvla"
+        ],
+        "batch": 4,
+        "copies": [
+          {
+            "hf_model": "lerobot/smolvla_base",
+            "dtype": "fp16",
+            "batch": 4,
+            "cameras": 3,
+            "num_steps": 10,
+            "chunk_size": 50,
+            "params": 450046176,
+            "kv_cache_bytes": 19742720,
+            "split_vs_stock_max_abs_diff": 0.0,
+            "graph_vs_eager_max_abs_diff": 0.0,
+            "graph_scope": "denoising loop (prefix eager)"
+          }
+        ],
+        "profile": {},
+        "torch_threads": 16,
+        "affinity_cpus": 16
+      }
+    },
+    "time": "2026-11-18 00:31:59"
+  },
+  {
+    "config": "procs_smolvla+act",
+    "hosting": "procs",
+    "policies": [
+      "smolvla",
+      "act"
+    ],
+    "batch": 1,
+    "modes": [
+      "eager",
+      "graph"
+    ],
+    "duration_s": 15.0,
+    "warm_s": 5.0,
+    "mps": "",
+    "gpu_memory_used_after": "0 MiB",
+    "workers": {
+      "0": {
+        "worker": 0,
+        "pid": 3077729,
+        "policies": [
+          "smolvla"
+        ],
+        "batch": 1,
+        "copies": [
+          {
+            "hf_model": "lerobot/smolvla_base",
+            "dtype": "fp16",
+            "batch": 1,
+            "cameras": 3,
+            "num_steps": 10,
+            "chunk_size": 50,
+            "params": 450046176,
+            "kv_cache_bytes": 4935680,
+            "split_vs_stock_max_abs_diff": 0.0,
+            "graph_vs_eager_max_abs_diff": 0.0,
+            "graph_scope": "denoising loop (prefix eager)"
+          }
+        ],
+        "profile": {},
+        "torch_threads": 16,
+        "affinity_cpus": 16
+      },
+      "1": {
+        "worker": 1,
+        "pid": 3077730,
+        "policies": [
+          "act"
+        ],
+        "batch": 1,
+        "copies": [
+          {
+            "hf_model": "lerobot/act_aloha_sim_transfer_cube_human",
+            "dtype": "fp32",
+            "batch": 1,
+            "cameras": 1,
+            "image_input_hw": [
+              480,
+              640
+            ],
+            "chunk_size": 100,
+            "params": 51613582,
+            "graph_vs_eager_max_abs_diff": 0.0,
+            "graph_scope": "full step"
+          }
+        ],
+        "profile": {},
+        "torch_threads": 16,
+        "affinity_cpus": 16
+      }
+    },
+    "time": "2026-11-18 00:33:46"
+  },
+  {
+    "config": "procs-mps_smolvla+act",
+    "hosting": "procs-mps",
+    "policies": [
+      "smolvla",
+      "act"
+    ],
+    "batch": 1,
+    "modes": [
+      "eager",
+      "graph"
+    ],
+    "duration_s": 15.0,
+    "warm_s": 5.0,
+    "mps": "daemon up, servers: 3078583",
+    "gpu_memory_used_after": "66 MiB",
+    "workers": {
+      "0": {
+        "worker": 0,
+        "pid": 3078386,
+        "policies": [
+          "smolvla"
+        ],
+        "batch": 1,
+        "copies": [
+          {
+            "hf_model": "lerobot/smolvla_base",
+            "dtype": "fp16",
+            "batch": 1,
+            "cameras": 3,
+            "num_steps": 10,
+            "chunk_size": 50,
+            "params": 450046176,
+            "kv_cache_bytes": 4935680,
+            "split_vs_stock_max_abs_diff": 0.0,
+            "graph_vs_eager_max_abs_diff": 0.0,
+            "graph_scope": "denoising loop (prefix eager)"
+          }
+        ],
+        "profile": {},
+        "torch_threads": 16,
+        "affinity_cpus": 16
+      },
+      "1": {
+        "worker": 1,
+        "pid": 3078387,
+        "policies": [
+          "act"
+        ],
+        "batch": 1,
+        "copies": [
+          {
+            "hf_model": "lerobot/act_aloha_sim_transfer_cube_human",
+            "dtype": "fp32",
+            "batch": 1,
+            "cameras": 1,
+            "image_input_hw": [
+              480,
+              640
+            ],
+            "chunk_size": 100,
+            "params": 51613582,
+            "graph_vs_eager_max_abs_diff": 0.0,
+            "graph_scope": "full step"
+          }
+        ],
+        "profile": {},
+        "torch_threads": 16,
+        "affinity_cpus": 16
+      }
+    },
+    "time": "2026-11-18 00:35:26"
+  }
+]

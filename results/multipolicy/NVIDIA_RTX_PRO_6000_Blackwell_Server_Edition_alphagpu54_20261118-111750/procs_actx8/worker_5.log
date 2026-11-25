@@ -1,0 +1,5 @@
+WARNING:root:Unexpected key(s) when loading model: ['normalize_inputs.buffer_observation_images_top.mean', 'normalize_inputs.buffer_observation_images_top.std', 'normalize_inputs.buffer_observation_state.mean', 'normalize_inputs.buffer_observation_state.std', 'normalize_targets.buffer_action.mean', 'normalize_targets.buffer_action.std', 'unnormalize_outputs.buffer_action.mean', 'unnormalize_outputs.buffer_action.std']
+[w5] copy 0 act ready in 34.4s: {"graph_vs_eager_max_abs_diff": 0.0}
+[w5] eager copy 0 act         261 steps, median    38.32 ms
+[w5] graph copy 0 act         298 steps, median    33.66 ms
+[w5] loop  copy 0 act         302 steps, median    33.09 ms

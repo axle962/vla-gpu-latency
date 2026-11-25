@@ -1,0 +1,7 @@
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading  HuggingFaceTB/SmolVLM2-500M-Video-Instruct weights ...
+Reducing the number of VLM layers to 16 ...
+[w2] copy 0 smolvla ready in 47.1s: {"split_vs_stock_max_abs_diff": 0.0, "graph_vs_eager_max_abs_diff": 0.0}
+[w2] eager copy 0 smolvla      62 steps, median   161.72 ms
+[w2] graph copy 0 smolvla     120 steps, median    83.20 ms
+[w2] loop  copy 0 smolvla     209 steps, median    47.69 ms

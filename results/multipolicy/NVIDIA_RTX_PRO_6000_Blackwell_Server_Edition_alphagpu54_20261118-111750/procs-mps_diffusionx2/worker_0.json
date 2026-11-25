@@ -1,0 +1,25 @@
+{
+  "worker": 0,
+  "pid": 3437699,
+  "policies": [
+    "diffusion"
+  ],
+  "batch": 1,
+  "copies": [
+    {
+      "hf_model": "lerobot/diffusion_pusht",
+      "dtype": "fp32",
+      "batch": 1,
+      "cameras": 1,
+      "num_steps": 10,
+      "chunk_size": 16,
+      "params": 262709026,
+      "split_vs_stock_max_abs_diff": 0.0,
+      "graph_vs_eager_max_abs_diff": 0.0,
+      "graph_scope": "denoising loop (prefix eager)"
+    }
+  ],
+  "profile": {},
+  "torch_threads": 16,
+  "affinity_cpus": 16
+}

@@ -682,6 +682,20 @@ State:
     `envs/smolvla/bin/python model/robotwin_analysis.py > results/robotwin_analysis.md`
     (system python has no numpy). Team status page: `docs/status_2026-11-17.{html,pdf}`
     (artifact https://claude.ai/artifact/J7Y2PKjshfJbY6D6YNVV7D).
+- **Multi-policy hosting on one GPU (pending direction 6, 2026-11-18, Shrikar; branch
+  `shrikar/multipolicy-hosting`, `docs/multipolicy.md`):** `workloads/multipolicy.py` hosts N
+  copies of SmolVLA / ACT / Diffusion on one GPU as processes (with or without MPS), as threads
+  with one stream each, or batched, closed loop; `model/multipolicy_report.py` predicts each
+  hosted policy's latency from the solo step and its GPU busy time (two-station closed queueing
+  network, Bard-Schweitzer MVA). Quick matrix on an RTX PRO 6000 (Empire AI): eager SmolVLA
+  co-hosts 2x for free and 4x at 169 ms with MPS; graphed copies serialize and worse without
+  MPS (4 copies 191 ms, 3.1x) but overlap with MPS (86 ms, 46.5 steps/s, close to batch 4);
+  threads collapse on the GIL for eager (8x at 4). Full matrix (47 configs, N up to 8, plus
+  Diffusion): Diffusion is GPU bound by time (95% busy) but 8 copies under MPS give 4.9x the
+  throughput (small grids leave SMs idle); 8 graphed SmolVLA copies under MPS reach 72 steps/s,
+  within 11% of batch 8. Serialized model MAPE for processes without MPS: eager 16%, graph 21%
+  (time-slicing costs more than serialization, growing with kernel count); MPS sits far below
+  the model (needs an SM-sharing term). CIMS runs pending. CIMS runs 2026-11-23 (quick matrix, `docs/multipolicy.md`): 2080 Ti (cuda2), TITAN V (cuda3) and RTX 4070 (cuda5) confirm the picture; graphed SmolVLA x4 serializes without MPS (3.3x, 3.7x, 2.1x) and runs at 1.7x / 1.8x / 1.4x with it; MPS gain tracks the solo GPU share; model MAPE procs eager 5.5 / 6.7 / 3.2%, graph 15.4 / 12.5 / 16.0%.
 - **Next:**
   1. Paper and slides (deferred by the user until the teammates' work is merged): move the
      headline to `slot_drv` on four GPUs, add ACT/Diffusion (three regimes: dispatch bound,

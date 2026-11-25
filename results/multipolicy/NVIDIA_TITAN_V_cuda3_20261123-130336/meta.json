@@ -1,0 +1,25 @@
+{
+  "host": "cuda3.cims.nyu.edu",
+  "cpu": "Intel(R) Xeon(R) Gold 5118 CPU @ 2.30GHz",
+  "cpu_count": 48,
+  "affinity_cpus": 24,
+  "gpu": "NVIDIA TITAN V",
+  "driver": "580.196.07",
+  "gpu_memory_total": "12288 MiB",
+  "cuda_visible_devices": "0",
+  "torch": "2.10.0+cu128",
+  "cuda_runtime": "12.8",
+  "cuda_module_loading": "EAGER",
+  "slurm_job_id": "",
+  "profiler_bias_us": 0.95,
+  "policy_args": {
+    "cameras": 3,
+    "num_steps": 10,
+    "chunk_size": 50,
+    "diffusion_steps": 10,
+    "act_hw": [
+      480,
+      640
+    ]
+  }
+}

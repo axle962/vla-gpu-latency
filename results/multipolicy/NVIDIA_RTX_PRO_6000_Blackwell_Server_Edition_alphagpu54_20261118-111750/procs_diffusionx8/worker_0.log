@@ -1,0 +1,5 @@
+WARNING:root:Unexpected key(s) when loading model: ['normalize_inputs.buffer_observation_image.mean', 'normalize_inputs.buffer_observation_image.std', 'normalize_inputs.buffer_observation_state.max', 'normalize_inputs.buffer_observation_state.min', 'normalize_targets.buffer_action.max', 'normalize_targets.buffer_action.min', 'unnormalize_outputs.buffer_action.max', 'unnormalize_outputs.buffer_action.min']
+[w0] copy 0 diffusion ready in 41.1s: {"split_vs_stock_max_abs_diff": 0.0, "graph_vs_eager_max_abs_diff": 0.0}
+[w0] eager copy 0 diffusion     9 steps, median  1153.20 ms
+[w0] graph copy 0 diffusion     9 steps, median  1133.25 ms
+[w0] loop  copy 0 diffusion     9 steps, median  1123.86 ms
