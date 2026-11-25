@@ -41,9 +41,10 @@ show on LIBERO that the latency cut from CUDA graphs is worth up to 30 points of
 Robot policies built on vision-language models (OpenVLA~\cite{openvla}, $\pi_0$~\cite{pi0},
 SmolVLA~\cite{smolvla}, GR00T) are now deployed on a wide range of GPUs, and practitioners want
 to know how fast a policy will run on hardware they do not have. Public benchmarks show orderings
-that spec sheets do not explain: H200 slower than H100 on OpenVLA and GR00T, an RTX PRO 6000
-beating an H200 at small action chunks, and OpenVLA plateauing near the same latency on Hopper
-and Ada~\cite{yotta}. The recent analytical model VLA-Perf~\cite{vlaperf} is a per-operator
+that spec sheets do not explain: H200 slower than H100 on OpenVLA (273 vs 173\,ms) and GR00T
+(297 vs 180\,ms), an RTX PRO 6000 beating an H200 on Lingbot-VLA at small action chunks (460 vs
+583\,ms, reversing once the working set exceeds L2), and OpenVLA plateauing near 173\,ms on both
+the H100 and the PRO 6000 (B300: 73\,ms)~\cite{yotta}. The recent analytical model VLA-Perf~\cite{vlaperf} is a per-operator
 roofline over spec-sheet peaks and explicitly leaves kernel launch and runtime overheads
 unmodeled.
 
