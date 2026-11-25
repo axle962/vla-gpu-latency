@@ -68,7 +68,7 @@ autoregressive decoders (OpenVLA 3.6\%, $\pi_0$-FAST 2.1\%). Figure~\ref{fig:gra
 shows the predictions. The fitted values ($+0.52$, $-0.65$, $-0.35$ and $+0.80\,\mu$s) follow
 $\varepsilon = \delta_\text{node} - b$: with the node cost $\delta_\text{node}$ from our C++
 calibration and the profiler bias $b$ fitted independently by the cross-GPU model
-(Section~\ref{sec:crossgpu}), $\delta_\text{node} - b$ is $+0.43$, $-0.71$ and $+0.69\,\mu$s on
+(Section~\ref{sec:crossgpu}), $\delta_\text{node} - b$ is $+0.45$, $-0.71$ and $+0.69\,\mu$s on
 the 2080 Ti, A100 and TITAN V. $\varepsilon$ does not transfer across machines (leave GPU out,
 12.7\%) because $b$ is a property of each host's profiler. A utilization counter is a poor
 substitute: $1/\text{busy}$ is 16.9\% off and up to 62\% for single runs, because the busy
