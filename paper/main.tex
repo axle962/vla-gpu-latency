@@ -74,23 +74,29 @@ latencies on task success in simulation (Section~\ref{sec:success}).
 \textbf{Analytical GPU models.} Hong and Kim~\cite{hongkim} model memory-level and
 thread-level parallelism; GPUPerf~\cite{gpuperf} extends this to identify optimization
 potential; Wang, Liu and Chu~\cite{wang} predict performance under frequency scaling by
-cross-benchmarking. All target kernels that fill the GPU.
+cross-benchmarking. They are interpretable and need few parameters, but all target kernels
+that fill the GPU.
 \textbf{Static and program-level analysis.} Alavani, Varma and Sarkar~\cite{alavani} predict a
 CUDA kernel's execution time from static features of its code, and Muller and
 Hoffmann~\cite{muller} give a program logic that bounds a kernel's resource cost (divergence,
-uncoalesced accesses, bank conflicts). Both reason about one kernel in isolation; in our regime
+uncoalesced accesses, bank conflicts). Both predict without running the kernel, but they reason about one kernel in isolation; in
+our regime
 most of the step's time is outside any kernel body (dispatch, launch, node gaps).
 \textbf{Cross-GPU prediction for deep learning.} Habitat~\cite{habitat} predicts DNN
 training iteration time on a target GPU from a trace on a source GPU, scaling kernels by
-``wave scaling'' with GPU specs and using small MLPs for a few kernel types; it targets
+``wave scaling'' with GPU specs and using small MLPs for a few kernel types. Like our model it starts from measured kernels
+rather than spec sheets, but it targets
 training kernels that occupy the GPU and does not model host dispatch or CUDA graphs.
 Daydream~\cite{daydream} replays a dependency graph of CPU and GPU tasks to answer what-if
-questions on one machine; our two-timeline replay is the same idea, specialized to batch-1
+questions on one machine. It captures CPU-GPU dependencies, which spec models ignore, but
+stays on one machine; our two-timeline replay is the same idea, specialized to batch-1
 inference and moved across GPUs. Cycle-level simulators such as Accel-Sim~\cite{accelsim}
 are accurate but orders of magnitude too slow for 13{,}000-kernel steps on many targets.
 \textbf{VLA performance.} VLA-Perf~\cite{vlaperf} predicts an upper bound with
 $T_o = \max(\mathrm{FLOPs}_o/P, \mathrm{Bytes}_o/B)$ per operator, validated on one platform
-($\pi_0$ on an RTX 4090, 73 to 83\% fidelity). Real-time VLA work~\cite{realtime} reports about
+($\pi_0$ on an RTX 4090, 73 to 83\% fidelity). It needs only spec sheets and so covers any GPU,
+but it leaves launch and runtime overheads unmodeled by design, which is where batch-1 time
+goes. Real-time VLA work~\cite{realtime} reports about
 2$\times$ from CUDA graphs on $\pi_0$, but no one predicts when graphs pay off.
 \textbf{Launch overhead and CUDA graphs.} CUDA graphs~\cite{cudagraphs} record a sequence of
 kernels once and replay it with one launch, removing per-kernel CPU launch cost; PyTorch
@@ -429,16 +435,24 @@ GPUs), while bandwidth-bound streamcluster is within 2.5\%. Our model is built f
 latency-bound regime and complements rooflines rather than replacing them.
 
 \section{Conclusions}
-For batch-1 VLA inference, latency prediction across GPUs is a launch and latency problem
-before it is a bandwidth or FLOP problem. A model that replays the host and GPU timelines,
-corrects profiler bias, and transfers per-kernel graph slots with a handful of target
-microbenchmarks predicts the graphed loop within 9 to 16\% and the hybrid step within 5 to
-18\% across four GPU generations and six policies (all but Diffusion Policy), where spec
-bandwidth scaling is off by 58 to 96\% for SmolVLA, $\pi_0$, $\pi_{0.5}$ and ACT, and it reproduces orderings that spec ratios get wrong. CUDA-graph speedup
-is a property of the host-GPU pair and is predictable from eager mode alone within 2\%. Running a
-policy's halves on separate devices is additive and predictable but buys no latency; one GPU
-used well (a second stream, or MPS for several policies) already provides the capacity. Faster
-inference matters for success on delay-sensitive tasks.
+\begin{itemize}
+\item \textbf{At batch 1, VLA latency is a launch and per-kernel latency problem, not a
+bandwidth or FLOP problem.} A model that replays the host and GPU timelines, corrects profiler
+bias and transfers per-kernel graph slots with a handful of target microbenchmarks predicts the
+graphed loop within 9 to 16\% and the hybrid step within 5 to 18\% across four GPU generations
+and six policies (all but Diffusion Policy), where spec bandwidth scaling is off by 58 to 96\%
+for SmolVLA, $\pi_0$, $\pi_{0.5}$ and ACT, and it reproduces GPU orderings that spec ratios
+get wrong.
+\item \textbf{The benefit of CUDA graphs is a property of the host-GPU pair, and it can be
+predicted before capturing.} From eager mode alone and one calibration run per machine, the
+graph speedup is predicted within 2\% (1.8\% MAPE over 114 held-out runs), and the capture
+decision is right for at least 94\% of runs at every threshold.
+\item \textbf{One GPU used well beats spreading a policy over devices, and the latency it
+saves matters.} Splitting a policy's halves across devices is additive and predictable within
+2.5\% but buys no latency; a second stream (1.55$\times$ throughput) or MPS for several
+policies already provides the capacity, and on delay-sensitive LIBERO tasks the latency cut
+from CUDA graphs is worth up to 30 points of success.
+\end{itemize}
 
 \textbf{Limitations.} One host per GPU, and the eager host model does not transfer to a much
 slower host (the RTX 4070 on cuda5). Kernel-level transfer fails when libraries change

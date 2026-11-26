@@ -4,6 +4,9 @@ NYU GPU Architecture and Programming, Fall 2026, Project 2 (flavor B)
 Team: Aditya Maddur Guruprakash, Archana Jayakumar, Shrikar Madhu
 
 Report: paper/main.pdf (LaTeX source paper/main.tex plus paper/*_section.tex).
+Submission zip: scripts/make_submission_zip.sh (git-tracked files only, ~625 MB with traces/);
+scripts/make_submission_zip.sh --no-traces (~12 MB) if the upload limit is smaller. The traces
+(per-run kernel lists the models read) are then in https://github.com/axle962/vla-gpu-latency.
 
 Everything below runs on the CIMS CUDA machines (tested on cuda2 = 2x RTX 2080 Ti, cuda3 =
 TITAN V, cuda5 = RTX 4070). Only CUDA 12.4 (module cuda-12.4) and Python packages installed
