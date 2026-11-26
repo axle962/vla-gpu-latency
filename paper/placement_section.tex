@@ -5,7 +5,8 @@
 
 A flow-matching VLA step has two halves joined by one handoff: the prefix (vision tower and
 VLM, run once, filling the KV cache) and the action-expert loop (ten flow steps over that
-cache). We host each half on its own device and time the parts and the whole step for five
+cache). Like layer-level partitioning between a phone and the cloud~\cite{neurosurgeon}, but within one
+machine, we host each half on its own device and time the parts and the whole step for five
 placements: both halves on one GPU, prefix and loop on two GPUs, loop on the host CPU, prefix
 on the host CPU, and CPU only. GPUs run FP16 and the CPU FP32. We measure on two machines:
 cuda2 (RTX 2080 Ti, Xeon E5-2660 v3, 20 threads pinned to the GPU's NUMA node) and a cloud node

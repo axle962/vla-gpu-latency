@@ -74,8 +74,9 @@ latencies on task success in simulation (Section~\ref{sec:success}).
 \textbf{Analytical GPU models.} Hong and Kim~\cite{hongkim} model memory-level and
 thread-level parallelism; GPUPerf~\cite{gpuperf} extends this to identify optimization
 potential; Wang, Liu and Chu~\cite{wang} predict performance under frequency scaling by
-cross-benchmarking. They are interpretable and need few parameters, but all target kernels
-that fill the GPU.
+cross-benchmarking; the roofline model~\cite{roofline} bounds a kernel by peak compute and
+memory bandwidth. They are interpretable and need few parameters, but all target kernels that
+fill the GPU.
 \textbf{Static and program-level analysis.} Alavani, Varma and Sarkar~\cite{alavani} predict a
 CUDA kernel's execution time from static features of its code, and Muller and
 Hoffmann~\cite{muller} give a program logic that bounds a kernel's resource cost (divergence,
@@ -92,6 +93,16 @@ questions on one machine. It captures CPU-GPU dependencies, which spec models ig
 stays on one machine; our two-timeline replay is the same idea, specialized to batch-1
 inference and moved across GPUs. Cycle-level simulators such as Accel-Sim~\cite{accelsim}
 are accurate but orders of magnitude too slow for 13{,}000-kernel steps on many targets.
+\textbf{Inference latency prediction and serving.} nn-Meter~\cite{nnmeter} predicts DNN
+inference latency on edge devices from kernel-level predictors built by measuring fused
+kernels on each device; it captures runtime fusion, but each new device needs its own
+measurement campaign and the host-side framework cost is not modeled. Clockwork~\cite{clockwork}
+observes that DNN inference times are predictable and builds a serving system on that; it
+predicts on the GPU it measured, not across GPUs.
+\textbf{Partitioning and pipelining.} Neurosurgeon~\cite{neurosurgeon} splits a DNN between a
+mobile device and the cloud at a layer boundary chosen from per-layer latency and energy
+predictions. It picks the split automatically, but there the network link dominates; our split
+is within one machine, where the handoff is about 1\,ms and host dispatch dominates.
 \textbf{VLA performance.} VLA-Perf~\cite{vlaperf} predicts an upper bound with
 $T_o = \max(\mathrm{FLOPs}_o/P, \mathrm{Bytes}_o/B)$ per operator, validated on one platform
 ($\pi_0$ on an RTX 4090, 73 to 83\% fidelity). It needs only spec sheets and so covers any GPU,
@@ -100,7 +111,10 @@ goes. Real-time VLA work~\cite{realtime} reports about
 2$\times$ from CUDA graphs on $\pi_0$, but no one predicts when graphs pay off.
 \textbf{Launch overhead and CUDA graphs.} CUDA graphs~\cite{cudagraphs} record a sequence of
 kernels once and replay it with one launch, removing per-kernel CPU launch cost; PyTorch
-exposes them for static-shape regions~\cite{ptgraphs}. Their benefit depends on how much of
+exposes them for static-shape regions~\cite{ptgraphs}, \texttt{torch.compile}~\cite{pytorch2}
+fuses operators into fewer kernels and can wrap the result in a graph, and LLM serving engines
+such as vLLM~\cite{vllm} capture decoding steps as graphs. These tools apply graphs; none
+predicts beforehand whether a region is worth capturing. Their benefit depends on how much of
 the step is CPU-side launch and framework overhead, which we measure and model directly.
 \textbf{Sharing a GPU.} For several policies on one GPU we use a closed queueing network solved
 by approximate mean value analysis~\cite{mva,schweitzer}.
@@ -367,7 +381,7 @@ loop's graph speedup falls below 2$\times$ at batch 10 on the TITAN V and 16 on 
 With $b$ and $p$ fitted at batch 1 the same-GPU predictions stay within 5\% at every batch;
 cross-GPU the graph loop is within 6 to 18\% up to batch 8 and 27\% at batch 16, where larger
 GEMMs make tensor-core throughput, absent from our slot ratios, matter.
-\textbf{torch.compile.} Inductor fuses the 10-step loop from about 11.5k to 3.2k kernels;
+\textbf{torch.compile.} Inductor~\cite{pytorch2} fuses the 10-step loop from about 11.5k to 3.2k kernels;
 compiled plus CUDA graphs runs about 2$\times$ faster than our manual graph (2080 Ti 20.8 vs
 40.1\,ms, TITAN V 30.9 vs 61.4, RTX 4070 13.8 vs 22.8). Our model, applied to the source's
 compiled trace, predicts the compiled graph with 12\% MAPE at batch 1.
@@ -490,6 +504,23 @@ pp.~503--521.
 Efficacy of Optimizations for DNN Training. USENIX ATC 2020, pp.~337--352.
 \bibitem{accelsim} M.~Khairy, Z.~Shen, T.~M.~Aamodt, T.~G.~Rogers. Accel-Sim: An Extensible
 Simulation Framework for Validated GPU Modeling. ISCA 2020.
+\bibitem{roofline} S.~Williams, A.~Waterman, D.~Patterson. Roofline: An Insightful Visual
+Performance Model for Multicore Architectures. Communications of the ACM 52(4):65--76, 2009.
+doi:10.1145/1498765.1498785
+\bibitem{nnmeter} L.~L.~Zhang, S.~Han, J.~Wei, N.~Zheng, T.~Cao, Y.~Yang, Y.~Liu. nn-Meter:
+Towards Accurate Latency Prediction of Deep-Learning Model Inference on Diverse Edge Devices.
+MobiSys 2021.
+\bibitem{clockwork} A.~Gujarati, R.~Karimi, S.~Alzayat, W.~Hao, A.~Kaufmann, Y.~Vigfusson,
+J.~Mace. Serving DNNs like Clockwork: Performance Predictability from the Bottom Up. OSDI 2020.
+\bibitem{neurosurgeon} Y.~Kang, J.~Hauswald, C.~Gao, A.~Rovinski, T.~Mudge, J.~Mars, L.~Tang.
+Neurosurgeon: Collaborative Intelligence Between the Cloud and Mobile Edge. ASPLOS 2017,
+pp.~615--629. doi:10.1145/3037697.3037698
+\bibitem{pytorch2} J.~Ansel et al. PyTorch 2: Faster Machine Learning Through Dynamic Python
+Bytecode Transformation and Graph Compilation. ASPLOS 2024, pp.~929--947.
+doi:10.1145/3620665.3640366
+\bibitem{vllm} W.~Kwon, Z.~Li, S.~Zhuang, Y.~Sheng, L.~Zheng, C.~H.~Yu, J.~E.~Gonzalez,
+H.~Zhang, I.~Stoica. Efficient Memory Management for Large Language Model Serving with
+PagedAttention. SOSP 2023. doi:10.1145/3600006.3613165
 \bibitem{cudagraphs} A.~Gray. Getting Started with CUDA Graphs. NVIDIA Technical Blog, 2019.
 \url{https://developer.nvidia.com/blog/cuda-graphs/}
 \bibitem{ptgraphs} Accelerating PyTorch with CUDA Graphs. PyTorch Blog, 2021.
